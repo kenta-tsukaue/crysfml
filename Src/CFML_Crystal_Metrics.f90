@@ -1484,7 +1484,7 @@
     !!----
     !!---- Update: November - 2008
     !!----
-    Subroutine Get_Conventional_Cell(Twofold,Cell,Tr,Message,Ok,told)
+    Subroutine Get_Conventional_Cell(Twofold,Cell,Tr,Message,Ok,lattice,told)
        !---- Arguments ----!
        Type(Twofold_Axes_Type), intent(in)  :: Twofold
        Type(Crystal_Cell_Type), intent(out) :: Cell
@@ -1492,6 +1492,7 @@
        character(len=*),        intent(out) :: message
        logical,                 intent(out) :: ok
        real(kind=cp), optional, intent(in)  :: told
+       character(len=2), optional, intent(out) :: lattice
 
        !---- Local variables ----!
        integer, dimension(1)          :: ix
@@ -1586,17 +1587,21 @@
              Select Case (namina)
                 Case(1)
                    message="Monoclinic, primitive cell"
+                   if (present(lattice)) lattice="mP"
                 Case(2)
                    rw=matmul((/0,1,1/),tr)
                    if (.not. co_prime(rw,3)) then
                       message="Monoclinic, A-centred cell"
+                      if (present(lattice)) lattice="mA"
                    else
                       rw=matmul((/1,1,1/),tr)
                       if (.not. co_prime(rw,3)) then
                          message="Monoclinic, I-centred cell"
+                         if (present(lattice)) lattice="mI"
                       else
                          rw=matmul((/1,1,0/),tr)
                          if(.not. co_prime(rw,3)) message="Monoclinic, C-centred cell"
+                         if (present(lattice)) lattice="mC"
                       end if
                    end if
 
@@ -1647,28 +1652,35 @@
                 Select Case (namina)
                    Case(1)
                       message="Orthorhombic, Primitive cell"
-
+                      if (present(lattice)) lattice="oP"
                    Case(2)
                       rw=matmul((/0,1,1/),tr)
                       if (.not. co_prime(rw,3)) then
                          message="Orthorhombic, A-centred cell"
+                         if (present(lattice)) lattice="oA"
                       else
                          rw=matmul((/1,1,1/),tr)
                          if (.not. co_prime(rw,3)) then
                             message="Orthorhombic, I-centred cell"
+                            if (present(lattice)) lattice="oI"
                          else
                             rw=matmul((/1,1,0/),tr)
                             if (.not. co_prime(rw,3)) then
                                message="Orthorhombic, C-centred cell"
+                               if (present(lattice)) lattice="oC"
                             else
                                rw=matmul((/1,0,1/),tr)
-                               if (.not. co_prime(rw,3)) message="Orthorhombic, B-centred cell"
+                               if (.not. co_prime(rw,3)) then
+                                 message="Orthorhombic, B-centred cell"
+                                 if (present(lattice)) lattice="oB"
+                               end if
                             end if
                          end if
                       end if
 
                    Case(3:)
                       message="Orthorhombic, F-centred cell"
+                      if (present(lattice)) lattice="oF"
                 End Select
 
              else !Rhombohedral/Trigonal
@@ -1765,12 +1777,15 @@
                       Select Case (namina)
                          case(1)
                             message="Primitive hexagonal cell"
+                            if (present(lattice)) lattice="hP"
                          case(3)
                             rw=matmul((/2,1,1/),tr)
                             if (.not. co_prime(rw,3)) then
                                message="Rhombohedral, obverse setting cell"
+                               if (present(lattice)) lattice="hR"
                             else
                                message="Rhombohedral, reverse setting cell"
+                               if (present(lattice)) lattice="hR"
                             end if
                       End Select
 
@@ -1841,8 +1856,10 @@
              Select Case (namina)
                 Case(1)
                    message="Tetragonal, Primitive cell"
+                   if (present(lattice)) lattice="tP"
                 Case(2)
                    message="Tetragonal, I-centred cell"
+                   if (present(lattice)) lattice="tI"
                 Case(3:)
                    message="Error in tetragonal cell"
                    ok=.false.
@@ -1911,8 +1928,10 @@
                 Select Case (namina)
                    Case(1)
                       message="Hexagonal, Primitive cell"
+                      if (present(lattice)) lattice="hP"
                    Case(2:)
                       message="Hexagonal, centred cell? possible mistake"
+                      if (present(lattice)) lattice="hX"
                 End Select
 
              else
@@ -1966,27 +1985,35 @@
                   return
                 Case(1)
                    message="Cubic, Primitive cell"
+                   if (present(lattice)) lattice="cP"
                 Case(2)
                    rw=matmul((/0,1,1/),tr)
                    if (.not. co_prime(rw,3)) then
                       message="Cubic, A-centred cell"
+                      if (present(lattice)) lattice="cA"
                    else
                       rw=matmul((/1,1,1/),tr)
                       if (.not. co_prime(rw,3)) then
                          message="Cubic, I-centred cell"
+                         if (present(lattice)) lattice="cI"
                       else
                          rw=matmul((/1,1,0/),tr)
                          if (.not. co_prime(rw,3)) then
                             message="Cubic, C-centred cell"
+                            if (present(lattice)) lattice="cC"
                          else
                             rw=matmul((/1,0,1/),tr)
-                            if (.not. co_prime(rw,3)) message="Cubic, B-centred cell"
+                            if (.not. co_prime(rw,3)) then
+                              message="Cubic, B-centred cell"
+                              if (present(lattice)) lattice="cB"
+                            end if
                          end if
                       end if
                    end if
 
                 Case(3:)
                   message="Cubic, F-centred cell"
+                  if (present(lattice)) lattice="cF"
              End Select
 
           case default
