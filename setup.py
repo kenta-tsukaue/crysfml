@@ -5,6 +5,7 @@ import shutil
 import struct
 import sys
 import setuptools
+import distutils.sysconfig as sysconfig
 from distutils.core import setup
 from distutils.command.install_data import install_data
 from subprocess import CalledProcessError, check_output, check_call
