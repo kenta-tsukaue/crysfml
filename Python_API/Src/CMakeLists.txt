@@ -117,7 +117,7 @@ if(NOT PYSETUP)
         COMMAND
         ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_FILENAME}
-        ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api
+        ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api/${LIBRARY_FILENAME}
         )
     add_dependencies(Python_SO_Files ${LIBRARY_NAME})
 endif()
