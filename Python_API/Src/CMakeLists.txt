@@ -34,7 +34,7 @@ add_dependencies(${LIBRARY_NAME} crysfml_common)
 
 set(Python3_USE_STATIC_LIBS, ON)
 find_package(Python3 COMPONENTS Interpreter Development)
-set(PYTHON_INTERPRETER_PATH ${Python3_EXECUTABLE})
+#set(PYTHON_INTERPRETER_PATH ${Python3_EXECUTABLE})
 
 if(WIN32 OR MSYS)
     target_link_libraries(${LIBRARY_NAME} Python3::Python)
@@ -97,7 +97,7 @@ endif (DOXYGEN_FOUND)
 # Tests
 #################################
 # Add tests
-add_test(NAME "Python_API_Tests" COMMAND ${PYTHON_INTERPRETER_PATH} -m unittest discover ${CMAKE_CURRENT_BINARY_DIR}/../Tests)
+add_test(NAME "Python_API_Tests" COMMAND ${Python3_EXECUTABLE} -m unittest discover ${CMAKE_CURRENT_BINARY_DIR}/../Tests)
 if(PYSETUP)
     add_custom_target(Python_Files ALL
         COMMAND
@@ -122,10 +122,17 @@ else()
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api
 
+        # COMMAND
+        # ${CMAKE_COMMAND} -E copy
+        # ${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_FILENAME}
+        # ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api/${LIBRARY_FILENAME}
+
+        # Make this the same as previously implemented.
         COMMAND
         ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_FILENAME}
-        ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api/${LIBRARY_FILENAME}
+        ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api
+
         )
 endif()
 
