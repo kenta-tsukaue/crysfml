@@ -20,6 +20,8 @@ from setuptools.command.install_scripts import install_scripts
 try:
     from find_libpython import find_libpython
     p_lib = find_libpython()
+    if os.environ.get('FLIP_SLASHES', False):
+        p_lib = p_lib.replace('\\', '/')
     if p_lib is not None:
         python_lib_path = f'-DPYTHON_LIBRARY_PATH={p_lib}'
     else:
@@ -57,10 +59,8 @@ if os.environ.get('FC', False):
     COMPILER = os.environ.get('FC')
 print(f'Compiler set to: {COMPILER}')
 CFML_OVERRIDE = []
-if os.environ.get('CMAKE_Fortran_COMPILER', False):
-    CFML_OVERRIDE.append(f"-DCMAKE_Fortran_COMPILER={os.environ.get('CMAKE_Fortran_COMPILER')}")
 if os.environ.get('CMAKE_GENERATOR', False):
-    CFML_OVERRIDE.append(f"-G\"{os.environ.get('CMAKE_GENERATOR')}\"")
+    CFML_OVERRIDE += ["-G", f"{os.environ.get('CMAKE_GENERATOR')}"]
 
 
 # We can use cmake provided from pip which (normally) gets installed at /bin
@@ -268,8 +268,8 @@ class BuildCMakeExt(build_ext):
             '-B' + self.build_temp,
             f'-DPYTHON_INTERPRETER_PATH={sys.executable}',
             python_lib_path,
+            f"-DCMAKE_Fortran_COMPILER={COMPILER}",
             "-DARCH32=OFF",
-            "-DCMAKE_Fortran_COMPILER={}".format(COMPILER),
             "-DPYTHON_API=ON",
             "-DUSE_HDF=OFF",
             "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm

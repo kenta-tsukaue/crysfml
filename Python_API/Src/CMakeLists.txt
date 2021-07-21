@@ -110,7 +110,7 @@ endif (DOXYGEN_FOUND)
 # Tests
 #################################
 # Add tests
-add_test(NAME "Python_API_Tests" COMMAND ${Python3_EXECUTABLE} -m unittest discover ${CMAKE_CURRENT_BINARY_DIR}/../Tests)
+add_test(NAME "Python_API_Tests" COMMAND ${PYTHON_INTERPRETER_PATH} -m unittest discover ${CMAKE_CURRENT_BINARY_DIR}/../Tests)
 if(PYSETUP)
     add_custom_target(Python_Files ALL
         COMMAND
