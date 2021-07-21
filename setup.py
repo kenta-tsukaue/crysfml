@@ -56,7 +56,12 @@ COMPILER = 'gfortran'
 if os.environ.get('FC', False):
     COMPILER = os.environ.get('FC')
 print(f'Compiler set to: {COMPILER}')
-CFML_OVERRIDE = [os.environ.get('CFML_OVERRIDE', '')]
+CFML_OVERRIDE = []
+if os.environ.get('CMAKE_Fortran_COMPILER', False):
+    CFML_OVERRIDE.append(f"-DCMAKE_Fortran_COMPILER={os.environ.get('CMAKE_Fortran_COMPILER')}")
+if os.environ.get('CMAKE_GENERATOR', False):
+    CFML_OVERRIDE.append(f"-G\"{os.environ.get('CMAKE_GENERATOR')}\"")
+
 
 # We can use cmake provided from pip which (normally) gets installed at /bin
 # Except that in the manylinux builds it's placed at /opt/python/[version]/bin/
