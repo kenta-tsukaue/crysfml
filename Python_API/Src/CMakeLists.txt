@@ -32,12 +32,25 @@ set_source_files_properties(forpy_mod.f90 PROPERTIES COMPILE_FLAG "-cpp")
 # See https://gitlab.kitware.com/cmake/cmake/-/issues/19226 for linking
 add_dependencies(${LIBRARY_NAME} crysfml_common)
 
-set(Python3_USE_STATIC_LIBS, ON)
-find_package(Python3 COMPONENTS Interpreter Development)
-#set(PYTHON_INTERPRETER_PATH ${Python3_EXECUTABLE})
+if (NOT PYTHON_INTERPRETER_PATH) OR (NOT PYTHON_LIBRARY_PATH)
+  set(Python3_USE_STATIC_LIBS, TRUE)
+  find_package(Python3 COMPONENTS Interpreter Development)
+  set(PYTHON_INTERPRETER_PATH ${Python3_EXECUTABLE})
+  set(PYTHON_LIBRARY_PATH Python3::Python)
+  message(STATUS "Using Python interpreter found with PYTHON_INTERPRETER_PATH variable: " ${PYTHON_INTERPRETER_PATH})
+  message(STATUS "Linking Python extension with found PYTHON_LIBRARY_PATH variable: " ${PYTHON_LIBRARY_PATH})
+else()
+  message(STATUS "Using Python interpreter provided with PYTHON_INTERPRETER_PATH variable: " ${PYTHON_INTERPRETER_PATH})
+  message(STATUS "Linking Python extension with provided PYTHON_LIBRARY_PATH variable: " ${PYTHON_LIBRARY_PATH})
+endif()
+
+
+
 
 if(WIN32 OR MSYS)
-    target_link_libraries(${LIBRARY_NAME} Python3::Python)
+  add_library(Python3_LIB STATIC IMPORTED)
+  set_property(TARGET Python3_LIB PROPERTY IMPORTED_LOCATION ${PYTHON_LIBRARY_PATH})
+  target_link_libraries(${LIBRARY_NAME} Python3_LIB)
 endif()
 
 # Set -Wl,-undefined,dynamic_lookup to OTHER_LDFLAGS
@@ -122,17 +135,10 @@ else()
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api
 
-        # COMMAND
-        # ${CMAKE_COMMAND} -E copy
-        # ${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_FILENAME}
-        # ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api/${LIBRARY_FILENAME}
-
-        # Make this the same as previously implemented.
         COMMAND
         ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_FILENAME}
-        ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api
-
+        ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api/${LIBRARY_FILENAME}
         )
 endif()
 
@@ -144,9 +150,9 @@ add_dependencies(Python_Files ${LIBRARY_NAME})
 # The rules for installing the library.
 install(DIRECTORY "" DESTINATION ${PYTHON_API_PREFIX}/CFML_api FILES_MATCHING PATTERN "*.py" PATTERN "Extensions" EXCLUDE)
 if(WIN32 OR MSYS)
-install(TARGETS ${LIBRARY_NAME} RUNTIME DESTINATION ${PYTHON_API_PREFIX}/CFML_api)
+    install(TARGETS ${LIBRARY_NAME} RUNTIME DESTINATION ${PYTHON_API_PREFIX}/CFML_api)
 else()
-install(TARGETS ${LIBRARY_NAME} LIBRARY DESTINATION ${PYTHON_API_PREFIX}/CFML_api)
+    install(TARGETS ${LIBRARY_NAME} LIBRARY DESTINATION ${PYTHON_API_PREFIX}/CFML_api)
 endif()
 
 # Installing example files
