@@ -18,6 +18,21 @@ from setuptools.command.install_lib import install_lib
 from setuptools.command.install_scripts import install_scripts
 
 try:
+    from find_libpython import find_libpython
+    p_lib = find_libpython()
+    if p_lib is not None:
+        python_lib_path = f'-DPYTHON_LIBRARY_PATH={p_lib}'
+    else:
+        python_lib_path = ''
+except ImportError:
+    p_dir = sysconfig.get_config_var("LIBDIR")
+    p_lib = sysconfig.get_config_var("INSTSONAME")
+    if p_dir is None or p_lib is None:
+        python_lib_path = ''
+    else:
+        python_lib_path = f'-DPYTHON_LIBRARY_PATH={os.path.join(p_dir, p_lib)}'
+
+try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
     # this overrides standard naming of the wheel to not include
     # architecture or python dot version number
@@ -41,6 +56,7 @@ COMPILER = 'gfortran'
 if os.environ.get('FC', False):
     COMPILER = os.environ.get('FC')
 print(f'Compiler set to: {COMPILER}')
+CFML_OVERRIDE = [os.environ.get('CFML_OVERRIDE', '')]
 
 # We can use cmake provided from pip which (normally) gets installed at /bin
 # Except that in the manylinux builds it's placed at /opt/python/[version]/bin/
@@ -245,7 +261,8 @@ class BuildCMakeExt(build_ext):
         cmake_args = [
             '-H' + SOURCE_DIR,
             '-B' + self.build_temp,
-            "-DPython3_ROOT_DIR={}".format(os.path.abspath(os.path.join(sys.executable, '..', '..'))),
+            f'-DPYTHON_INTERPRETER_PATH={sys.executable}',
+            python_lib_path,
             "-DARCH32=OFF",
             "-DCMAKE_Fortran_COMPILER={}".format(COMPILER),
             "-DPYTHON_API=ON",
@@ -253,7 +270,7 @@ class BuildCMakeExt(build_ext):
             "-DCMAKE_BUILD_TYPE={}".format(cfg),  # not used on MSVC, but no harm
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(os.path.join(build_dir), 'Release'),
             "-DPYSETUP=ON"
-        ]
+        ] + CFML_OVERRIDE
         build_args = []
 
         check_call(
