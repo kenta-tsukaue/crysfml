@@ -98,7 +98,8 @@ endif (DOXYGEN_FOUND)
 #################################
 # Add tests
 add_test(NAME "Python_API_Tests" COMMAND ${PYTHON_INTERPRETER_PATH} -m unittest discover ${CMAKE_CURRENT_BINARY_DIR}/../Tests)
-add_custom_target(Python_Files ALL
+if(PYSETUP)
+    add_custom_target(Python_Files ALL
         COMMAND
         ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/../Tests
@@ -109,18 +110,26 @@ add_custom_target(Python_Files ALL
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api
         )
+else()
+    add_custom_target(Python_Files ALL
+        COMMAND
+        ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Tests
+        ${CMAKE_CURRENT_BINARY_DIR}/../Tests
 
-add_dependencies(Python_Files ${LIBRARY_NAME})
+        COMMAND
+        ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api
 
-if(NOT PYSETUP)
-    add_custom_target(Python_SO_Files ALL
         COMMAND
         ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_FILENAME}
         ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api/${LIBRARY_FILENAME}
         )
-    add_dependencies(Python_SO_Files ${LIBRARY_NAME})
 endif()
+
+add_dependencies(Python_Files ${LIBRARY_NAME})
 
 #################################
 # Install section
