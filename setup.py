@@ -5,6 +5,7 @@ import pkgutil
 import shutil
 import struct
 import sys
+import platform
 import setuptools
 import distutils.sysconfig as sysconfig
 from distutils.core import setup
@@ -46,7 +47,8 @@ try:
 
         def get_tag(self):
             python, abi, plat = _bdist_wheel.get_tag(self)
-            python, abi = 'py3', 'none'
+            if platform.system() != 'Windows':
+                python, abi = 'py3', 'none'
             return python, abi, plat
 except ImportError:
     Bdist_wheel = None
