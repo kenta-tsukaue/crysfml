@@ -89,8 +89,8 @@ set(CRYSFML_COMMON_SOURCES
 set_source_files_properties(${CRYSFML_COMMON_SOURCES} PROPERTIES COMPILE_FLAGS ${OPT_FLAGS})
 
 # Those files need specific optimization flags.
-set_source_files_properties(CFML_BVSpar.f90 CFML_Bond_Table.f90 CFML_Scattering_Chemical_Tables.f90 CFML_Symmetry_Tables.f90 PROPERTIES COMPILE_FLAGS ${OPT_FLAGS0})
-set_source_files_properties(CFML_Profile_TOF.f90 PROPERTIES COMPILE_FLAGS ${OPT_FLAGS1})
+set_source_files_properties(CFML_BVSpar.f90 CFML_Bond_Tables.f90 CFML_Scattering_Chemical_Tables.f90 CFML_Symmetry_Tables.f90 PROPERTIES COMPILE_FLAGS ${OPT_FLAGS0})
+set_source_files_properties(CFML_PowderProfiles_TOF.f90 PROPERTIES COMPILE_FLAGS ${OPT_FLAGS2})
 
 #################################
 # Build section
