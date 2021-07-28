@@ -122,11 +122,16 @@ module API_init
        crystal_metrics_get_cellvol, &
        crystal_metrics_get_rcellvol, &
        crystal_metrics_get_stdvol, &
-       crystal_metrics_get_CartType
+       crystal_metrics_get_CartType, &
+       crystal_metrics_cart_vector, &
+       crystal_metrics_cart_u_vector, &
+       crystal_metrics_get_betas_from_biso
 
   use API_Atom_TypeDef, only: &
        atom_typedef_del_atom_list, &
        atom_typedef_atomlist_from_CIF_string_array, &
+       atom_typedef_atomlist_reset_occ_cif, &
+       atom_typedef_atomlist_set_all_adp_cif, &
        atom_typedef_get_item, &
        atom_typedef_get_natoms, &
        atom_typedef_atom_from_string, &
@@ -266,7 +271,7 @@ CONTAINS
     !--------------------------
     !Total number of method in the binding
     !--------------------------
-    call method_table%init(203)
+    call method_table%init(208)
 
 
 
@@ -881,7 +886,7 @@ CONTAINS
          c_funloc(IO_Formats_set_bkg))  ! address of Fortran function to add
     
     !--------------------------
-    ! Atom Typedef (45)
+    ! Atom Typedef (47)
     !--------------------------
     call method_table%add_method("atom_typedef_del_atom_list", &                  ! method name
          "Delete an atom list", &  !doc-string
@@ -892,6 +897,16 @@ CONTAINS
          "Create an atom list from an array of CIF lines", &  !doc-string
          METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
          c_funloc(atom_typedef_atomlist_from_CIF_string_array))  ! address of Fortran function to add
+
+    call method_table%add_method("atom_typedef_atomlist_reset_occ_cif", & ! method name
+         "Set mult and occ according to Sfac convention", &  !doc-string
+         METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
+         c_funloc(atom_typedef_atomlist_reset_occ_cif))  ! address of Fortran function to add
+
+    call method_table%add_method("atom_typedef_atomlist_set_all_adp_cif", & ! method name
+         "Set all Atom fields for Us, Bs and betas", &  !doc-string
+         METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
+         c_funloc(atom_typedef_atomlist_set_all_adp_cif))  ! address of Fortran function to add
     
     call method_table%add_method("atom_typedef_set_item", &                  ! method name
          "Set an item in the atom list", &  !doc-string
@@ -1215,7 +1230,7 @@ CONTAINS
 
     
     !--------------------------
-    ! Crystal Metrics (21)
+    ! Crystal Metrics (24)
     !--------------------------
     call method_table%add_method("crystal_metrics_set_crystal_cell", &                  ! method name
          "Creates the crystal cell", &  !doc-string
@@ -1321,6 +1336,25 @@ CONTAINS
          "CartType getter", &  !doc-string
          METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
          c_funloc(crystal_metrics_get_CartType))  ! address of Fortran function to add
+
+    call method_table%add_method("crystal_metrics_cart_vector", &                  ! method name
+         "Convert a vector in crystal space to cartesian components", &  !doc-string
+         METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
+         c_funloc(crystal_metrics_cart_vector))  ! address of Fortran function to add
+
+    call method_table%add_method("crystal_metrics_cart_u_vector", &                  ! method name
+         "Convert a vector in crystal space to unitary cartesian components", &  !doc-string
+         METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
+         c_funloc(crystal_metrics_cart_u_vector))  ! address of Fortran function to add
+
+    call method_table%add_method("crystal_metrics_get_betas_from_biso", &                  ! method name
+         "Convert a vector in crystal space to cartesian components", &  !doc-string
+         METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
+         c_funloc(crystal_metrics_get_betas_from_biso))  ! address of Fortran function to add
+
+
+
+    
     
     m = mod_def%init("crysfml_symmetry", "A Python extension for crysFML symmetry", method_table)
   end function init

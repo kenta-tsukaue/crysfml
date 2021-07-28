@@ -1,7 +1,7 @@
 #################################
 # Commad line arguments section
 #################################
-cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.13 FATAL_ERROR)
 
 #################################
 # Project section
@@ -29,39 +29,38 @@ set_source_files_properties(forpy_mod.f90 PROPERTIES COMPILE_FLAG "-cpp")
 # Dependencies section
 #################################
 # Add a dependency to crysfml_common to keep sure that the crysfml_common library will be built first.
+# See https://gitlab.kitware.com/cmake/cmake/-/issues/19226 for linking
 add_dependencies(${LIBRARY_NAME} crysfml_common)
 
-set(COMPATIBLE_VERSIONS 3.8 3.7 3.6 3.5)
-if (NOT PYTHON_INTERPRETER_PATH)
-  set(Python_ADDITIONAL_VERSIONS ${COMPATIBLE_VERSIONS})
-  find_package(PythonInterp REQUIRED)
-  set(PYTHON_INTERPRETER_PATH ${PYTHON_EXECUTABLE})
-  message(STATUS ${PYTHON_INTERPRETER_PATH})
+if (NOT PYTHON_INTERPRETER_PATH OR NOT PYTHON_LIBRARY_PATH)
+  set(Python3_USE_STATIC_LIBS, TRUE)
+  find_package(Python3 COMPONENTS Interpreter Development)
+  set(PYTHON_INTERPRETER_PATH ${Python3_EXECUTABLE})
+  set(PYTHON_LIBRARY_PATH Python3::Python)
+  message(STATUS "Using Python interpreter found with PYTHON_INTERPRETER_PATH variable: " ${PYTHON_INTERPRETER_PATH})
+  message(STATUS "Linking Python extension with found PYTHON_LIBRARY_PATH variable: " ${PYTHON_LIBRARY_PATH})
 else()
-  message(STATUS "using Python interpreter provided with PYTHON_INTERPRETER_PATH variable: " ${PYTHON_INTERPRETER_PATH})
-endif()
-
-if (NOT PYTHON_LIBRARY_PATH)
-  set(Python_ADDITIONAL_VERSIONS ${COMPATIBLE_VERSIONS})
-  find_package(PythonLibs REQUIRED)
-  set(PYTHON_LIBRARY_PATH ${PYTHON_LIBRARY})
-  message(STATUS ${PYTHON_LIBRARY_PATH})
-else()
+  message(STATUS "Using Python interpreter provided with PYTHON_INTERPRETER_PATH variable: " ${PYTHON_INTERPRETER_PATH})
   message(STATUS "Linking Python extension with provided PYTHON_LIBRARY_PATH variable: " ${PYTHON_LIBRARY_PATH})
 endif()
 
-if (UNIX)
-  add_library(Python3_LIB SHARED IMPORTED)
-  set_property(TARGET Python3_LIB PROPERTY IMPORTED_LOCATION ${PYTHON_LIBRARY_PATH})
-elseif(WIN32)
+
+
+
+if(WIN32 OR MSYS)
   add_library(Python3_LIB STATIC IMPORTED)
   set_property(TARGET Python3_LIB PROPERTY IMPORTED_LOCATION ${PYTHON_LIBRARY_PATH})
+  target_link_libraries(${LIBRARY_NAME} Python3_LIB)
 endif()
 
+# Set -Wl,-undefined,dynamic_lookup to OTHER_LDFLAGS
 # Set include and linking
 include_directories(${CRYSFML_COMMON_MODULE_DIRECTORY})
 target_link_libraries(${LIBRARY_NAME} crysfml_common)
-target_link_libraries(${LIBRARY_NAME} Python3_LIB)
+# Fix a problem on Mac OS X when building shared libraries
+if(APPLE)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+endif()
 
 # Set library extension
 set_target_properties(${LIBRARY_NAME} PROPERTIES PREFIX "" OUTPUT_NAME ${LIBRARY_NAME})
@@ -69,7 +68,7 @@ set(LIBRARY_FILENAME "crysfml_api.so")
 if(APPLE)
     set_target_properties(${LIBRARY_NAME} PROPERTIES SUFFIX ".so")
     set(LIBRARY_FILENAME "crysfml_api.so")
-elseif(WIN32)
+elseif(WIN32 OR MSYS)
     set_target_properties(${LIBRARY_NAME} PROPERTIES SUFFIX ".pyd")
     set(LIBRARY_FILENAME "crysfml_api.pyd")
 endif()
@@ -112,42 +111,56 @@ endif (DOXYGEN_FOUND)
 #################################
 # Add tests
 add_test(NAME "Python_API_Tests" COMMAND ${PYTHON_INTERPRETER_PATH} -m unittest discover ${CMAKE_CURRENT_BINARY_DIR}/../Tests)
-add_custom_target(Python_Files ALL
+if(PYSETUP)
+    add_custom_target(Python_Files ALL
         COMMAND
         ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}/../Tests
         ${CMAKE_CURRENT_BINARY_DIR}/../Tests
-        
+
         COMMAND
         ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api
-        
+        )
+else()
+    add_custom_target(Python_Files ALL
+        COMMAND
+        ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}/../Tests
+        ${CMAKE_CURRENT_BINARY_DIR}/../Tests
+
+        COMMAND
+        ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api
+
         COMMAND
         ${CMAKE_COMMAND} -E copy
         ${CMAKE_CURRENT_BINARY_DIR}/${LIBRARY_FILENAME}
-        ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api
+        ${CMAKE_CURRENT_BINARY_DIR}/../Tests/CFML_api/${LIBRARY_FILENAME}
         )
-add_dependencies(Python_Files ${LIBRARY_NAME})
+endif()
 
+add_dependencies(Python_Files ${LIBRARY_NAME})
 
 #################################
 # Install section
 #################################
 # The rules for installing the library.
 install(DIRECTORY "" DESTINATION ${PYTHON_API_PREFIX}/CFML_api FILES_MATCHING PATTERN "*.py" PATTERN "Extensions" EXCLUDE)
-if(WIN32)
-install(TARGETS ${LIBRARY_NAME} RUNTIME DESTINATION ${PYTHON_API_PREFIX}/CFML_api)
+if(WIN32 OR MSYS)
+    install(TARGETS ${LIBRARY_NAME} RUNTIME DESTINATION ${PYTHON_API_PREFIX}/CFML_api)
 else()
-install(TARGETS ${LIBRARY_NAME} LIBRARY DESTINATION ${PYTHON_API_PREFIX}/CFML_api)
+    install(TARGETS ${LIBRARY_NAME} LIBRARY DESTINATION ${PYTHON_API_PREFIX}/CFML_api)
 endif()
 
 # Installing example files
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Examples" DESTINATION ${PYTHON_API_PREFIX} FILES_MATCHING PATTERN "*.py")
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Examples/Data" DESTINATION ${PYTHON_API_PREFIX}/Examples FILES_MATCHING PATTERN "*.cfl" PATTERN "*.cif")
-
-# Installing tests files
+#
+# # Installing tests files
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/../Tests" DESTINATION ${PYTHON_API_PREFIX} FILES_MATCHING PATTERN "*.py")
-
-# Installing documentation files
+#
+# # Installing documentation files
 install(DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/doxygen/html" DESTINATION ${PYTHON_API_PREFIX}/Doc OPTIONAL)
