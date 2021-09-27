@@ -1181,7 +1181,7 @@
       do n=1,At2%natoms
           n2=At2%Atom(n)%ind(1)
           !write(unit=*,fmt="(a,a,3f12.5)") At2%Atom(n)%Lab,At2%Atom(n)%SfacSymb,At2%Atom(n)%x
-          if (n2 ==0) then
+          if (n2 == 0) then
              err_conf=.true.
              ERR_Conf_Mess="The atom "//trim(At2%Atom(n)%lab)//" is not in the Species Table"
              return
@@ -1233,6 +1233,8 @@
       sbvs=0.0
       rep=0.0
       ncont=0
+      !write(*,"(a,6i4)") "nz1,nz2,ny1,ny2,nx1,nx2: ",nz1,nz2,ny1,ny2,nx1,nx2
+      !write(*,"(a,3f10.5,a,f10.4)") "Coordinates of the site: ",pto, "  drmax: ",drmax
       do n=1,At2%natoms
          n2=At2%Atom(n)%ind(1)
          q2=At2%Atom(n)%charge
@@ -1245,12 +1247,14 @@
          occ=At2%Atom(n)%VarF(1)
          c_rep=occ*q1*q2/sqrt(n_tion*n_j(n2))
          c_atr=occ*dzero
+         !write(*,"(2i4,12f10.4)") n1,n2,q1,q2,rho,dzero,dmin,alpha,d_cutoff,occ,n_tion,n_j(n2), c_rep, c_atr
          ferfc=erfc(drmax/rho)/drmax !always below 10^(-9) when drmax/rho > 4.2
          do k1=nz1,nz2
             do j1=ny1,ny2
                do i1=nx1,nx2
                   pta=At2%Atom(n)%x+real((/i1,j1,k1/))
                   dd=max(Distance(pto,pta,Cell),0.0001) !To avoid division by zero
+                  !write(*,"(a,i5,3i4,3f10.4,f12.4)") " n,i1,j1,k1,pta,distance: ",n,i1,j1,k1,pta,dd
                   if (dd > drmax) cycle
                   if (sig1 == sig2) then
                      rep=rep + c_rep*(erfc(dd/rho)/dd-ferfc)
@@ -1258,6 +1262,7 @@
                      !if(dd > d_cutoff) cycle
                      sbvs=sbvs+ c_atr*((exp(alpha*(dmin-dd))-1.0)**2-1.0)
                   end if
+                  !write(*,"(a,3f10.4)") " rep,sbvs,distance: ",rep,sbvs,dd
                end do
             end do
          end do
@@ -1265,6 +1270,7 @@
       end do
       !Multiply the repulsion term by the Coulomb constant to convert to eV
       emin=sbvs+ke*rep
+      !write(*,"(a,2f10.4)")  " => Drmax and Site Energy",drmax,emin
       return
     End Subroutine Calc_Site_Ene
 

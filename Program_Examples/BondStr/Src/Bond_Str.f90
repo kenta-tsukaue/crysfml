@@ -548,6 +548,7 @@ Program Bond_Str
            end if
 
         else if(bvel_calc) then
+
            Write(unit=*,fmt="(/,a)") " => Calculation of Bond-Valence Energy Landscape Map (it can take few minutes) ...."
            write (unit=lun, fmt='(/,a,f10.4,a)')" => Global distance cutoff:",drmax," angstroms"
            write(unit=lun,fmt='(/,2a/)') " => Bond-site energies for species ",trim(atname)
