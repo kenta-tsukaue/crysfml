@@ -1038,7 +1038,11 @@ Program Bond_Str
          end if
 
          ! Volume discrepancy
-         Vdis=100.0*((vi - vp)/vi)
+         if(abs(vi) > 1.0e-5) then
+            Vdis=100.0*((vi - vp)/vi)
+         else
+            Vdis=0.0
+         end if
 
          write(unit=lun, fmt='(a,3f10.4)') ' Centroid   coordinates: ',cent_fr
          write(unit=lun, fmt='(a,3f10.4)') ' Baricenter coordinates: ',bari_fr
