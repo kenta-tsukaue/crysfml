@@ -2253,7 +2253,7 @@
             CarType=U_case(adjustl(CarTypeIn))
             !> Check for valid input
             if(len_trim(CarType) == 2)then          !two symbols input
-                if(CarType /= 'CA' .and. CarType /= 'AB' .and.CarType /= 'BC' .and.CarType /= 'BA' .and.CarType /= 'CB')then
+                if(CarType /= 'CA' .and. CarType /= 'AC' .and.CarType /= 'BC' .and.CarType /= 'BA' .and.CarType /= 'CB')then
                     err_crys=.true.
                     err_crys_mess='Invalid CarType in call to Get_Cryst_Orthog_Matrix. Reset to default'
                     CarType='CA'     !default: c//Z, a*//X
@@ -2265,13 +2265,13 @@
                 case('A')
                     CarType(2:2)='C'
                 case('B')
-                    CarType(2:2)='C'        !defaults to c* // Z for this case
+                    CarType(2:2)='C'        !defaults to c* // Z for this case (Carpenter)
                 case default
-                    CarType='CA'            !default because invalid first character
+                    CarType='CA'     !default because invalid first character
                 end select
             endif
         endif
-        if(len_trim(CarType) == 0)CarType='CA'     !default: c//Z, a*//X
+        if(len_trim(CarType) == 0) CarType='CA'     !default: c//Z, a*//X
 
 
        !> Setting of matrix
@@ -2400,7 +2400,7 @@
             CarType=U_case(adjustl(CarTypeIn))
             !> Check for valid input
             if(len_trim(CarType) == 2)then          !two symbols input
-                if(CarType /= 'CA' .and. CarType /= 'AB' .and. CarType /= 'BC' .and. CarType /= 'BA' .and. CarType /= 'CB')then
+                if(CarType /= 'CA' .and. CarType /= 'AC' .and. CarType /= 'BC' .and. CarType /= 'BA' .and. CarType /= 'CB')then
                     err_crys=.true.
                     err_crys_mess='Invalid CarType in call to Get_Deriv_Orth_Cell'
                     return
@@ -3627,16 +3627,17 @@
 
        select case(Celda%CartType)
 
-       case('BA')     ! Angel & Brown setting
-           Write(unit=iunit,fmt="(/,a,/)") " =>  Cartesian frame: y // b; z is in the bc-plane; x is y ^ z = a*   "
+         case('BA')     ! Angel & Brown setting
+             Write(unit=iunit,fmt="(/,a,/)") " =>  Cartesian frame: y // b; z is in the bc-plane; x is y ^ z = a*   "
 
-       case('BC')     ! Carpenter setting
-           Write(unit=iunit,fmt="(/,a,/)") " =>  Cartesian frame: y // b; x is in the ab-plane; z is x ^ y = c*   "
+         case('BC')     ! Carpenter setting
+             Write(unit=iunit,fmt="(/,a,/)") " =>  Cartesian frame: y // b; x is in the ab-plane; z is x ^ y = c*   "
 
-       case('AB')     ! previous alternate setting
-           Write(unit=iunit,fmt="(/,a,/)") " =>  Cartesian frame: x // a; z is in the ac-plane; y is x ^ z = b*   "
-       case default   ! 'CA'
-           Write(unit=iunit,fmt="(/,a,/)") " =>  Cartesian frame: z // c; y is in the bc-plane; x is y ^ z = a*  "
+         case('AC')     ! previous alternate setting
+             Write(unit=iunit,fmt="(/,a,/)") " =>  Cartesian frame: x // a; z is along c*; y is within the ab-plane   "
+
+         case default   ! 'CA'
+             Write(unit=iunit,fmt="(/,a,/)") " =>  Cartesian frame: z // c; y is in the bc-plane; x is along y ^ z = a*  "
        end select
 
 
