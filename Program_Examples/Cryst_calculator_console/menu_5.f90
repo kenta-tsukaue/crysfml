@@ -47,7 +47,7 @@
        end if
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
 
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
@@ -133,7 +133,7 @@
        real(kind=cp), dimension(3):: Cellv,Angl
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -194,7 +194,7 @@
        integer, dimension(3)  :: h1,h2,u
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "        GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -251,7 +251,7 @@
        real(kind=cp)              :: angle,mu,mv
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "        GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -332,7 +332,7 @@
        real(kind=cp)              :: angle,mh,mk
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "        GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -414,7 +414,7 @@
        real(kind=cp)              :: angle,mh,mu
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "        GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -495,7 +495,7 @@
        real(kind=cp)               :: mu,mv
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "        GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -562,7 +562,7 @@
        real(kind=cp)              :: mu,mv
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "        GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -629,7 +629,7 @@
        integer                      :: i
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "        GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -697,7 +697,7 @@
        Logical                :: ok
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "                   GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -836,7 +836,7 @@
        Logical                :: ok,v21,v41,v22,v42,vv, equival
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "        GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -1093,7 +1093,7 @@
        real(kind=cp)             :: ang,ang1,ang2,mc1,mc2,dmin
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "                  GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -1206,7 +1206,7 @@
        real(kind=cp)                :: angu,angv,angw,Chi,Phi,Theta,mc
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "                  GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -1342,7 +1342,7 @@
        Logical                :: ok,cond,v13,v14,v23,v24
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "        GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "

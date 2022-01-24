@@ -1964,7 +1964,7 @@ Module CFML_ILL_Instrm_Data
           path = trim(path)//Extension
           inquire(file=trim(path),exist=exists)
           if (exists) then ! uncompress into temp directory
-             call system(trim(uncompresscommand)//' '//trim(path)//' > '//trim(ILL_temp_directory)//numstr)
+             call execute_command_line(trim(uncompresscommand)//' '//trim(path)//' > '//trim(ILL_temp_directory)//numstr)
              if (present(actual_path)) actual_path = path
              path = trim(ILL_temp_directory)//numstr
              return ! found numor so return
@@ -1997,7 +1997,7 @@ Module CFML_ILL_Instrm_Data
           path = trim(path)//Extension
           inquire(file=trim(path),exist=exists)
           if (exists) then ! uncompress into temp directory
-             call system(trim(uncompresscommand)//' '//trim(path)//' > '//trim(ILL_temp_directory)//numstr)
+             call execute_command_line(trim(uncompresscommand)//' '//trim(path)//' > '//trim(ILL_temp_directory)//numstr)
              if (present(actual_path)) actual_path = path
              path = trim(ILL_temp_directory)//numstr
              return ! found numor so return

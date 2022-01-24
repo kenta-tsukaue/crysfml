@@ -1618,6 +1618,9 @@
          end do
          infile = args(1)
          arggiven=.true.
+      else
+        write(unit=*,fmt="(a)") " => ERROR ! => The Program Faults should be invoked with the name of the input file"
+        call Close_Faults()        
       end if
 
       CALL salute()

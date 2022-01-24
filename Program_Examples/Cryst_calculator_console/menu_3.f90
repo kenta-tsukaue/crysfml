@@ -36,7 +36,7 @@
        character(len=2)  :: car
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
 
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
@@ -97,7 +97,7 @@
        type (Space_Group_type)    :: grp_espacial
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -117,7 +117,7 @@
             cycle
           end if
           do
-             call system(clear_string)
+             call execute_command_line(clear_string)
              write(unit=*,fmt="(a)") " "
              write(unit=*,fmt="(a)") "       GENERAL CRYSTALLOGRAPHY CALCULATOR "
              write(unit=*,fmt="(a)") " "
@@ -158,7 +158,7 @@
        logical               :: esta
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -235,7 +235,7 @@
        !---- Local Variables ----!
        integer               :: i
 
-       call system(clear_string)
+       call execute_command_line(clear_string)
        write(unit=*,fmt="(a)") " "
        write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
        write(unit=*,fmt="(a)") " "
@@ -261,13 +261,13 @@
 
        call Wait_Message(" => Press <enter> to continue ...")
 
-       call system(clear_string)
+       call execute_command_line(clear_string)
        write(unit=*,fmt="(/a/)") " => SPACE GROUP information: "
        call Write_SpaceGroup(SpG,Full=.true.)
        call Write_SpaceGroup(SpG,i_out,Full=.true.)
        call Wait_Message(" => Press <enter> to continue ...")
 
-       call system(clear_string)
+       call execute_command_line(clear_string)
        write(unit=*,fmt="(/a/)") " => ATOMS information: "
        call Write_Atom_List(A,level=1)
        call Write_Atom_List(A,level=1,lun=i_out)
@@ -288,7 +288,7 @@
        real(kind=cp), dimension(  384):: qat !New charges
        logical                        :: calc_possible=.true.
 
-       call system(clear_string)
+       call execute_command_line(clear_string)
        write(unit=*,fmt="(a)") " "
        write(unit=*,fmt="(a)") "               GENERAL CRYSTALLOGRAPHY CALCULATOR "
        write(unit=*,fmt="(a)") " "
@@ -480,7 +480,7 @@
        real(kind=cp), dimension(  384):: qat !New charges
        logical                        :: calc_possible=.true.
 
-       call system(clear_string)
+       call execute_command_line(clear_string)
        write(unit=*,fmt="(a)") " "
        write(unit=*,fmt="(a)") "               GENERAL CRYSTALLOGRAPHY CALCULATOR "
        write(unit=*,fmt="(a)") " "

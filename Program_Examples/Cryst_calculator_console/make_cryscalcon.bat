@@ -34,7 +34,7 @@ rem ****---- Lahey Compiler ----****
    lf95 -c menu_3.f90  -tp -nomap -stchk -nchk -o1 -mod ".;..\..\lahey\LibC"
    lf95 -c menu_4.f90  -tp -nomap -stchk -nchk -o1 -mod ".;..\..\lahey\LibC"
    lf95 -c menu_5.f90  -tp -nomap -stchk -nchk -o1 -mod ".;..\..\lahey\LibC"
-   lf95 -c calsym.f90  -tp -nomap -stchk -nchk -o1 -mod ".;..\..\lahey\LibC"
+   lf95 -c cryscalc_con.f90  -tp -nomap -stchk -nchk -o1 -mod ".;..\..\lahey\LibC"
    lf95  *.obj -out CrysCalCon -tp -nomap -stchk -nchk -o1 -lib ..\..\lahey\LibC\CrysFML
    goto END
 rem
@@ -57,7 +57,7 @@ rem   Directory holding the source code of the FullProf library for writing PCRs
    ifort /c menu_3.f90 /O3 /nologo %INC%
    ifort /c menu_4.f90 /O3 /nologo %INC%
    ifort /c menu_5.f90 /O3 /nologo %INC%
-   ifort /c calsym.f90 /O3 /nologo %INC%
+   ifort /c cryscalc_con.f90 /O3 /nologo %INC%
    rem ifort /exe:CrysCalcon *.obj %CRYSLIB%
    link /subsystem:console /out:CrysCalCon.exe *.obj %CRYSLIB%
    goto END
@@ -78,7 +78,7 @@ rem   Directory holding the source code of the FullProf library for writing PCRs
    ifort /c menu_3.f90 /debug:full /check /traceback /nologo %INC%
    ifort /c menu_4.f90 /debug:full /check /traceback /nologo %INC%
    ifort /c menu_5.f90 /debug:full /check /traceback /nologo %INC%
-   ifort /c calsym.f90 /debug:full /check /traceback /nologo %INC%
+   ifort /c cryscalc_con.f90 /debug:full /check /traceback /nologo %INC%
    rem ifort /exe:CrysCalcon *.obj %CRYSLIB%
    link /subsystem:console /out:CrysCalCon.exe *.obj %CRYSLIB%
    goto END
@@ -91,7 +91,7 @@ rem **---- G95 Compiler ----**
    g95 -c -O3 -funroll-loops  -msse2   menu_3.f90     -I..\..\G95\LibC
    g95 -c -O3 -funroll-loops  -msse2   menu_4.f90     -I..\..\G95\LibC
    g95 -c -O3 -funroll-loops  -msse2   menu_5.f90     -I..\..\G95\LibC
-   g95 -c -O3 -funroll-loops  -msse2   calsym.f90     -I..\..\G95\LibC
+   g95 -c -O3 -funroll-loops  -msse2   cryscalc_con.f90     -I..\..\G95\LibC
    g95  *.o -o cryscalcon -O3  -funroll-loops  -msse2  -L..\..\G95\LibC -lcrysfml
    goto END
 rem
@@ -103,7 +103,7 @@ rem **---- GFORTRAN Compiler ----**
    gfortran -c -O3 -funroll-loops  -msse2   menu_3.f90     -I..\..\GFortran\LibC
    gfortran -c -O3 -funroll-loops  -msse2   menu_4.f90     -I..\..\GFortran\LibC
    gfortran -c -O3 -funroll-loops  -msse2   menu_5.f90     -I..\..\GFortran\LibC
-   gfortran -c -O3 -funroll-loops  -msse2   calsym.f90     -I..\..\GFortran\LibC
+   gfortran -c -O3 -funroll-loops  -msse2   cryscalc_con.f90     -I..\..\GFortran\LibC
    gfortran *.o -o cryscalcon -O3  -funroll-loops  -msse2  -L..\..\GFortran\LibC -lcrysfml
    goto END
 :GFORD
@@ -113,7 +113,7 @@ rem **---- GFORTRAN Compiler ----**
    gfortran -c -O0 -fbacktrace -funroll-loops  -msse2   menu_3.f90     -I..\..\GFortran_debug\LibC
    gfortran -c -O0 -fbacktrace -funroll-loops  -msse2   menu_4.f90     -I..\..\GFortran_debug\LibC
    gfortran -c -O0 -fbacktrace -funroll-loops  -msse2   menu_5.f90     -I..\..\GFortran_debug\LibC
-   gfortran -c -O0 -fbacktrace -funroll-loops  -msse2   calsym.f90     -I..\..\GFortran_debug\LibC
+   gfortran -c -O0 -fbacktrace -funroll-loops  -msse2   cryscalc_con.f90     -I..\..\GFortran_debug\LibC
    gfortran *.o -o cryscalcon -fbacktrace -funroll-loops  -msse2  -L..\..\GFortran_debug\LibC -lcrysfml
    goto END
 rem

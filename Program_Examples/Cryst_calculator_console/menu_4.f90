@@ -25,7 +25,7 @@
        character(len=2)  :: car
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
 
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
@@ -77,7 +77,7 @@
        call Set_Chem_Info()
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "

@@ -126,7 +126,7 @@ $COMP $OPT1 menu_2.f90    $INC
 $COMP $OPT1 menu_3.f90    $INC
 $COMP $OPT1 menu_4.f90    $INC
 $COMP $OPT1 menu_5.f90    $INC
-$COMP $OPT1 calsym.f90    $INC
+$COMP $OPT1 cryscalc_con.f90    $INC
 case $COMP
 in
   'af95')

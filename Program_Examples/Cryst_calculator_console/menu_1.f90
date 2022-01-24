@@ -27,7 +27,7 @@
        character(len=2)  :: car
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
 
           write(unit=*,fmt="(a)") "     CRYSTRALLOGRAPHIC CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -110,7 +110,7 @@
        type (Space_Group_Type):: grp_espacial
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "                   GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -156,7 +156,7 @@
        type (Space_Group_type)          :: grp_espacial
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "              GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -246,7 +246,7 @@
 
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -341,7 +341,7 @@
        type (Space_Group_type)           :: grp_espacial
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -443,7 +443,7 @@
        type (Space_Group_type)           :: grp_espacial1, grp_espacial2
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -682,7 +682,7 @@
        type (Space_Group_type)    :: grp_espacial
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -749,7 +749,7 @@
        real(kind=cp), dimension(3,24)    :: ts
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -836,7 +836,7 @@
        call Set_Spgr_Info()
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -924,7 +924,7 @@
        logical                        :: ok_newspg,ok
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "                  GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -1041,7 +1041,7 @@
        call Set_Spgr_Info()
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -1084,7 +1084,7 @@
        call Set_Spgr_Info()
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -1552,7 +1552,7 @@
       type (NS_Space_Group_Type)    :: grp2
 
       do
-         call system(clear_string)
+         call execute_command_line(clear_string)
          write(unit=*,fmt="(a)") " "
          write(unit=*,fmt="(a)") "                   GENERAL CRYSTALLOGRAPHY CALCULATOR "
          write(unit=*,fmt="(a)") " "

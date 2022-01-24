@@ -26,7 +26,7 @@
        character(len=2)  :: car
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
 
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
@@ -90,7 +90,7 @@
        type (Space_Group_type)     :: grp_espacial
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -145,7 +145,7 @@
        num=0
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -224,7 +224,7 @@
        info=.true.
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -286,7 +286,7 @@
        num=0
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -381,7 +381,7 @@
        num=0
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "         GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
@@ -454,7 +454,7 @@
        info=.true.
 
        do
-          call system(clear_string)
+          call execute_command_line(clear_string)
           write(unit=*,fmt="(a)") " "
           write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
           write(unit=*,fmt="(a)") " "
