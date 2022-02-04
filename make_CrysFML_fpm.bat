@@ -9,7 +9,7 @@ cd .\Src
 call tochange xxx
 cd ..
 echo ---- Construction of the CrysFML library for 64 bits using gfortran, ifort or ifx (oneAPI) ----
-echo ---- The building procedure install also some executable programs of the Program_Examples subdirectory 
+echo ---- The building procedure installs also some executable programs of the Program_Examples subdirectory 
 echo      Default: ifort compiler in release mode. Equivalent to the first example below 
 echo  Usage: make_CrysFML  ifort  
 echo         make_CrysFML  ifort debug 
@@ -38,9 +38,9 @@ rem > Arguments ----
       ren  CFML_GlobalDeps_Windows_Intel.xxx  CFML_GlobalDeps.f90
       cd ..
       if [%_DEBUG%]==[Y] (
-         fpm @ifort_debug
+         fpm @./rsp/ifort_debug
       ) else (
-         fpm @ifort_release
+         fpm @./rsp/ifort_release
       )
       cd .\Src
       ren CFML_GlobalDeps.f90 CFML_GlobalDeps_Windows_Intel.xxx  
@@ -51,9 +51,9 @@ rem > Arguments ----
       ren  CFML_GlobalDeps_Windows_Intel.xxx  CFML_GlobalDeps.f90
       cd ..
       if [%_DEBUG%]==[Y] (
-         fpm @ifx_debug
+         fpm @./rsp/ifx_debug
       ) else (
-         fpm @ifx_release
+         fpm @./rsp/ifx_release
       )
       cd .\Src
       ren CFML_GlobalDeps.f90 CFML_GlobalDeps_Windows_Intel.xxx  
@@ -61,18 +61,17 @@ rem > Arguments ----
     )
     if [%_COMP%]==[gfortran] (
       cd .\Src
-      ren  CFML_GlobalDeps_Windows_gfortran.xxx  CFML_GlobalDeps.f90
+      ren  CFML_GlobalDeps_Windows.xxx  CFML_GlobalDeps.f90
       cd ..
       if [%_DEBUG%]==[Y] (
-         fpm @gf_debug
+         fpm @./rsp/gf_debug
       ) else (
-         fpm @gf_release
+         fpm @./rsp/gf_release
       )
       cd .\Src
-      ren  CFML_GlobalDeps.f90 CFML_GlobalDeps_Windows_gfortran.xxx  
+      ren  CFML_GlobalDeps.f90 CFML_GlobalDeps_Windows.xxx  
       cd ..
     )
-
 rem
 rem  Undo the changes of extensions to be compatilbe with Cmake
 rem

@@ -980,7 +980,7 @@
 !  This Subroutine calls no Subroutine.
 
 !***********************************************************************
-      integer :: nh, nhp,i,j,k,n,ni,nj,ii,lc
+      integer :: nh, nhp,i,j,k,n,ni,nj,ii,l
       nh=1
       nhp=1
 
