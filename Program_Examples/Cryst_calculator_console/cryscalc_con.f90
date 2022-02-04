@@ -31,7 +31,7 @@
     write(unit=i_out,fmt="(a)") "  "
 
     do
-       call execute_command_line(clear_string)
+       call system(clear_string)
 
        write(unit=*,fmt="(a)") " "
        write(unit=*,fmt="(a)") "     GENERAL CRYSTALLOGRAPHY CALCULATOR "
@@ -76,7 +76,7 @@
     end do
     close(unit=i_out)
     call Wait_Message(" => Press <enter> to close the program ...")
-    call execute_command_line(clear_string)
+    call system(clear_string)
  End Program CrysCalc_con
 
 

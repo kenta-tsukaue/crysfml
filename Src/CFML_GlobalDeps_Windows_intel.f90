@@ -38,7 +38,7 @@
 !!----         All the global variables defined in this module are implicitly public.
 !!----
 !!---- HISTORY
-!!--..    Update: January - 2009
+!!--..    Update: 02/03/2011
 !!--..
 !!---- VARIABLES
 !!--..
@@ -145,8 +145,6 @@ Module CFML_GlobalDeps
    !!
    integer, parameter :: cp = sp
 
-   integer, parameter :: IL = selected_int_kind(16)              ! Long Integer
-
    !----------------------------------!
    !---- Trigonometric Parameters ----!
    !----------------------------------!
@@ -214,6 +212,8 @@ Module CFML_GlobalDeps
    !!----  Update: January - 2009
    !!
    real(kind=cp),  parameter, public  ::  eps=0.00001_cp
+
+   integer, parameter :: IL = selected_int_kind(16)              ! Long Integer
 
  Contains
 
@@ -290,5 +290,4 @@ Module CFML_GlobalDeps
             "  Time: "//tim(1:2)//":"//tim(3:4)//":"//tim(5:10)
      return
    End Subroutine Write_Date_Time
-
 End Module CFML_GlobalDeps
