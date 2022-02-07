@@ -40,8 +40,7 @@
        Type(file_list_type),   intent( in)  :: file_cfl
        !---- Local variables ----!
        character(len=132)   :: line
-       real                 :: w,tol
-       integer              :: i,ier,j,nrel,i1,i2,i3,i4
+       integer              :: i,ier,j,i1,i2,i3,i4
 
        ier=0
        Icost=0; wcost=0.0
@@ -110,9 +109,7 @@
        !---- Arguments ----!
        integer,   intent( in)    :: lun
        !---- Local variables ----!
-       character(len=132)   :: line
-       real                 :: w,tol
-       integer              :: i,ier
+       integer              :: i
 
 
        Write(unit=lun,fmt="(/,a)")    "=================================="
@@ -157,8 +154,6 @@
        !---- Arguments ----!
        integer,   intent( in)    :: lun
        !---- Local variables ----!
-       character(len=132)   :: line
-       real                 :: w,tol
        integer              :: i,iset
 
 
@@ -225,7 +220,7 @@
        !---- Arguments ----!
 
       !---- Local variables ----!
-      integer               :: i,ic, nop, numv, iset
+      integer               :: i,ic, numv, iset
       integer, dimension(1) :: List
 
          if(allocated(Pcost)) deallocate(Pcost)
@@ -479,12 +474,12 @@ Subroutine Write_SOL_mCFL(lun,file_cfl,mA,Mag_dom,comment)
        character(len=*),optional,intent(in)           :: comment
 
        !----- Local variables -----!
-       integer                         :: j,i,n,ier
+       integer                         :: i,n,ier
        integer                         :: num_matom,num_skp,num_dom,ik,im,ip
        real,dimension(3)               :: Rsk,Isk
        real(kind=cp),dimension(12)     :: coef
        real(kind=cp)                   :: Ph
-       character(len=132)              :: lowline,line
+       character(len=132)              :: lowline
        character(len=30)               :: forma
        logical                         :: skp_begin, bfcoef_begin, magdom_begin=.true.
 

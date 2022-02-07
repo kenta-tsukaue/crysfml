@@ -1,5 +1,5 @@
   Program Cell_Relations
-    use CFML_Crystal_Metrics,  only: Crystal_Cell_Type, Err_Crys, Err_Crys_Mess, Init_err_crys,  &
+    use CFML_Crystal_Metrics,  only: Crystal_Cell_Type, Init_err_crys,  &
                                      Change_Setting_Cell,Set_Crystal_Cell, Write_Crystal_Cell,   &
                                      get_primitive_cell
     use CFML_Crystallographic_Symmetry, only: Space_Group_type, Set_SpaceGroup
@@ -31,7 +31,7 @@
 
     character(len=256) :: fileinp, fileout, line
     integer :: i,j,lun=1,lout=2, ier,i1,i2,i3,i4,i5,i6,i7,i8,i9,iratio,n,irvol,ncar
-    integer :: ia1,ia2,ib1,ib2,ic1,ic2, iargc,narg,isol,nn,im, neq,Num_Ref,n_kind=0
+    integer :: ia1,ia2,ib1,ib2,ic1,ic2, narg,isol,nn,im, neq,Num_Ref,n_kind=0
     real    :: tol1,tol2,rvol,rfac,bestr,sm,start,fin
 
 

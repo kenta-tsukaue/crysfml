@@ -957,7 +957,7 @@
     !!---- Created: March - 2009 OZ, Updated: June-2012 (JRC)
     !!
     Subroutine Calc_Polar_Dom(Cell, H, SPV, Pin, NSF, Mag_dom, Mh, Polari,ok,mess,B_Q)
-       !---- Arguments ----!
+       ! ---- Arguments ---- !
        type (Crystal_Cell_Type),    intent(in)       :: Cell
        real(kind=cp), dimension (3),intent(in)       :: H
        real(kind=cp), dimension(3), intent(in)       :: SPV

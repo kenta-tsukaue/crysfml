@@ -134,7 +134,7 @@ Program Global_Optimization_Xtal_structures
    integer                            :: lun=1,ifst=2, ier,i,j,k, n, i_cfl,ninfo=0,i_best
    integer, dimension(:),allocatable  :: i_bvs
    real                               :: start,fin, mindspc, maxsintl, within, costop, costmax, thr
-   integer                            :: narg, max_coor, num_p
+   integer                            :: narg, num_p
    Logical                            :: esta, arggiven=.false., ref_within=.false.,&
                                          fst_out=.false., local_opt=.false., rest_file=.false., local_ref=.false.
 
@@ -881,6 +881,7 @@ Subroutine Write_FST(fst_file,v,cost)
    character(len=132)                 :: file_fst,fst_cmd
    character(len=30), dimension(10)   :: cmds
 
+   if(v(1) == 1.234567) write(*,"(a)") " => This is nothing!"
    i=index(fst_file,".fst")
    file_fst=fst_file(1:i+3)
    fst_cmd=adjustl(fst_file(i+4:))

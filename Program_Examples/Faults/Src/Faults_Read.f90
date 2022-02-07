@@ -1756,7 +1756,7 @@
                  read(unit=txt,fmt=*, iostat=ier)   alow(j),ahigh(j)
                  if(ier /= 0 ) then
                      Err_crys=.true.
-                     write(unit=Err_crys_mess,fmt="(a,i3)"),"ERROR reading the excluded region number ",j
+                     write(unit=Err_crys_mess,fmt="(a,i3)") "ERROR reading the excluded region number ",j
                      logi=.false.
                      return
                  end if

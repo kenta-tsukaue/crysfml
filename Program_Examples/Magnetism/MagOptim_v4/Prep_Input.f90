@@ -150,11 +150,11 @@ contains
       character(len=256)             :: title,formt
       character(len=256)             :: lowline
       character(len=1)               :: sig
-      integer                        :: ier,ic,num_k,m,ih,ik,il,ncont,iv,i,j,ityp,ipow,ip,iset,&
+      integer                        :: ier,ic,num_k,m,ih,ik,il,ncont,iv,i,j,ityp,ipow,iset,&
                                         iobs,ind,nd
       integer                        :: n_ini, n_end
       real,allocatable,dimension(:,:):: vk
-      real                           :: Gobs,SGobs,lambda,k11,k22,k12,kdif,k0(3)
+      real                           :: lambda,k11,k22,k12,kdif,k0(3)
       logical                        :: kvect_begin=.true.
 
       Nset=0; MNset=0; Npol=0
@@ -673,7 +673,7 @@ contains
 
       !---- Local variables ----!
       integer                     :: ih,ik,il,m,ier
-      logical                     :: pesta, argtaken=.false.
+      logical                     :: pesta
       real                        :: vpl, pol
 
      inquire(file=trim(datfile),exist=pesta)
@@ -707,11 +707,10 @@ contains
 
       !---- Local variables ----!
       character(len=256)          :: title,formt,lambda
-      character(len=1)            :: sig
       integer                     :: ier,num_k,m,ih,ik,il,ncont,i,ityp,ipow
       real,   dimension(3)        :: vk
       real                        :: Gobs,SGobs
-      logical                     :: pesta, argtaken=.false.
+      logical                     :: pesta
 
       inquire(file=trim(datfile),exist=pesta)
       if( .not. pesta) then
@@ -756,10 +755,9 @@ contains
 
       !---- Local variables ----!
       character(len=256)          :: title,formt,lambda
-      character(len=1)            :: sig
-      integer                     :: ier,num_k,m,ih,ik,il,ncont,i,ityp,ipow
+      integer                     :: ier,ih,ik,il,ncont,ityp,ipow
       real                        :: Gobs,SGobs
-      logical                     :: pesta, argtaken=.false.
+      logical                     :: pesta
 
       inquire(file=trim(datfile),exist=pesta)
       if( .not. pesta) then
@@ -949,10 +947,12 @@ contains
       integer, optional, intent(in) :: iset,lun
 
       !---- Local variables ----!
-      integer                     :: j,ich,nch,nd,k0(3)
+      integer                     :: j,k0(3)
       real(kind=cp)               :: Pin
       real(kind=cp),dimension(3)  :: SPV
       complex                     :: NSF
+      logical                     :: ok
+      character(len=80)           :: mess
 
       k0=(/0.00,0.00,0.00/)
       Npol=Multidata%Nobs(iset)
@@ -974,7 +974,9 @@ contains
          ! as mode='y' MiV w.r.t. cartesian crystallographic frame
          Mh=MhMultilist%MhList(iset)%Mh(j)
          call Calc_Magnetic_StrF_MiV_Dom(Cell,MGp,mA,Mag_Dom,Mh) !CFML_Msfac
-         call Calc_Polar_Dom(Cell,Mh%h,SPV,Pin,NSF,Mag_Dom,Mh,PolariMultilist%Polarilist(iset)%Polari(j)) !CFML_Polar
+         !call Calc_Polar_Dom(Cell,Mh%h,SPV,Pin,NSF,Mag_Dom,Mh,PolariMultilist%Polarilist(iset)%Polari(j)) !CFML_Polar
+         call Calc_Polar_Dom(Cell,Mh%h,SPV,Pin,NSF,Mag_Dom,Mh,PolariMultilist%Polarilist(iset)%Polari(j),ok,mess)
+         if(.not. ok) write(unit=*,fmt="(a)") " => "//trim(mess)
          !---- without mode components with respect to direct cell system {e1,e2,e3}
          !---- with mode components with respect to the cartesian frame
          MhMultilist%MhList(iset)%Mh(j)%sqMiV=Mh%sqMiV

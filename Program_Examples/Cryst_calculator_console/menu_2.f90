@@ -83,10 +83,8 @@
     Subroutine Menu_Refl_1()
        !---- Local Variables ----!
        character(len=20)           :: line, spgr
-       integer                     :: i, iv, ierr, npos
-       integer, dimension(1)       :: ivet
+       integer                     :: ierr
        integer, dimension(3)       :: h,k
-       real(kind=cp), dimension(1) :: vet
        type (Space_Group_type)     :: grp_espacial
 
        do
@@ -131,12 +129,10 @@
     Subroutine Menu_Refl_2()
        !---- Local Variables ----!
        logical                                          :: info
-       character(len=20)                                :: spgr,line
+       character(len=20)                                :: line
        integer, dimension(3)                            :: h,k,nulo
-       integer, dimension(1)                            :: ivet
-       integer                                          :: i,j,num,iv,ierr,npos
-       real(kind=cp)                                    :: fase,fase1,fase2
-       real(kind=cp), dimension(1)                      :: vet
+       integer                                          :: i,j,num
+       real(kind=cp)                                    :: fase,fase1
        type (Space_Group_type)                          :: grp_espacial
        type (Reflection_type),allocatable, dimension(:) :: reflexiones
 
@@ -213,11 +209,8 @@
     Subroutine Menu_Refl_3()
        !---- Local Variables ----!
        logical                    :: info
-       character(len=20)          :: line, spgr
-       integer                    :: i, iv, ierr, npos
-       integer, dimension(1)      :: ivet
-       integer, dimension(3)      :: h,k,nulo
-       real(kind=cp), dimension(1):: vet
+       character(len=20)          :: line
+       integer, dimension(3)      :: h,nulo
        type (Space_Group_type)    :: grp_espacial
 
        nulo=0
@@ -272,12 +265,10 @@
     subroutine Menu_REFL_4()
        !---- Local Variables ----!
        logical                                     :: info
-       character(len=20)                           :: spgr,line
+       character(len=20)                           :: line
        integer, dimension(3)                       :: h,k,l,nulo
-       integer, dimension(1)                       :: ivet
-       integer                                     :: i,j,num,iv,ierr,npos
+       integer                                     :: i,j,num
        real(kind=cp)                               :: fase,fase1,fase2
-       real(kind=cp), dimension(1)                 :: vet
        type (Space_Group_type)                          :: grp_espacial
        type (Reflection_type),allocatable, dimension(:) :: reflexiones
 
@@ -363,16 +354,14 @@
     !!
     Subroutine Menu_Refl_5()
        !---- Local Variables ----!
-       logical                                     :: info
-       character(len=20)                           :: spgr,line
-       character(len=80)                           :: name_file
-       integer, dimension(3)                       :: h,k,l,nulo
-       integer, dimension(1)                       :: ivet
-       integer                                     :: i,j,num,iv,ierr,npos
-       real(kind=cp)                               :: fase,fase1,fase2,val1,val2
-       real(kind=cp), dimension(1)                 :: vet
-       real(kind=cp), dimension(3)                 :: celda, angulo
-       type (Space_Group_type)                     :: grp_espacial
+       logical                                       :: info
+       character(len=20)                             :: line
+       character(len=80)                             :: name_file
+       integer, dimension(3)                         :: nulo
+       integer                                       :: i,num
+       real(kind=cp)                                 :: val1,val2
+       real(kind=cp), dimension(3)                   :: celda, angulo
+       type (Space_Group_type)                       :: grp_espacial
        type (Reflect_type),allocatable, dimension(:) :: reflexiones
        type (Crystal_Cell_type)                      :: celdilla
 
@@ -442,12 +431,9 @@
     subroutine Menu_REFL_6()
        !---- Local Variables ----!
        logical                      :: info
-       character(len=20)            :: spgr,line
-       integer, dimension(3)        :: h,k,l,nulo
-       integer, dimension(1)        :: ivet
+       character(len=20)            :: line
+       integer, dimension(3)        :: h,nulo
        integer                      :: mul
-       integer                      :: i,j,iv,ierr,npos
-       real(kind=cp), dimension(1)  :: vet
        type (Space_Group_type)      :: grp_espacial
 
        nulo=0

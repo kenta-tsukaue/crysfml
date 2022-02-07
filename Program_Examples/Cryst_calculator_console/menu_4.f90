@@ -70,7 +70,7 @@
     Subroutine Menu_Chem_1()
        !---- Local Variables ----!
        character(len=20)           :: line
-       integer                     :: i, j, n, iv, ierr, npos
+       integer                     :: i, j, n, iv, npos
        integer,       dimension(1) :: ivet
        real(kind=cp), dimension(1) :: vet
 

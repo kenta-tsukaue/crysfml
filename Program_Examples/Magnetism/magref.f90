@@ -23,12 +23,10 @@ Program MagRef
 
  character(len=256)          :: filcod     !Name of the input file
  character(len=1)            :: sig
- real                        :: sn,sf2
  real, dimension(3)          :: u_vect
- integer                     :: Num, lun=1, ier,i,j,m,ih,ik,il,iv, n_ini,n_end
- complex                     :: fc
+ integer                     :: lun=1, i,j,m,ih,ik,iil,iv, n_ini,n_end
 
- integer                     :: narg,iargc
+ integer                     :: narg
  Logical                     :: esta, arggiven=.false.
       !---- Arguments on the command line ----!
       narg=COMMAND_ARGUMENT_COUNT()
@@ -113,14 +111,14 @@ Program MagRef
          if(Am%suscept) then
            write(unit=*,fmt="(a)",advance="no") &
            " => Enter a reflections as 3 integers -> (h,k,l) : "
-           read(unit=*,fmt=*) ih,ik,il
+           read(unit=*,fmt=*) ih,ik,iil
            m=1
          else
            write(unit=*,fmt="(a)",advance="no") &
            " => Enter a magnetic reflection as 4 integers -> (h,k,l,m)=H+sign(m)*k(abs(m)): "
-           read(unit=*,fmt=*) ih,ik,il,m
+           read(unit=*,fmt=*) ih,ik,iil,m
          end if
-         if( m == 0 .or. abs(ih)+abs(ik)+abs(il) == 0 ) exit
+         if( m == 0 .or. abs(ih)+abs(ik)+abs(iil) == 0 ) exit
          !construct partially the object Mh
          j=sign(1,m)
          sig="+"
@@ -128,7 +126,7 @@ Program MagRef
          Mh%signp=real(-j)  ! sign "+" for H-k and "-" for H+k
          iv=abs(m)
          Mh%num_k=iv
-         Mh%h= real((/ih,ik,il/)) - Mh%signp*MGp%kvec(:,iv)
+         Mh%h= real((/ih,ik,iil/)) - Mh%signp*MGp%kvec(:,iv)
          Mh%s = hkl_s(Mh%h,Cell)
          Mh%keqv_minus=K_Equiv_Minus_K(MGp%kvec(:,iv),MGp%latt)
 
@@ -138,8 +136,8 @@ Program MagRef
             !read(unit=*,fmt=*) Am%MagField, Am%dir_MField
             call Calc_Induced_Sk(cell,SpG,Am%MagField,Am%dir_MField,Am,6)
             call Calc_Magnetic_Strf_Tensor(SpG,Am,Mh)
-            write(unit=lun,fmt="(/,a,3i4,a)")  "  Reflection: (",ih,ik,il,") "
-            write(unit=*,  fmt="(/,a,3i4,a)")  "  Reflection: (",ih,ik,il,") "
+            write(unit=lun,fmt="(/,a,3i4,a)")  "  Reflection: (",ih,ik,iil,") "
+            write(unit=*,  fmt="(/,a,3i4,a)")  "  Reflection: (",ih,ik,iil,") "
             write(unit=lun,fmt="(a)")          "  Real part of Tensorial Magnetic Structure Factor: "
             write(unit=*,  fmt="(a)")          "  Real part of Tensorial Magnetic Structure Factor: "
             do i=1,3
@@ -164,9 +162,9 @@ Program MagRef
 
             !Calculate magnetic structure factor and magnetic interaction vector
             call Calc_Magnetic_StrF_MiV(Cell,MGp,Am,Mh)
-            write(unit=lun,fmt="(/,a,3i4,a,3f8.4,a)") "  Reflection: (",ih,ik,il,") "//sig//" (",MGp%kvec(:,iv),")"
+            write(unit=lun,fmt="(/,a,3i4,a,3f8.4,a)") "  Reflection: (",ih,ik,iil,") "//sig//" (",MGp%kvec(:,iv),")"
             write(unit=lun,fmt="(a,3f8.4,a)")         "              (",Mh%h,")"
-            write(unit=*,  fmt="(/,a,3i4,a,3f8.4,a)") "  Reflection: (",ih,ik,il,") "//sig//" (",MGp%kvec(:,iv),")"
+            write(unit=*,  fmt="(/,a,3i4,a,3f8.4,a)") "  Reflection: (",ih,ik,iil,") "//sig//" (",MGp%kvec(:,iv),")"
             write(unit=*,  fmt="(a,3f8.4,a)")         "              (",Mh%h,")"
             write(unit=lun,fmt="(a,2(3f8.4,a))") "  Magnetic Structure   Factor : (",real(Mh%MsF),")+i(",aimag(Mh%MsF),") "
             write(unit=lun,fmt="(a,2(3f8.4,a))") "  Magnetic Interaction Vector : (",real(Mh%MiV),")+i(",aimag(Mh%MiV),") "
@@ -208,7 +206,7 @@ Program MagRef
        type(MagH_Type),            intent(in out) :: Mh
        !--- Local variables ---!
        real(kind=cp)                  :: s
-       real(kind=cp),    dimension(3) :: u_vec,er,ed
+       real(kind=cp),    dimension(3) :: er,ed
        complex(kind=cp), dimension(3) :: Mc, MiV
 
        !

@@ -87,13 +87,13 @@
     !!----
     !!
     Subroutine Menu_Atom_1()
+
        !---- Local Variables ----!
        character(len=30)          :: line
-       character(len=20)          :: spgr
-       integer                    :: i, iv, ierr, mlt
+       integer                    :: iv, mlt
        integer, dimension(3)      :: ivet
        real(kind=cp)              :: occ
-       real(kind=cp), dimension(3):: vet,xp
+       real(kind=cp), dimension(3):: vet
        type (Space_Group_type)    :: grp_espacial
 
        do
@@ -232,8 +232,6 @@
     !!----
     !!
     Subroutine Menu_Atom_3()
-       !---- Local Variables ----!
-       integer               :: i
 
        call execute_command_line(clear_string)
        write(unit=*,fmt="(a)") " "
@@ -281,7 +279,7 @@
 
     Subroutine Menu_Atom_4()
        !---- Local Variables ----!
-       integer                        :: i,j,Mult,m ,la,lb,lc,lam,lbm,lcm,np,nm
+       integer                        :: i,j,Mult,m,lam,lbm,lcm,np,nm
        real(kind=cp)                  :: q, qp,pol,ang,ncell,dist,polc
        real(kind=cp), dimension(3)    :: pos,cpos,r_frac, r_pol,r_plus,r_minus,dir_pol
        real(kind=cp), dimension(3,384):: orb !increased to take into account the surface atoms
@@ -472,8 +470,7 @@
 
     Subroutine Menu_Atom_5()
        !---- Local Variables ----!
-       character(len=132) :: filnopol
-       integer                        :: i,j,Mult,m ,la,lb,lc,lam,lbm,lcm,np,nm
+       integer                        :: i,j,Mult,m,lam,lbm,lcm,np,nm
        real(kind=cp)                  :: q, qp,pol,ang,ncell,dist,polc
        real(kind=cp), dimension(3)    :: pos,cpos,r_frac, r_pol,r_plus,r_minus,dir_pol
        real(kind=cp), dimension(3,384):: orb !increased to take into account the surface atoms

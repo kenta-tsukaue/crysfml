@@ -25,20 +25,20 @@ Program MagPolar3D
  type (MagHD_Type)              :: Mh
  type (Magnetic_domain_type)    :: Mag_Dom
  Type (Polar_calc_type)         :: polari
- Type (Polar_Info_type)         :: polaro
+ !Type (Polar_Info_type)         :: polaro
  Type (Zone_Axis_Type)          :: zone_axis
  !Type (Scattering_Species_Type) :: Scattf
 
  character(len=256)          :: filcod,line,mess     !Name of the input file
  character(len=1)            :: sig
  real                        :: sn,sf2,omega, wave=0.8
- real, dimension(3)          :: vpl,uvw, created_pol,pin,pf,h1,h2
+ real, dimension(3)          :: vpl,created_pol,pin,pf,h1,h2
  real, dimension(3,3)        :: UB, polar_tensor,pseudoT
- integer                     :: Num, lun=1, ier,i,j,m,ih,ik,il,iv, n_ini,n_end, &
+ integer                     :: lun=1, ier,i,j,m,ih,ik,il,iv, n_ini,n_end, &
                                 ich, nd, nch
  complex                     :: NSF
 
- integer                     :: narg,iargc
+ integer                     :: narg
  Logical                     :: esta, arggiven=.false., ub_given=.false., uvw_given=.false., &
                                 addref_given=.false., wave_given=.false., ok ,hklp_given=.false.
 

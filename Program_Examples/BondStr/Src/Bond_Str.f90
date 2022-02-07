@@ -618,8 +618,7 @@ Program Bond_Str
      end if
 
      if (.not. cif .and. bvs_calc .and. .not. map_calc .and. .not. bvel_calc ) then
-        call system("type "//trim(filcod)//"_sum.bvs")
-        !call execute_command_line ("type "//trim(filcod)//"_sum.bvs")
+        call execute_command_line ("more "//trim(filcod)//"_sum.bvs")
      end if
      write(unit=*,fmt="(/,a)")   " => Normal End of: PROGRAM BOND_STR "
      write(unit=*,fmt="(a)")     " => Global results in File: "//trim(filcod)//".bvs"

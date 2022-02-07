@@ -451,9 +451,8 @@
      return
    End Subroutine Print_AC
 
-   Subroutine construct_jxch(lun,iprin,n_mag,spaths,Acm,kf)
+   Subroutine construct_jxch(lun,n_mag,spaths,Acm,kf)
     integer,                            intent(in) :: lun,n_mag
-    logical,                            intent(in) :: iprin
     type (SE_Connection),dimension(:,:),intent(in) :: spaths
     type(Atoms_Cell_Type),              intent(in) :: Acm
     real, optional,                     intent(in) :: kf
@@ -466,7 +465,7 @@
     integer, dimension(n_mag,n_mag)     :: nterms
     integer,          dimension(max_jx) :: p
     character(len=25),dimension(max_jx) :: trans
-    character(len=25),dimension(max_jx) :: Nam_12
+    !character(len=25),dimension(max_jx) :: Nam_12
     character(len=180)                  :: text
     character(len=60)                   :: expo
     character(len=25)                   :: transla
@@ -779,7 +778,6 @@
    Implicit None
 
    character(len=120), allocatable, dimension(:) :: file_dat
-   integer                                       :: nlines, n_ini,n_end
    integer, parameter :: max_magt=96
    type (Crystal_Cell_Type) :: Cell, Celln
    type (Space_Group_Type)  :: Spg, gP1
@@ -790,10 +788,10 @@
    type (Job_Info_type)     :: Job_Info
    character(len=1)    :: ans
    character(len=20)   :: sp1
-   character(len=80)   :: line , title
+   character(len=80)   :: title
    character(len=256)  :: infil,outfil,texto
-   integer, parameter :: lun1=1,lun2=6,lun=2
-   integer :: i, j, numops, ln, nauas, natc, iid,  nmag, lr, max_coord, L
+   integer, parameter  :: lun1=1,lun2=6,lun=2
+   integer :: i, j, numops, ln, nauas, nmag, lr, max_coord, L
    integer, dimension(:), allocatable :: ptr
    integer, dimension(10) :: nif
    real, dimension(10)  :: mom
@@ -1065,7 +1063,7 @@
    call Change_Setting_Cell(Cell,M_basis,Celln)
    !End of calculation for McMag
 
-   Call construct_jxch(lun,iprin,nmag,spaths,Acm)
+   Call construct_jxch(lun,nmag,spaths,Acm)
 
    write(unit=3,fmt="(a)")  "!   Ni    Nf   Spin     ScattFact"
    do i=1,L

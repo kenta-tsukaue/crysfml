@@ -1,0 +1,4 @@
+options install --prefix gfortran_debug
+options --profile debug
+options --compiler gfortran
+options --flag "-ffree-line-length-none -static"
