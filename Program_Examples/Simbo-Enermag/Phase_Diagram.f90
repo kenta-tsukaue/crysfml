@@ -63,7 +63,7 @@
       real, dimension(5,numag)   :: jdomax
       character (len=35)         :: kvector
       real, dimension(3)         :: vk,tvk
-      real, dimension(numa)      :: eigenvr,eigenvi
+      real, dimension(numa)      :: eigenvr
       character (len=132)        :: fileres,forma,fform
       character (len=1)          :: parenth, ans
       character (len=512)        :: line
@@ -82,7 +82,7 @@
       type (Crystal_Cell_Type)   :: celda              ! Cell type structure
       type (Space_Group_Type)    :: grp_espacial       ! Space Group structure
       integer, dimension(3)      :: ngrid
-      integer                    :: natom=2,ntype=1,jfilbin=15,j,k
+      integer                    :: ntype=1,jfilbin=15,j,k
       REAL,    allocatable,dimension(:,:,:) :: rho
       integer, allocatable,dimension(:,:,:) :: freq
       real                  :: denmin=1.0,denmax
@@ -335,10 +335,6 @@
    subroutine crea_filebin()
 
       !---- Definition of variables ----!
-      logical :: info
-
-      integer :: lun
-      integer :: iend
       integer :: i,j,k
   !!! Complementary variables for Fourier compatibility
       character (len=150) :: fildat   ! Data file

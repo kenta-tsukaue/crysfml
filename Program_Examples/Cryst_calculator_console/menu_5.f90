@@ -827,8 +827,8 @@
        integer,      dimension(3,8):: hb
        real(kind=cp),dimension(:),allocatable  :: angles
        integer,      dimension(:),allocatable  :: ii,jj,nang
-       integer,      dimension(3)              :: u,h,hi2,ho2,hi4,ho4
-       real(kind=cp)          :: n_max,angle,mv1,mv2,mv3,mv4, tol, a13,a14,a23,a24, &
+       integer,      dimension(3)              :: h,hi2,ho2,hi4,ho4
+       real(kind=cp)          :: n_max,angle,mv1,mv2,mv3,mv4, tol, a13,a23, &
                                  a1,a2,a3,a4, mu,mv,rf, rmin
        integer                :: i,j,k,nedges,n,msol,nsol, nbest,neq
        Type(Zone_Axis_Type)   :: Zone_Axis
@@ -1334,7 +1334,7 @@
        real(kind=cp),    dimension(:),allocatable  :: angs,angles
        integer, dimension(:),allocatable  :: ii,jj,nn,nang,nl
        integer, dimension(:,:),allocatable  :: p
-       integer, dimension(3)  :: u,h,h1,h2,h3,h4,hi,ho
+       integer, dimension(3)  :: h,h1,h2,h3,h4,hi,ho
        real(kind=cp)          :: n_max,angle,mu,mv, tol
        integer                :: i,j,k,nedges,n,msol,nsol,k1,k2
        Type(Zone_Axis_Type)   :: Zone_Axis
@@ -1595,7 +1595,6 @@
       !---- Local variables ----!
       integer              :: i1,i2,n,i,j
       real(kind=cp)        :: smax,rm,rm1,rm2
-      real(kind=cp)        :: cosgam,cos2,singam
       integer,      dimension(3)  :: h
       real(kind=cp),dimension(3,3):: mat,mg
       integer,      dimension(:,:), allocatable :: cp_ind
@@ -1683,10 +1682,10 @@
       Character(len=*), optional,   intent(in) :: Mode
 
       !---- Local variables ----!
-      integer                          :: i1,i2,nref,n,ii,jj,j,k,iv
-      real(kind=cp)                     :: d,rm,rm1,rm2,rm3,ri,rj,s,smax
+      integer                           :: i1,i2,j,iv
+      real(kind=cp)                     :: rm1,rm2,rm3,smax
       real(kind=cp)                     :: deter,cosgam,cos2,singam,cosbet,cost,vrec,anglp
-      real(kind=cp), dimension(3)               :: h,u3,r,r1,r2
+      real(kind=cp), dimension(3)               :: u3,r1,r2
       real(kind=cp), dimension(3,3)             :: uc,b,tinv,mat
       real(kind=cp), parameter, dimension(3,16) :: rmore=reshape( (/1.,0.,0.,  0.,1.,0.,  0.,0.,1.,  1.,1.,0.,  1.,0.,1., &
                                                            0.,1.,1., -1.,1.,0., -1.,0.,1.,  0.,-1.,1., 1.,1.,1., &

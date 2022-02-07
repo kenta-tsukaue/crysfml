@@ -11,7 +11,7 @@
    use CFML_Math_General,    only: asind,sind,cosd,atan2d
    use CFML_Math_3D,         only: Invert=>Invert_A, Cross_Product
    use CFML_Crystal_Metrics, only: Crystal_Cell_Type, Cart_Vector,Rot_Matrix, &
-                                   ERR_Crys_Mess,ERR_Crys, set_crystal_cell
+                                   set_crystal_cell
    use CFML_String_Utilities,only: L_case
    use CFML_Geometry_Calc,   only: Set_Rotation_Matrix
    use CFML_Geometry_SXTAL,  only: z4frgn, z1frz4, Get_FlatCone_Angles_D10
@@ -25,20 +25,19 @@
 
    implicit none
 
-   Character(len=150)            :: cfl_file, fileout, line
+   Character(len=150)            :: cfl_file, line
    Character(len=1)              :: ans
-   integer                       :: i,j,k,n,ier,narg, npoints,nref,np_ini
-   real(kind=cp)                 :: Lambda, ruvw, dstar,omega,chi,phi,rho,alpha, &
+   integer                       :: i,j,n,ier,narg, npoints,nref,np_ini
+   real(kind=cp)                 :: Lambda, ruvw, dstar,rho,alpha, & !,omega,chi,phi
                                     gamma,nu,mu,step,rho1,rho2, sn, fsq, rho_ini, rho_fin
-   real(kind=cp), dimension(3)   :: h1,h2,uvw,r1,z1,z2,z3,z4,dL
-   real(kind=cp), dimension(3,3) :: U_Mat,UB,UB_inv,UB_invt, R_rho, Gibbs,Rot, &
-                                    M_Omega,M_Chi,M_Phi,M_set
+   real(kind=cp), dimension(3)   :: h1,h2,uvw,r1,z1,z2,dL
+   real(kind=cp), dimension(3,3) :: U_Mat,UB,UB_inv,UB_invt, R_rho, Gibbs,Rot
+                                    !M_Omega,M_Chi,M_Phi,M_set
    real(kind=cp), dimension(2,3) :: limits
    type (Crystal_Cell_Type)      :: Cell
    type (space_group_type)       :: SpG
    type (Atom_list_Type)         :: Atm
-   logical                       :: ok,new_ref
-   character(len=80)             :: mess
+   logical                       :: ok !,new_ref
    integer,       parameter      :: maxang=5000, nfil=128, maxref=1500
    logical,       dimension(maxang) :: inlim
    real(kind=cp), dimension(maxang) :: om,ch,ph,ps

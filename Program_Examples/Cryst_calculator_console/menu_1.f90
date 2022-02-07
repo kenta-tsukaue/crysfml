@@ -97,16 +97,15 @@
 
     End Subroutine Menu_Princ1
 
+
+
     !!----
     !!---- Subroutine Menu_SPGR_1
     !!----
     !!
     Subroutine Menu_Spgr_1()
        !---- Local Variables ----!
-       character(len=20)           :: line, spgr
-       integer                     :: i, iv, ierr, npos
-       integer, dimension(1)       :: ivet
-       real(kind=cp), dimension(1) :: vet
+       character(len=20)           :: line
        type (Space_Group_Type):: grp_espacial
 
        do
@@ -138,21 +137,19 @@
        end do
     End Subroutine Menu_Spgr_1
 
+
+
     !!----
     !!---- Subroutine Menu_SPGR_2
     !!----
     !!
+
     Subroutine Menu_Spgr_2()
        !---- Local Variables ----!
-       character(len=20)                :: line, spgr
+       character(len=20)                :: line !, spgr
        character(len=40)                :: str
        character(len=80), dimension(96) :: texto
-
-       integer                          :: i, iv, ierr, lun, nlines, npos
-       integer, dimension(1)            :: ivet
-
-       real(kind=cp), dimension(1)               :: vet
-
+       integer                          :: i, lun, nlines
        type (Space_Group_type)          :: grp_espacial
 
        do
@@ -231,18 +228,15 @@
     !!
     Subroutine Menu_Spgr_3()
        !---- Local Variables ----!
-       character (len=80)                :: line
+       !character (len=80)                :: line
        character (len=1)                 :: ans
-       character (len=30)                :: spgr, spg, str
+       character (len=30)                :: spgr
        character (len=30), dimension(10) :: gen
        character (len=140)               :: gener
-
        integer, dimension(3,3,24)        :: ss
-       integer                           :: ng,i,istart,nlines,ier
-
+       integer                           :: ng,i,istart
        real(kind=cp), dimension(3,24)    :: ts
-
-       type (Space_Group_type)                :: grp_espacial
+       type (Space_Group_type)           :: grp_espacial
 
 
        do
@@ -331,13 +325,13 @@
     !!
     Subroutine Menu_Spgr_4()
        !---- Local Variables ----!
-       character (len=80)                :: line
+       !character (len=80)                :: line
        character (len=1)                 :: ans
-       character (len=30)                :: spgr, spg, str
+       character (len=30)                :: spgr
        character (len=16)                :: hall
        character (len=30), dimension(10) :: gen
        character (len=140)               :: gener
-       integer                           :: ng,i,istart,nlines,ier
+       integer                           :: ng,i,istart
        type (Space_Group_type)           :: grp_espacial
 
        do
@@ -426,13 +420,13 @@
     !!
     Subroutine Menu_Spgr_5()
        !---- Local Variables ----!
-       character (len=80)                :: line,spg
+       character (len=80)                :: line
        character (len=20)                :: spgr
        character (len= 1)                :: car
        character (len=30), dimension(10) :: gen
        character (len=140)               :: gener
 
-       integer                           :: i, ng, istart, npos, iv, ierr
+       integer                           :: i, ng, istart, npos, iv
        integer, dimension(1)             :: ivet
        integer, dimension(3,3,24)        :: ss
        integer, parameter                :: num_spgr_info=612
@@ -737,14 +731,13 @@
     !!
     Subroutine Menu_Spgr_7()
        !---- Local Variables ----!
-       character (len=80)                :: line,simbolo,symb
-       character (len=12)                :: spgr,spg
+       character (len=80)                :: simbolo,symb
+       character (len=12)                :: spgr
        character (len= 1)                :: ans
        character (len=30), dimension(10) :: gen
        character (len=140)               :: gener
-
        integer, dimension(3,3,24)        :: ss
-       integer                           :: ng,i,istart,ier
+       integer                           :: ng,i,istart
 
        real(kind=cp), dimension(3,24)    :: ts
 
@@ -829,7 +822,7 @@
     !!
     Subroutine Menu_Spgr_8()
        !---- Local Variables ----!
-       character(len=20)     :: spgr, cmd
+       character(len=20)     :: spgr
        character(len=35)     :: Appl_trs, IAppl_trs
        type (Space_Group_type)    :: grp_espacial, grp_modified
 
@@ -1033,9 +1026,8 @@
     !!
     Subroutine Menu_Spgr_10()
        !---- Local Variables ----!
-       character(len=40)      :: line, spgr
-       character(len=3)       :: car
-       integer                :: i
+       character(len=40)      :: line !, spgr
+       !character(len=3)       :: car
        type (Space_Group_Type):: grp_espacial
 
        call Set_Spgr_Info()
@@ -1077,8 +1069,8 @@
     Subroutine Menu_Spgr_11()
        !---- Local Variables ----!
        character(len=40)      :: line, spgr
-       character(len=3)       :: car
-       integer                :: i,ier
+       !character(len=3)       :: car
+       integer                :: ier
        type (Space_Group_Type):: grp_espacial
 
        call Set_Spgr_Info()
@@ -1141,7 +1133,7 @@
        integer                           :: iunit, num_orbita, nvar, npos, num_old, nzeros
        integer                           :: nx,ny,nz
        integer,dimension(3)              :: ix,ix1,ix2,ix11,ix22
-       integer,dimension(3,3)            :: w,w1
+       integer,dimension(3,3)            :: w
        real(kind=cp),dimension(3)        :: t,t1,ts,ts1,ts2,x,x1,x2
        type(wyckoff_type)                :: Wyck1
        type(wyck_pos_type)               :: wyckpos
@@ -1516,7 +1508,7 @@
       integer,       dimension(3),    intent(out) :: Ix
 
       !---- Local Variables ----!
-      integer                   :: i,j,k
+      integer                   :: i,j
       integer,dimension(3,3)    :: w
 
       t=0.0
@@ -1541,13 +1533,11 @@
    !!
    Subroutine Menu_Spgr_12()
       !---- Local Variables ----!
-      character(len=80)             :: line,line2
-      character(len=20)             :: spgr
-      integer                       :: i, j,iv, ierr, npos
+      character(len=80)             :: line
+      integer                       :: i, iv
       integer, dimension(3)         :: ivet
-      integer, dimension(3,3)       :: w
-      real(kind=cp), dimension(3)   :: vet,orig,t1,t2,t3
-      real(kind=cp), dimension(3,3) :: p, p_inv,w1,w2
+      real(kind=cp), dimension(3)   :: vet,orig
+      real(kind=cp), dimension(3,3) :: p
       type (Space_Group_Type)       :: grp1,grp3
       type (NS_Space_Group_Type)    :: grp2
 

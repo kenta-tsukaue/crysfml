@@ -30,15 +30,15 @@ Program Optimizing_MagStructure
 !   type (Atom_list_Type)              :: A
 
    character(len=256)                 :: filcod     !Name of the input file
-   character(len=256)                 :: filhkl     !Name of the hkl-file
-   character(len=256)                 :: filrest    !Name of restraints file
+   !character(len=256)                 :: filhkl     !Name of the hkl-file
+   !character(len=256)                 :: filrest    !Name of restraints file
    character(len=256)                 :: line       !Text line
-   character(len=256)                 :: fst_cmd    !Commands for FP_Studio
-   integer                            :: Num, ier,i,j,k,n, i_cfl, nln
+   !character(len=256)                 :: fst_cmd    !Commands for FP_Studio
+   integer                            :: i,n, i_cfl
    real                               :: start,fin
-   integer                            :: narg,iargc, n_ini,n_end
-   Logical                            :: esta, arggiven=.false.,sthlgiven=.false., &
-                                         fst_out=.false., local_opt=.false., rest_file=.false.
+   integer                            :: narg,n_ini,n_end
+   Logical                            :: esta, arggiven=.false.  !fst_out=.false.,sthlgiven=.false.
+                                         ! local_opt=.false. , rest_file=.false.
 
     !---- Arguments on the command line ----!
     narg=COMMAND_ARGUMENT_COUNT()
@@ -218,10 +218,10 @@ End Program Optimizing_MagStructure
 
 Subroutine Write_FST(fst_file,v,cost) ! Is not used here, needed for CFML_optimization_san from libcrysfml
    !---- Arguments ----!
-   use CFML_String_Utilities,        only: get_logunit
-   use CFML_Keywords_Code_Parser,    only: VState_to_AtomsPar
-   use CFML_Atom_TypeDef,            only: atom_type, atom_list_type
-   use CFML_crystal_Metrics,         only: Crystal_Cell_Type
+   use CFML_String_Utilities,          only: get_logunit
+   use CFML_Keywords_Code_Parser,      only: VState_to_AtomsPar
+   use CFML_Atom_TypeDef,              only: atom_type, atom_list_type
+   use CFML_crystal_Metrics,           only: Crystal_Cell_Type
    use CFML_crystallographic_symmetry, only: space_group_type
 
    character(len=*),     intent(in):: fst_file
@@ -229,7 +229,7 @@ Subroutine Write_FST(fst_file,v,cost) ! Is not used here, needed for CFML_optimi
    real,                 intent(in):: cost
 
    !----- Local variables -----!
-   type(Atom_Type)                    :: atom
+   !type(Atom_Type)                    :: atom
    type (Atom_list_Type)              :: A
    type (Crystal_Cell_Type)           :: Cell
    type (space_group_type)            :: SpG
@@ -237,6 +237,8 @@ Subroutine Write_FST(fst_file,v,cost) ! Is not used here, needed for CFML_optimi
    integer :: lun,i,nc, ier
    character(len=132)                 :: file_fst,fst_cmd
    character(len=30), dimension(10)   :: cmds
+
+   if(v(1) == 1.23456 .or. cost == v(2)) write(unit=*,fmt="(a)") " => This is nothing else that to avoid warnings!"
 
    i=index(fst_file,".fst")
    file_fst=fst_file(1:i+3)

@@ -197,7 +197,7 @@
         end do
 
         !!!------ FIRST: test with all twofold axes found
-        call Get_Conventional_Cell(twofold,Cell,tr,message,ok,told)
+        call Get_Conventional_Cell(twofold,Cell,tr,message,ok,told=told)
         det=determ_A(tr)
         !Here Tr is the matrix transforming the Niggli cell to the conventional cell
         if(ok) then

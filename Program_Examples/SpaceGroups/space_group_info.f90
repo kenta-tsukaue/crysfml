@@ -20,7 +20,6 @@ Program SPG_Info
    integer,           dimension(20) :: point_op
    character(len=50), dimension(20) :: gen
    character(len=70)                :: op_symb
-   character(len=6),  dimension(20) :: sgen
    integer :: ngen,i,j
 
    !---- Procedure ----!
@@ -33,7 +32,7 @@ Program SPG_Info
         ngen=0
         do
           i=index(spgr,";")
-          if(i == 0) then 
+          if(i == 0) then
             ngen=ngen+1
             gen(ngen)=adjustl(spgr)
             exit
@@ -43,7 +42,7 @@ Program SPG_Info
           spgr=adjustl(spgr(i+1:))
         end do
         call set_spacegroup(spgr,grp_espacial,gen,ngen,"gen")
-      else      
+      else
         !> Setting the Space Group Information
         call set_spacegroup(spgr,grp_espacial)
       end if

@@ -24,14 +24,14 @@ Program Schwinger
  character(len=1)             :: indv
  real(kind=cp)                :: sn,s2,theta,lambda,flip_right,flip_left,up,down,stlmax,Nuc
  real(kind=cp), dimension(3)  :: hn
- integer                      :: lun=1, ier,i,j,ih,ik,il, MaxNumRef
+ integer                      :: lun=1, ier,i,j,ih,ik,iil, MaxNumRef
  complex(kind=cp)             :: fn,fx,fe,fsru,fsrd,fslu,fsld
  real(kind=cp), dimension(6)  :: extc
- real(kind=cp), dimension(3,3):: ub
+ !real(kind=cp), dimension(3,3):: ub
  integer,  dimension(:), allocatable :: ind
 
- integer                     :: narg,iext,ity
- Logical                     :: esta, arggiven=.false.,left=.false.,ext=.false.,ubgiven=.false.,ok
+ integer                     :: narg,iext
+ Logical                     :: esta, arggiven=.false.,ext=.false.,ok !,ubgiven=.false.,left=.false.
 
  Type(Scattering_Species_Type) :: Scattf, add_Scat
 
@@ -164,10 +164,10 @@ Program Schwinger
        do
          if(indv == "i") then
            write(unit=*,fmt="(a)",advance="no")  " => Enter a reflection as 3 integers -> (h,k,l): "
-           read(unit=*,fmt=*,iostat=ier) ih,ik,il
+           read(unit=*,fmt=*,iostat=ier) ih,ik,iil
            if(ier /= 0) cycle
-           if(abs(ih)+abs(ik)+abs(il) == 0 ) exit
-           hn=real([ih,ik,il])
+           if(abs(ih)+abs(ik)+abs(iil) == 0 ) exit
+           hn=real([ih,ik,iil])
            sn = hkl_s(hn,Cell)
            theta=lambda*sn
            theta=asin(theta)
@@ -190,7 +190,7 @@ Program Schwinger
            else
               flip_left=up/down
            end if
-           write(unit=*,fmt="(/,a,3i4,a,f8.5)") "  Reflection: (",ih,ik,il,") sinTheta/Lambda=",sn
+           write(unit=*,fmt="(/,a,3i4,a,f8.5)") "  Reflection: (",ih,ik,iil,") sinTheta/Lambda=",sn
            write(unit=*,fmt="(a,2(f10.5,a))")   "  Nuclear     Structure   Factor : (",real(fn),  " ) + i (",aimag(fn),  " ) "
            write(unit=*,fmt="(a,2(f10.5,a))")   "  X-rays      Structure   Factor : (",real(fx),  " ) + i (",aimag(fx),  " ) "
            write(unit=*,fmt="(a,2(f10.5,a))")   "  Electrostatic Structure Factor : (",real(fe),  " ) + i (",aimag(fe),  " ) "
@@ -202,7 +202,7 @@ Program Schwinger
            write(unit=*,fmt="(a, f12.6)")      "            Flipping ratio left  : ", flip_left
            write(unit=*,fmt="(a, f12.6)")      "         Nuclear Intensity(Fn^2) : ", Nuc
 
-           write(unit=lun,fmt="(/,a,3i4,a,f8.5)") "  Reflection: (",ih,ik,il,") sinTheta/Lambda=",sn
+           write(unit=lun,fmt="(/,a,3i4,a,f8.5)") "  Reflection: (",ih,ik,iil,") sinTheta/Lambda=",sn
            write(unit=lun,fmt="(a,2(f10.5,a))")   "  Nuclear     Structure   Factor : (",real(fn),  " ) +i (",aimag(fn),  " ) "
            write(unit=lun,fmt="(a,2(f10.5,a))")   "  X-rays      Structure   Factor : (",real(fx),  " ) +i (",aimag(fx),  " ) "
            write(unit=lun,fmt="(a,2(f10.5,a))")   "  Electrostatic Structure Factor : (",real(fe),  " ) +i (",aimag(fe),  " ) "
@@ -219,7 +219,7 @@ Program Schwinger
                                     "  SRUr      SRUi          SRDr      SRDi          SLUr      SLUi          SLDr      SLDi"
            do j=1,hkl%NRef
               i=ind(j)
-              hn=real(hkl%ref(i)%h)
+              hn = real(hkl%ref(i)%h,kind=cp)
               sn = hkl%ref(i)%s
               theta=lambda*sn
               theta=asin(theta)

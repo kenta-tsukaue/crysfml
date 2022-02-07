@@ -33,7 +33,7 @@
     Implicit None
 
     type(file_list_type) :: file_dat
-    integer                                 :: nlines, nlong, n_ini,n_end
+    integer                                 :: n_ini,n_end
 
     type (Crystal_Cell_Type)                :: Cell, Cell_n, Cell_std
     type (Space_Group_Type)                 :: SpaceGroup,SpaceGroup_n
@@ -45,30 +45,27 @@
 
     type (Point_list_type)                  :: pl, pl_n
 
+
     character(len=1)         :: ans
-    character(len=5)         :: so_ord
     character(len=20)        :: nam
-    character(len=20)        :: spp, sppg,symb !symbol of space group
-    character(len=80)        :: line , title, cmdline, trans_symb
+    character(len=20)        :: symb !symbol of space group
+    character(len=80)        :: line , cmdline, trans_symb
     character(len=90)        :: group_setting
     character(len=90),dimension(1024)  :: symb_setting
     character(len=256)       :: filcod,outfil,texto
     integer, parameter       :: lun1=1,lun2=6,lun=2
-    integer                  :: i, j, numops, ier, ln, nauas, natc, iid,  nmag, len_cmdline, &
+    integer                  :: i, j, numops, ier, ln, len_cmdline, &
                                 lenf, lr, nsg, nat, i1,i2
-    integer                  :: l,ng, indx, k, order,mulg, norbi, n, ifail, indice,i_cfl,mult
-    real                     :: seconds, End_time, start_time, rminutes, hours, det,occ
+    integer                  :: l,ng, indx, k, norbi, n, ifail, indice,i_cfl,mult
+    real                     :: seconds, End_time, start_time, det,occ
     integer, dimension(3,3)  :: Mat        !Auxiliary matrix
     real, dimension(3,3)     :: trans      !matrix transforming the cells
-    real, dimension(3,3,1024) :: invMt,Mstd !Transformation of coordinates to standard setting
-    real, dimension(3,1024)   :: tor        !Origin for transforming to standard setting
+    real, dimension(3,3,1024):: invMt,Mstd !Transformation of coordinates to standard setting
+    real, dimension(3,1024)  :: tor        !Origin for transforming to standard setting
     real, dimension(3  )     :: orig       !origin of the transformed cell in old cell
     real, dimension(3  )     :: xp         !auxiliary 3D-vector
-    real, dimension(6  )     :: cel        !cell parameters
-    logical                  :: iprin, trans_given, trn_std, index_given, fix_given, full_given, esta
-    integer, dimension (48)  :: spg_ptr, ptr, norb, sbg_ptr
+    logical                  :: trans_given, trn_std, index_given, fix_given, full_given, esta
     real,   dimension(3,48)  :: xo !orbits matrix
-    character(len=512)       :: cosets, stabil
     character(len=1)         :: fix_lat
     integer                  :: narg
     real, parameter,dimension(3,3) :: identity=reshape ([1,0,0,0,1,0,0,0,1],[3,3])
@@ -524,7 +521,6 @@
         character(len=*),       intent(out)     :: symb_set
         real, dimension(4,4)      :: C
         type (Space_Group_Type)   :: Gsp
-        integer :: i
         real, dimension(3,3)      :: iMt,M
         real, dimension(3)        :: tr
 

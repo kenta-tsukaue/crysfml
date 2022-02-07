@@ -53,7 +53,7 @@
          real, dimension(3), intent(in) :: t
          integer,            intent(in) :: n
          real, dimension(3) ::  xc,xo
-         integer :: i,j
+         integer :: i
          xc=0.0
          xo=0.0
          do i=1,nat
@@ -345,7 +345,7 @@
       End Subroutine Input_Data
 
       Subroutine Interactive_Input()
-         integer :: i,j,iv
+         integer :: i,iv
          nfst(1)="S(k)"
          nfst(2)="T(k)"
          write(unit=*,fmt="(a)",advance="no")" => Give a title for the job: "
@@ -597,7 +597,7 @@
          character (len=132) :: fmtformat
          character (len=132) :: aline
          character (len=9)   :: key,lab
-         integer :: i,j,iv,ive
+         integer :: i,iv,ive
          nfst(1)="S(k)"
          nfst(2)="T(k)"
          !-----------------------------
@@ -759,7 +759,7 @@
          character (len=132) :: fmtformat
          character (len=132) :: aline
          character (len=9)   :: key,lab
-         integer :: i,j,iv,ive,ier
+         integer :: i,iv,ive,ier
          nfst(1)="S(k)"
          ifou=1
          do
@@ -962,7 +962,7 @@
       Subroutine Show_Input(ilo)
         integer, intent(in) :: ilo
          character (len=1)  :: ans
-         integer :: i,j,iv
+         integer :: i,iv
 
          write(unit=ilo,fmt="(/a/)") "   Information about LATTICE and PROPAGATION VECTORS"
          write(unit=*,fmt="(a/4x,3f10.5,3f10.4)")  &
@@ -1010,7 +1010,7 @@
          logical :: cartes
          real,    dimension(3) :: t(3),cm(3)
          integer, dimension(3) :: ic1(3),ic2(3)
-         integer :: i,j,i1,i2,i3,jl,ia,n
+         integer :: i,i1,i2,i3,jl,ia,n
 
          cartes=.FALSE.
          write(unit=*,fmt="(a)",advance="no") " => Name of the output file: "
@@ -1062,7 +1062,7 @@
          character (len=256) :: filmom
          character (len=40)  :: label
          real,    dimension(3) :: t(3),cm(3),mlt
-         integer :: i,j,i1,i2,i3,jl,ia,n,Ipr,iat
+         integer :: i,i1,i2,i3,jl,ia,n,Ipr,iat
          real, dimension(:,:), allocatable :: moments
          character(len=10),dimension(:),allocatable :: nam_at
 
@@ -1199,7 +1199,7 @@
       Subroutine Write_Mag3D()
          character (len=2),dimension(10)    :: spec
          real,    dimension(3) :: t(3),cm(3)
-         integer :: i,j,jl,ia,n,nspec,ns
+         integer :: i,jl,ia,n,nspec,ns
          real    :: phi,theta,ss
 
          open(unit=iom,file="mag3d.cry",status="unknown")
@@ -1279,7 +1279,9 @@
       Program Moment
       Use Moment_Mod
       Use Moment_Inout
+      implicit none
       character(len=2) :: cop
+      integer :: iin, ival
 !     Initialization of some variables
       phasgiven=.FALSE.
       nce=0

@@ -97,7 +97,7 @@
 
        !--- Local Variables ----!
        integer :: i,j,npts,i1,i2
-       real    :: step,Intens,Bragg,Hl,Hg, ss,cs,tt,th1,th2,LorentzF, Y,eta,fwhm,chw
+       real    :: Intens,Bragg,Hl,Hg, ss,cs,tt,th1,th2,LorentzF, Y,eta,fwhm,chw
 
        npts=(PPC%Thmax-PPC%Thmin)/PPC%step + 1.02
        call Allocate_Diffraction_Pattern(Pat,npts)
@@ -189,16 +189,12 @@
      !---- Variables ----!
      implicit none
 
-     integer                :: i,j,k,l,m,n,maxnumref,ier,mult,nf
+     integer                :: i,maxnumref,ier,mult,nf
      integer                :: lun=1,lp=2
-     real, dimension(3)     :: ad,ang,x,fr
-     character(len=1)       :: ans,outa
-     integer, dimension(3)  :: ncel,h
-     real                   :: stlmax,tini,tfin,sn,sf2,tim,ftim=1.0,box
+     real                   :: stlmax,tini,tfin,tim,ftim=1.0
      character(len=132)     :: line,powfile,filcod
      character(len=3)       :: mode
      character(len=8)       :: units="seconds",radiation
-     character(len=4),dimension(:),allocatable :: ch
 
      Type(Crystal_Cell_type)        :: cell
      Type(Space_Group_Type)         :: SpG
@@ -208,7 +204,7 @@
      Type(PowPat_CW_Conditions)     :: PPC
      Type(file_list_type)           :: fich_cfl
      integer                        :: narg
-     Logical                        :: esta, arggiven=.false., fail
+     Logical                        :: esta, arggiven=.false.
 
 
      !---- Arguments on the command line ----!

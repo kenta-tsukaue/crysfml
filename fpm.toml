@@ -1,8 +1,6 @@
-# This is the manifest file for building CrysFML 
+# This is the manifest file for building CrysFML with fpm
 # It is better to comment the part corresponding to executables in order to construct
-# the library totally independent of the programs using it. An error occurs if one uses
-#  
-#
+# the library totally independent of the programs using it.
 #
 name = "CrysFML"
 version = "0.1.0"
@@ -15,6 +13,7 @@ copyright = "Copyright 2022, Juan Rodriguez-Carvajal, Javier Gonzalez-Platas, Ne
 auto-executables = false
 auto-tests = false
 auto-examples = false
+#link=["../../wint/lib.i64/winter.lib","user32.lib", "gdi32.lib", "comdlg32.lib", "winspool.lib", "winmm.lib", "shell32.lib", "advapi32.lib", "htmlhelp.lib"]
 
 [install]
 library = true
@@ -22,6 +21,10 @@ library = true
 [library]
 source-dir = "Src"
 include-dir = "Src"
+
+#[dependencies]
+#my-utils = { path = "../../wint/lib.i64" } does not work! Looks for a fpm.toml file!
+
 #
 # The lines above are enough for building the library using the scripts make_CrysFML_fpm.bat/make_CrysFML_fpm.sh
 #
@@ -31,7 +34,6 @@ include-dir = "Src"
 #
 # Some executables from Program_Examples
 #
-
 [[executable]]
 name="cryscalcon"
 source-dir="Program_Examples/Cryst_calculator_console"
@@ -92,10 +94,10 @@ main="GLOpSAnn.f90"
 #
 # Metric
 #
-#[[executable]]
-#name="Get_Conv_Cell"
-#source-dir="Program_Examples/Metrics"
-#main="Get_Conv_Cell.f90"
+[[executable]]
+name="Get_Conv_Cell"
+source-dir="Program_Examples/Metrics"
+main="Get_Conv_Cell.f90"
 
 [[executable]]
 name="search_cellrelations"
@@ -110,25 +112,26 @@ name="MagPolar3D"
 source-dir="Program_Examples/Magnetism"
 main="MagPolar3D.f90"
 
-#[[executable]]
-#name="magref"
-#source-dir="Program_Examples/Magnetism"
-#main="magref.f90"
+[[executable]]
+name="magref"
+source-dir="Program_Examples/Magnetism"
+main="magref.f90"
 
-#[[executable]]
-#name="Schwinger"
-#source-dir="Program_Examples/Magnetism"
-#main="Schwinger.f90"
+################### Warning! ifx in mode release is unable to compile Schwinger: hn = real(hkl%ref(i)%h,kind=cp)
+[[executable]]
+name="Schwinger"
+source-dir="Program_Examples/Magnetism"
+main="Schwinger.f90"
 
 [[executable]]
 name="Moment"
 source-dir="Program_Examples/Magnetism/Moment"
 main="moment.f90"
 
-#[[executable]]
-#name="MagOptim"
-#source-dir="Program_Examples/Magnetism/MagOptim_v4"
-#main="MagOptim.f90"
+[[executable]]
+name="MagOptim"
+source-dir="Program_Examples/Magnetism/MagOptim_v4"
+main="MagOptim.f90"
 
 #
 # Magnetic package Simbo, EnerMag, Phase_Diagram and MC_Mag
@@ -194,4 +197,16 @@ name="Laue_Powder"
 source-dir="Program_Examples/PowderPattern"
 main="Laue_powder.f90"
 
+#
+# Single X-tal diffractometry
+#
 
+[[executable]]
+name="d10_flat_cone"
+source-dir="Program_Examples/SXtal_Diffractometry"
+main="d10_flat_cone.f90"
+
+[[executable]]
+name="get_UB_from2ref"
+source-dir="Program_Examples/SXtal_Diffractometry"
+main="get_UB_from2ref.f90"

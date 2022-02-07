@@ -5506,14 +5506,14 @@ Module CFML_ILL_Instrm_Data
     !!----
     !!---- Update: 29/04/2011
     !!
-    Subroutine Read_SXTAL_Numor(filename,instrument,num,inf,frames,counts)
+    Subroutine Read_SXTAL_Numor(filename,instrument,num,inf,frames)  !,counts)
        !---- Arguments ----!
        character(len=*)               , intent(in)     :: filename
        character(len=*)               , intent(in)     :: Instrument
        type(SXTAL_Numor_Type)         , intent(in out) :: Num
        logical, optional              , intent(in)     :: inf
        integer, optional, dimension(:), intent(in)     :: frames
-       integer, optional, dimension(:,:,:), allocatable, intent(out) :: counts
+       !integer, optional, dimension(:,:,:), allocatable, intent(out) :: counts
 
        !---- Local variables ----!
        character(len=4)       :: instr

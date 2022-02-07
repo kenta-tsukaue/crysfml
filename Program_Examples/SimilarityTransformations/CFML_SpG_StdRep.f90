@@ -56,10 +56,10 @@ contains
         integer,                         intent(out) :: n
 
         !---- Local variables ----!
+
         integer                         :: i
         logical                         :: singular
         integer,       dimension(3,3)   :: R1,R2,R3
-        real(kind=cp), dimension(3,3)   :: B
         real(kind=cp), dimension(3,3,6) :: Ainv
 
         select case (trim(LaueClass))
@@ -136,13 +136,13 @@ contains
         real(kind=cp),       dimension(4,4,3),  intent(out) :: G         ! generators
         integer,                                intent(out) :: nGen      ! number of generators
 
-        integer                              :: inversion,ng_,n,i,j,ngaux
+        integer                              :: inversion,n,i,ngaux
         real(kind=cp)                        :: d
-        logical                              :: matched,positive
+        logical                              :: positive
         integer,       dimension(3)          :: axis
         integer,       dimension(3,3)        :: identity
-        real(kind=cp), dimension(4,4)        :: W
         integer, dimension(:,:), allocatable :: idd
+
 
         ERR_StdRep = .false.
         if (spaceGroupNumber < 1 .or. spaceGroupNumber > 230) then
@@ -611,7 +611,7 @@ contains
         logical, optional,             intent(in)  :: info ! if present, write output
 
         !---- Local variables ----!
-        integer           :: i
+
         character         :: lattyp
         character(len=60) :: symb
         logical           :: singular,output
@@ -732,19 +732,18 @@ contains
         logical, optional,             intent(in)  :: info  ! if present, write output
 
         !---- Local variables ----!
-        integer                           :: i,j,k,n,n_,tr,nCubicAxes
-        real                              :: d
+
+        integer                           :: i,j,k,n,n_,nCubicAxes
         logical                           :: colin,singular,integral,standard,output
         integer,           dimension(2)   :: order
         integer,           dimension(3)   :: bx,by,bz
-        real(kind=cp),     dimension(3)   :: v
         character(len=20), dimension(6)   :: axisName
         character(len=60)                 :: symb
         integer,           dimension(3,3) :: W,U
         integer,           dimension(3,4) :: paxis,cubicAxes
         real(kind=cp),     dimension(3,3) :: Pinv,Waux,Uaux,PM,PMinv
         integer,           dimension(:,:), allocatable :: idd
-        real(kind=cp),     dimension(:,:), allocatable :: T
+
 
         output = .false.
         if (present(info)) output = .true.
@@ -1168,13 +1167,13 @@ contains
         logical, optional,             intent(in)  :: info ! if present, write output
 
         !---- Local variables ----!
-        integer                       :: n,i,j,k,l,m
+        integer                       :: n,i,j,k,m
         integer                       :: nCentringVectors
         real(kind=cp)                 :: d
         logical                       :: linearDependence,sorted,&
                                          singular,primitive,integral,&
                                          output
-        character(len=60)             :: symb,tr_symb
+        character(len=60)             :: symb
         real(kind=cp), dimension(4)   :: v
         real(kind=cp), dimension(3,3) :: A,Pinv
         real(kind=cp), dimension(:,:), allocatable :: centringVectors
@@ -1589,7 +1588,6 @@ contains
         real                    :: dr
         logical                 :: integral,ordered
         real,    dimension(3)   :: raxis,axisaux
-        logical, dimension(3)   :: fix
         integer, dimension(3,3) :: A,U
         integer, dimension(:), allocatable :: nzeros,row
 
@@ -1854,12 +1852,11 @@ contains
         logical, optional,             intent(in)  :: outp
 
         !---- Local variables ----!
-        integer                         :: n,sgNumber,i,j
+        integer                         :: n,i
         character                       :: lattyp
         character(len=90)               :: setting
         real(kind=cp), dimension(3,3)   :: P,Mp,Mc,M
         real(kind=cp), dimension(3,3,6) :: A
-        integer, dimension(3) :: axis
 
         call Init_Err_StdRep()
         call Init_Err_Symm()
@@ -2178,12 +2175,9 @@ contains
         logical, optional,               intent(in)  :: info
 
         !---- Local variables ----!
-        integer                   :: i,j,k,l,r,s,ng,ng_,nr,firstSpaceGroup,lastSpaceGroup,sgNumber
-        real                      :: dx
+        integer                   :: i,j,s,ng,ng_,firstSpaceGroup,lastSpaceGroup,sgNumber
         character(len=12)         :: sgString
-        character(len=60)         :: symb,tr_symb
-        character(len=256)        :: generators
-        logical                   :: output,singular,matching,getShift
+        logical                   :: singular,getShift
         type(NS_Space_Group_Type) :: SGtargetaux
         type(Space_Group_Type)    :: SGtarget
         character(len=1),          dimension(n) :: lattyp
