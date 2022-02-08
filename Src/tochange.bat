@@ -13,7 +13,6 @@ if [%_CHANGE%]==[to_xxx] (
    ren  CFML_GlobalDeps_MacOS_Intel.f90        CFML_GlobalDeps_MacOS_Intel.xxx
    ren  CFML_GlobalDeps_Windows.f90            CFML_GlobalDeps_Windows.xxx
    ren  CFML_GlobalDeps_Windows_Intel.f90      CFML_GlobalDeps_Windows_Intel.xxx
-   ren  CFML_GlobalDeps_Windows_Intel64.f90    CFML_GlobalDeps_Windows_Intel64.xxx
    ren  CFML_HDF5.f90                          CFML_HDF5.xxx
    ren  CFML_ILL_Instrm_Data_LF.f90            CFML_ILL_Instrm_Data_LF.xxx
    ren  CFML_IO_MessagesRW.f90                 CFML_IO_MessagesRW.xxx
@@ -37,7 +36,6 @@ if [%_CHANGE%]==[to_f90] (
    ren  CFML_GlobalDeps_MacOS_Intel.xxx        CFML_GlobalDeps_MacOS_Intel.f90
    ren  CFML_GlobalDeps_Windows.xxx            CFML_GlobalDeps_Windows.f90
    ren  CFML_GlobalDeps_Windows_Intel.xxx      CFML_GlobalDeps_Windows_Intel.f90
-   ren  CFML_GlobalDeps_Windows_Intel64.xxx    CFML_GlobalDeps_Windows_Intel64.f90
    ren  CFML_HDF5.xxx                          CFML_HDF5.f90
    ren  CFML_ILL_Instrm_Data_LF.xxx            CFML_ILL_Instrm_Data_LF.f90
    ren  CFML_IO_MessagesRW.xxx                 CFML_IO_MessagesRW.f90

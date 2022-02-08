@@ -84,7 +84,7 @@
 
     !---- List of public subroutines ----!
     public :: Close_scroll_window, error_message, info_message, question_message, warning_message, &
-              stop_message, write_scroll_text
+              stop_message, write_scroll_text, Wait_Message, Print_Message
 
     !---- Definitions ----!
 
@@ -304,5 +304,49 @@
 
        return
     End Subroutine Write_Scroll_Text
+
+    !!----
+    !!---- Subroutine Print_Message(Mess)
+    !!----    character(len=*), intent(in)  :: Mess    !  In -> Print information
+    !!----
+    !!----    Print an message on the standard output. This subroutine is here for
+    !!----    compatibility with the console version of this module. It should not be
+    !!---     used in pure Winteracter programs.
+    !!
+    Subroutine Print_Message(Mess)
+       !---- Arguments ----!
+       character(len=*),intent(in) ::  Mess
+
+       !---- Local Variables ----!
+       integer :: lon
+
+       lon=len_trim(mess)
+       if (lon == 0) then
+          write(unit=*,fmt="(a)") "  "
+       else
+          if (mess(1:1) == "=" .or. mess(2:2) == "=") then
+             write(unit=*,fmt="(a)") mess(1:lon)
+          else
+             write(unit=*,fmt="(a,a)")" =>", mess(1:lon)
+          end if
+       end if
+    End Subroutine Print_Message
+
+    !!----
+    !!---- Subroutine Wait_Message(Mess)
+    !!----    character(len=*), optional, intent(in) :: Mess
+    !!----
+    !!----    Similar to Pause for Console version .This subroutine is here for
+    !!----    compatibility with the console version of this module. It should not be
+    !!---     used in pure Winteracter programs.
+    !!----
+    !!
+    Subroutine Wait_Message(Mess)
+       !---- Argument ----!
+       character(len=*), optional, intent(in) :: Mess
+
+       write(unit=*,fmt="(a)") " "
+       if (present(mess)) write(unit=*,fmt="(a)", advance="no") mess
+    End Subroutine Wait_Message
 
  End Module CFML_IO_Messages
