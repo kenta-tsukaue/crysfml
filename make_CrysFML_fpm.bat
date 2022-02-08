@@ -27,6 +27,16 @@ rem > Arguments ----
     shift
     if not [%1]==[] goto LOOP
 rem .
+rem  Select the proper fpm.toml file depending on win
+rem .
+   if [%_WINT%]==[win] (
+          echo Copying .\toml\fpm_windows_win.toml to fpm.toml
+          copy .\toml\fpm_windows_win.toml  fpm.toml
+   ) else (
+          echo Copying .\toml\fpm_windows_con.toml to fpm.toml
+          copy .\toml\fpm_windows_con.toml  fpm.toml
+          )
+   )
 rem  First change the extensions of files that are optionally used in fpm to "xxx" by
 rem  invoking the tochange.bat script in the Src directory.
 cd .\Src

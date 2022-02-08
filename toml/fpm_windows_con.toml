@@ -11,14 +11,12 @@ copyright = "Copyright 2022, Juan Rodriguez-Carvajal, Javier Gonzalez-Platas, Ne
 
 [library]
 source-dir = "Src"
-include-dir = "../../wint/lib.i64"
+include-dir = "Src"
 
 [build]
 auto-executables = false
 auto-tests = false
 auto-examples = false
-external-modules = "winteracter"
-link=["winter","user32", "gdi32", "comdlg32", "winspool", "winmm", "shell32", "advapi32", "htmlhelp"]
 
 [install]
 library = true
