@@ -881,12 +881,11 @@ Subroutine Write_FST(fst_file,v,cost)
    character(len=132)                 :: file_fst,fst_cmd
    character(len=30), dimension(10)   :: cmds
 
-   if(v(1) == 1.234567) write(*,"(a)") " => This is nothing!"
+   if(v(1) == 1.234567 .and. cost == v(2)) write(*,"(a)") " => This is nothing! To avoid warnings in compilation"
    i=index(fst_file,".fst")
    file_fst=fst_file(1:i+3)
    fst_cmd=adjustl(fst_file(i+4:))
    nc=0
-   if(cost < -1.0e30) write(unit=*,fmt="(a)",advance="no") "?"  !Just to avoid warning
    do
      i=index(fst_cmd,";")
      if(i /= 0) then
