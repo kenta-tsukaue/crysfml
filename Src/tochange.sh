@@ -29,9 +29,6 @@ do
          ;;
    esac
 done
-echo "to_change:"  $to_change
-echo " _CHANGEX:"  $_CHANGEX
-echo "      win:"  $win
 # Space between [ and  comparison are essential!
 if [ $to_change == $_CHANGEX ]
 then
@@ -74,7 +71,6 @@ then
    mv  CFML_HDF5.xxx                         CFML_HDF5.f90
    mv  CFML_ILL_Instrm_Data_LF.xxx           CFML_ILL_Instrm_Data_LF.f90
    mv  CFML_IO_MessagesRW.xxx                CFML_IO_MessagesRW.f90
-   mv  CFML_IO_MessagesWin.xxx               CFML_IO_MessagesWin.f90
    if [ $win ==  $_WIN ]
    then
       mv CFML_IO_Messages.f90                CFML_IO_MessagesWin.f90

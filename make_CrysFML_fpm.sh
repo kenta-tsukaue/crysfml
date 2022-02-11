@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-#  
+#
 #  Attempt to create a unified build method for CrysFML using fmp
-#  
+#
 echo "---- Construction of the CrysFML library for 64 bits using gfortran, ifort or ifx (oneAPI) ----         "
 echo "---- The building procedure installs also some executable programs of the Program_Examples subdirectory"
 echo "     Default: ifort compiler in release mode. Equivalent to the first example below"
@@ -18,8 +18,8 @@ echo "----"
 
 if [ -z "$1" ]; then
 cat << !
-Syntax : make_CrysFML_fpm.sh xxx  or make_CrysFML_fpm.sh f90
-         or make_CrysFML_fpm.sh xxx win make_CrysFML_fpm.sh f90 win
+Syntax : make_CrysFML_fpm.sh compiler           or make_CrysFML_fpm.sh compiler debug
+         or make_CrysFML_fpm.sh compiler win    or make_CrysFML_fpm.sh compiler debug  win
 !
 exit
 fi
@@ -52,17 +52,17 @@ do
    esac
 done
 
-# 
+#
 # Select the proper fpm.toml file depending on win
-# 
-   if [ $WINT == "Y" ]; then
-          echo "Copying ./toml/fpm_linmac_win.toml to fpm.toml"
-          cp ./toml/fpm_linmac_win.toml  fpm.toml
+#
+   if [ $WINT == "win" ]; then
+          echo "Copying ./toml/fpm_linmac_win.toml to ./fpm.toml"
+          cp ./toml/fpm_linmac_win.toml  ./fpm.toml
    else
-          echo Copying ./toml/fpm_linmac_con.toml to fpm.toml
-          cp ./toml/fpm_windows_con.toml  fpm.toml
-   fi       
-#  
+          echo "Copying ./toml/fpm_linmac_con.toml to ./fpm.toml" 
+          cp ./toml/fpm_linmac_con.toml  ./fpm.toml
+   fi
+#
 #  First change the extensions of files that are optionally used in fpm to "xxx" by
 #  invoking the tochange.bat script in the Src directory.
 #
@@ -81,24 +81,24 @@ cd ..
       cd ./Src
       mv  CFML_GlobalDeps_Linux_Intel.xxx  CFML_GlobalDeps.f90
       cd ..
-        if [ $WINT == "win" ]; then 
-            if [ $DEBUG == "Y" ];then 
-               fpm @./rsp/ifort_debug_win
-            else  
-               fpm @./rsp/ifort_release_win
+        if [ $WINT == "win" ]; then  # Winteracter mode (dependency different for all OS)
+            if [ $DEBUG == "Y" ];then
+               fpm @./rsp/ifort_lin_debug_win
+            else
+               fpm @./rsp/ifort_lin_release_win
             fi
-        else  
-            if [ $DEBUG == "Y" ]; then 
+        else   # Console mode (no dependencies, same for all OS)
+            if [ $DEBUG == "Y" ]; then
                fpm @./rsp/ifort_debug
-            else 
+            else
                fpm @./rsp/ifort_release
             fi
         fi
-      
+
       cd ./Src
       mv CFML_GlobalDeps.f90 CFML_GlobalDeps_Linux_Intel.xxx
       cd ..
-    fi 
+    fi
 #
 #  Block if-then-else for compiler "ifx"
 #
@@ -107,24 +107,24 @@ cd ..
       cd ./Src
       mv  CFML_GlobalDeps_Linux_Intel.xxx  CFML_GlobalDeps.f90
       cd ..
-        if [ $WINT == "win" ]; then 
-            if [ $DEBUG == "Y" ]; then 
-               fpm @./rsp/ifx_debug_win
-            else  
-               fpm @./rsp/ifx_release_win
+        if [ $WINT == "win" ]; then
+            if [ $DEBUG == "Y" ]; then
+               fpm @./rsp/ifx_lin_debug_win
+            else
+               fpm @./rsp/ifx_lin_release_win
             fi
-        else  
-            if [ $DEBUG == "Y" ]; then 
+        else
+            if [ $DEBUG == "Y" ]; then
                fpm @./rsp/ifx_debug
-            else 
+            else
                fpm @./rsp/ifx_release
             fi
         fi
-      
+
       cd ./Src
       mv CFML_GlobalDeps.f90 CFML_GlobalDeps_Linux_Intel.xxx
       cd ..
-    fi 
+    fi
 #
 #  Block if-then-else for compiler "gfortran"
 #
@@ -133,25 +133,25 @@ cd ..
       cd ./Src
       mv  CFML_GlobalDeps_Linux.xxx  CFML_GlobalDeps.f90
       cd ..
-        if [ $WINT == "win" ]; then 
-            if [ $DEBUG == "Y" ]; then 
+        if [ $WINT == "win" ]; then
+            if [ $DEBUG == "Y" ]; then
                fpm @./rsp/gfortran_debug_win
-            else  
+            else
                fpm @./rsp/gfortran_release_win
             fi
-        else  
-            if [ $DEBUG == "Y" ]; then 
+        else
+            if [ $DEBUG == "Y" ]; then
                fpm @./rsp/gfortran_debug
-            else 
+            else
                fpm @./rsp/gfortran_release
             fi
         fi
-      
+
       cd ./Src
       mv CFML_GlobalDeps.f90 CFML_GlobalDeps_Linux.xxx
       cd ..
-    fi 
-#  
+    fi
+#
 #  Undo the changes in extensions of files that were change above
 #
 cd ./Src

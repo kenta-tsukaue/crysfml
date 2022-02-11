@@ -179,9 +179,9 @@ main="Faults.f90"
 # Powder Patterns
 #
 [[executable]]
-name="Simple_Calc_Mag_Powder"
+name="Simple_calc_Mag_powder"
 source-dir="Program_Examples/PowderPattern"
-main="Simple_Calc_Mag_Powder.f90"
+main="Simple_calc_Mag_powder.f90"
 
 [[executable]]
 name="Calc_Powder"
