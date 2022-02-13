@@ -54,9 +54,9 @@ cd ..
       cd ..
       if [%_WINT%]==[win] (
           if [%_DEBUG%]==[Y] (
-             fpm @./rsp/ifort_debug_win
+             fpm @./rsp/ifort_win_debug_win
           ) else (
-             fpm @./rsp/ifort_release_win
+             fpm @./rsp/ifort_win_release_win
           )
       ) else (
           if [%_DEBUG%]==[Y] (
