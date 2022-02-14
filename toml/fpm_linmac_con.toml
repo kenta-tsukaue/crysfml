@@ -9,21 +9,19 @@ author = "Juan Rodriguez-Carvajal, Javier Gonzalez-Platas, Nebil A. Katcho"
 maintainer = "jrc@ill.eu"
 copyright = "Copyright 2022, Juan Rodriguez-Carvajal, Javier Gonzalez-Platas, Nebil A. Katcho"
 
-[build]
-auto-executables = false
-auto-tests = false
-auto-examples = false
-#link=["../../wint/lib.i64/winter.lib","user32.lib", "gdi32.lib", "comdlg32.lib", "winspool.lib", "winmm.lib", "shell32.lib", "advapi32.lib", "htmlhelp.lib"]
-
-[install]
-library = true
-
 [library]
 source-dir = "Src"
 include-dir = "Src"
 
-#[dependencies]
-#my-utils = { path = "../../wint/lib.i64" } does not work! Looks for a fpm.toml file!
+[build]
+auto-executables = false
+auto-tests = false
+auto-examples = false
+
+[install]
+library = true
+
+
 
 #
 # The lines above are enough for building the library using the scripts make_CrysFML_fpm.bat/make_CrysFML_fpm.sh
@@ -34,6 +32,14 @@ include-dir = "Src"
 #
 # Some executables from Program_Examples
 #
+
+#[[executable]]
+#executable = [
+#  { name = "cryscalcon",     source-dir = "Program_Examples/Cryst_calculator_console", main = "cryscalc_con.f90"},
+#  { name = "hkl_gen",        source-dir = "Program_Examples/hkl_gen",                  main = "hkl_gen.f90"},
+#  { name = "Formal_Charges", source-dir = "Program_Examples/BondStr/FormalCharges",    main = "Formal_Charges.f90"},
+#  { name = "Bond_Str",       source-dir = "Program_Examples/BondStr/Src",              main = "Bond_Str.f90"}
+#]
 [[executable]]
 name="cryscalcon"
 source-dir="Program_Examples/Cryst_calculator_console"
@@ -118,10 +124,10 @@ source-dir="Program_Examples/Magnetism"
 main="magref.f90"
 
 ################### Warning! ifx in mode release is unable to compile Schwinger: hn = real(hkl%ref(i)%h,kind=cp)
-[[executable]]
-name="Schwinger"
-source-dir="Program_Examples/Magnetism"
-main="Schwinger.f90"
+#[[executable]]
+#name="Schwinger"
+#source-dir="Program_Examples/Magnetism"
+#main="Schwinger.f90"
 
 [[executable]]
 name="Moment"
@@ -173,9 +179,9 @@ main="Faults.f90"
 # Powder Patterns
 #
 [[executable]]
-name="Simple_Calc_Mag_Powder"
+name="Simple_calc_Mag_powder"
 source-dir="Program_Examples/PowderPattern"
-main="Simple_Calc_Mag_Powder.f90"
+main="Simple_calc_Mag_powder.f90"
 
 [[executable]]
 name="Calc_Powder"
