@@ -135,15 +135,15 @@ cd ..
       cd ..
         if [ $WINT == "win" ]; then
             if [ $DEBUG == "Y" ]; then
-               fpm @./rsp/gfortran_debug_win
+               fpm @./rsp/gf_debug_win
             else
-               fpm @./rsp/gfortran_release_win
+               fpm @./rsp/gf_release_win
             fi
         else
             if [ $DEBUG == "Y" ]; then
-               fpm @./rsp/gfortran_debug
+               fpm @./rsp/gf_debug
             else
-               fpm @./rsp/gfortran_release
+               fpm @./rsp/gf_release
             fi
         fi
 

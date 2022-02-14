@@ -124,10 +124,10 @@ source-dir="Program_Examples/Magnetism"
 main="magref.f90"
 
 ################### Warning! ifx in mode release is unable to compile Schwinger: hn = real(hkl%ref(i)%h,kind=cp)
-[[executable]]
-name="Schwinger"
-source-dir="Program_Examples/Magnetism"
-main="Schwinger.f90"
+#[[executable]]
+#name="Schwinger"
+#source-dir="Program_Examples/Magnetism"
+#main="Schwinger.f90"
 
 [[executable]]
 name="Moment"
