@@ -11,7 +11,10 @@ copyright = "Copyright 2022, Juan Rodriguez-Carvajal, Javier Gonzalez-Platas, Ne
 
 [library]
 source-dir = "Src"
+# ifort/ifx
 include-dir = "../../../../usr/local/wint/lib.i64"
+# gfortran
+#include-dir = "../../../../usr/local/wint/lib.gnu64/8.3"
 
 [build]
 auto-executables = false

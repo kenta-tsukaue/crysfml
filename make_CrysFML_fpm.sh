@@ -1,4 +1,4 @@
-#!/bin/bash
+cd#!/bin/bash
 #
 #
 #  Attempt to create a unified build method for CrysFML using fmp
@@ -89,9 +89,9 @@ cd ..
             fi
         else   # Console mode (no dependencies, same for all OS)
             if [ $DEBUG == "Y" ]; then
-               fpm @./rsp/ifort_debug
+               fpm @./rsp/ifort_lin_debug_con
             else
-               fpm @./rsp/ifort_release
+               fpm @./rsp/ifort_lin_release_con
             fi
         fi
 
@@ -115,9 +115,9 @@ cd ..
             fi
         else
             if [ $DEBUG == "Y" ]; then
-               fpm @./rsp/ifx_debug
+               fpm @./rsp/ifx_lin_debug_con
             else
-               fpm @./rsp/ifx_release
+               fpm @./rsp/ifx_lin_release_con
             fi
         fi
 
@@ -141,9 +141,9 @@ cd ..
             fi
         else
             if [ $DEBUG == "Y" ]; then
-               fpm @./rsp/gf_debug
+               fpm @./rsp/gf_debug_con
             else
-               fpm @./rsp/gf_release
+               fpm @./rsp/gf_release_con
             fi
         fi
 
