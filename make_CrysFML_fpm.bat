@@ -27,7 +27,8 @@ rem > Arguments ----
     shift
     if not [%1]==[] goto LOOP
 rem .
-rem  Select the proper fpm.toml file depending on win
+rem  Select the proper fpm.toml file depending on use for console of winteracter (two options com and win)
+rem  The console toml file construct also the executables in Program_Examples/...
 rem .
    if [%_WINT%]==[win] (
           echo Copying .\toml\fpm_windows_win.toml to fpm.toml
@@ -37,8 +38,10 @@ rem .
           copy .\toml\fpm_windows_con.toml  fpm.toml
           )
    )
+rem .
 rem  First change the extensions of files that are optionally used in fpm to "xxx" by
 rem  invoking the tochange.bat script in the Src directory.
+rem .
 cd .\Src
    if [%_WINT%]==[win] (
           call tochange xxx win
@@ -47,7 +50,9 @@ cd .\Src
           )
    )
 cd ..
-
+rem .
+rem Select now the compiles and execute the appropriate response file in rsp directory
+rem .
     if [%_COMP%]==[ifort] (
       cd .\Src
       ren  CFML_GlobalDeps_Windows_Intel.xxx  CFML_GlobalDeps.f90
@@ -60,23 +65,26 @@ cd ..
           )
       ) else (
           if [%_DEBUG%]==[Y] (
-             fpm @./rsp/ifort_debug
+             fpm @./rsp/ifort_win_debug_con
           ) else (
-             fpm @./rsp/ifort_release
+             fpm @./rsp/ifort_win_release_con
           )
       )
       cd .\Src
       ren CFML_GlobalDeps.f90 CFML_GlobalDeps_Windows_Intel.xxx
       cd ..
     )
+rem .
+rem With the compiler ifx only console modes are available
+rem .
     if [%_COMP%]==[ifx] (
       cd .\Src
       ren  CFML_GlobalDeps_Windows_Intel.xxx  CFML_GlobalDeps.f90
       cd ..
       if [%_DEBUG%]==[Y] (
-         fpm @./rsp/ifx_debug
+         fpm @./rsp/ifx_win_debug_con
       ) else (
-         fpm @./rsp/ifx_release
+         fpm @./rsp/ifx_win_release_con
       )
       cd .\Src
       ren CFML_GlobalDeps.f90 CFML_GlobalDeps_Windows_Intel.xxx
@@ -86,10 +94,18 @@ cd ..
       cd .\Src
       ren  CFML_GlobalDeps_Windows.xxx  CFML_GlobalDeps.f90
       cd ..
-      if [%_DEBUG%]==[Y] (
-         fpm @./rsp/gf_debug
+      if [%_WINT%]==[win] (
+          if [%_DEBUG%]==[Y] (
+             fpm @./rsp/gf_debug_win
+          ) else (
+             fpm @./rsp/gf_release_win
+          )
       ) else (
-         fpm @./rsp/gf_release
+          if [%_DEBUG%]==[Y] (
+             fpm @./rsp/gf_debug_con
+          ) else (
+             fpm @./rsp/gf_release_con
+          )
       )
       cd .\Src
       ren  CFML_GlobalDeps.f90 CFML_GlobalDeps_Windows.xxx
