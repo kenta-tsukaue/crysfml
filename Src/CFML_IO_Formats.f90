@@ -741,7 +741,7 @@
        Job_Info%W = 0.0
        Job_Info%X = 0.0
        Job_Info%Y = 0.0
-       
+
        Job_Info%theta_step = 0.0
        Job_Info%bkg = 0.0
 
@@ -749,10 +749,10 @@
           line=u_case(adjustl(file_dat(i)))
           if (line(1:5) == "TITLE") Job_info%title=line(7:)
           if (line(1:5) == "NPATT") then
-             
+
              read(unit=line(7:), fmt=*,iostat=ier) Job_info%Num_Patterns
              if (ier /= 0) Job_info%Num_Patterns=1
-          
+
           end if
           if (line(1:6) == "PHASE_") then
              nphas=nphas+1
@@ -775,7 +775,7 @@
              end if
           end if
 
-          if (line(1:4) == "STEP") then         
+          if (line(1:4) == "STEP") then
              read(unit=line(5:),fmt=*,iostat=ier) Job_info%theta_step
              if (ier /= 0) then
                 Job_info%theta_Step = 0.05
@@ -787,7 +787,7 @@
              read(unit=line(7:),fmt=*,iostat=ier) Job_info%bkg
              if(ier /= 0) Job_info%bkg=20.0
           end if
-          
+
        end do
 
        if (nphas == 0) then
@@ -859,8 +859,8 @@
        Job_Info%ratio = 0.0
        Job_Info%dtt1 = 0.0
        Job_Info%dtt2 = 0.0
-       
-       
+
+
        if (ncmd > 0) then
           if (allocated(Job_Info%cmd)) deallocate(Job_Info%cmd)
           allocate(Job_Info%cmd(ncmd))
@@ -2044,26 +2044,26 @@
        np1=nline_ini
        call Read_Key_Str(filevar,nline_ini,nline_end, &
                             "_symmetry_space_group_name_H-M",spgr_hm)
-       !if (len_trim(spgr_hm) ==0 ) spgr_hm=adjustl(filevar(nline_ini+1))
+       !if (len_trim(spgr_hm) == 0 ) spgr_hm=adjustl(filevar(nline_ini+1))
        !nline_ini=np1
        ! TR  feb. 2015 .(re-reading the same item with another name)
        if(len_trim(spgr_hm) == 0) then
         nline_ini=np1
         spgr_hm = " "
         call Read_Key_Str(filevar,nline_ini,nline_end, "_space_group_name_H-M_alt",spgr_hm)
-        if (len_trim(spgr_hm) ==0 ) spgr_hm=adjustl(filevar(nline_ini+1))
+        if (len_trim(spgr_hm) == 0 ) spgr_hm=adjustl(filevar(nline_ini+1))
        end if
 
-       if (spgr_hm =="?" .or. spgr_hm=="#") then
+       if (spgr_hm == "?" .or. spgr_hm == "#") then
           spgr_hm=" "
        else
           np1=index(spgr_hm,"'")
-          np2=index(spgr_hm,"'",back=.true.)
+          np2=index(spgr_hm,"'",back = .true.)
           if (np1 > 0 .and. np2 > 0 .and. np2 > np1) then
              spgr_hm=spgr_hm(np1+1:np2-1)
           else
              np1=index(spgr_hm,'"')
-             np2=index(spgr_hm,'"',back=.true.)
+             np2=index(spgr_hm,'"',back = .true.)
              if (np1 > 0 .and. np2 > 0 .and. np2 > np1) then
                 spgr_hm=spgr_hm(np1+1:np2-1)
              else
@@ -5351,7 +5351,7 @@
           n_end=ip(iph+1)
           call Read_Cif_Symm(file_dat,n_ini,n_end,noper,symm_car)
 
-          if (noper ==0) then
+          if (noper == 0) then
              err_form=.true.
              ERR_Form_Mess=" => No Space Group/No Symmetry information in this file "
              return
