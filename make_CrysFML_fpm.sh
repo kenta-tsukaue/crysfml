@@ -1,4 +1,4 @@
-cd#!/bin/bash
+#!/bin/bash
 #
 #
 #  Attempt to create a unified build method for CrysFML using fmp
