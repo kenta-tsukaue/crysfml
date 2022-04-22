@@ -8544,7 +8544,6 @@
              read(unit=spgm(j+1:j+2),fmt=*,iostat=ier) ic
              if (ier /=0) ic=0
              call getnum(spgm(:j-1),vet,ivet,iv)
-             spgm=spgm(:j-1)
           else
              call getnum(spgm,vet,ivet,iv)
           end if
@@ -8999,7 +8998,12 @@
              end do
              exit
           end do
-          SpaceGroup%Spg_Symb(2:)=l_case(SpaceGroup%Spg_Symb(2:))  !Make lowercase the HM generators of the group
+          j=index(SpaceGroup%Spg_Symb,":")
+          if(j /= 0) then
+            SpaceGroup%Spg_Symb(2:j)=l_case(SpaceGroup%Spg_Symb(2:j))  !Make lowercase the HM generators of the group
+          else
+            SpaceGroup%Spg_Symb(2:)=l_case(SpaceGroup%Spg_Symb(2:))  !Make lowercase the HM generators of the group
+          end if
        end if
        !write(*,"(a)") " => Wyckoff done"
 

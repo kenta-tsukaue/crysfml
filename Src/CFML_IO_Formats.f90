@@ -2044,6 +2044,7 @@
        np1=nline_ini
        call Read_Key_Str(filevar,nline_ini,nline_end, &
                             "_symmetry_space_group_name_H-M",spgr_hm)
+       !write(*,"(a)") " From Read_Key_Str _symmetry_space_group_name_H-M: "//spgr_hm
        !if (len_trim(spgr_hm) == 0 ) spgr_hm=adjustl(filevar(nline_ini+1))
        !nline_ini=np1
        ! TR  feb. 2015 .(re-reading the same item with another name)
@@ -2052,6 +2053,7 @@
         spgr_hm = " "
         call Read_Key_Str(filevar,nline_ini,nline_end, "_space_group_name_H-M_alt",spgr_hm)
         if (len_trim(spgr_hm) == 0 ) spgr_hm=adjustl(filevar(nline_ini+1))
+        !write(*,"(a)") " From Read_Key_Str _space_group_name_H-M_alt: "//spgr_hm
        end if
 
        if (spgr_hm == "?" .or. spgr_hm == "#") then
@@ -2071,6 +2073,7 @@
              end if
           end if
        end if
+       !write(*,"(a)") " After first processing: "//spgr_hm
 
        !---- Adapting Nomenclature from ICSD to our model ----!
        np1=len_trim(spgr_hm)
@@ -2080,16 +2083,21 @@
              case("1")
                 csym2=u_case(spgr_hm(np1-1:np1-1))
                 if (csym2 == "Z" .or. csym2 =="S") then
-                   spgr_hm=spgr_hm(:np1-2)//":1"
+                   spgr_hm=trim(spgr_hm(:np1-2))//":1"
+                else
+                   np2=index(spgr_hm,":1")
+                   if(np2 /= 0) then
+                     spgr_hm=trim(spgr_hm(:np2-1))//":1"
+                   end if
                 end if
 
              case("S","Z")
                 csym2=u_case(spgr_hm(np1-1:np1-1))
                 select case (csym2)
                    case ("H")
-                      spgr_hm=spgr_hm(:np1-2)
+                      spgr_hm=trim(spgr_hm(:np1-2))
                    case ("R")
-                      spgr_hm=spgr_hm(:np1-2)//":R"
+                      spgr_hm=trim(spgr_hm(:np1-2))//":R"
                    case default
                       spgr_hm=spgr_hm(:np1-1)
                 end select
@@ -2097,19 +2105,19 @@
              case("R")
                 csym2=u_case(spgr_hm(np1-1:np1-1))
                 if (csym2 == "H" ) then
-                   spgr_hm=spgr_hm(:np1-2)
+                   spgr_hm=trim(spgr_hm(:np1-2))
                 else
-                   spgr_hm=spgr_hm(:np1-1)//":R"
+                   spgr_hm=trim(spgr_hm(:np1-2))//":R"
                 end if
              case("H")
-                spgr_hm=spgr_hm(:np1-1)
+                spgr_hm=trim(spgr_hm(:np1-1))
                 csym2=u_case(spgr_hm(np1-1:np1-1))
-                if(csym2 == ":") spgr_hm=spgr_hm(:np1-2)
+                if(csym2 == ":") spgr_hm=trim(spgr_hm(:np1-2))
 
           end select
        end if
+       !write(*,"(a)") " After last processing: "//spgr_hm
 
-       return
     End Subroutine Read_Cif_Hm
 
     !!----
@@ -5346,6 +5354,8 @@
        n_end=ip(iph+1)
        if (len_trim(Spp) == 0) call Read_Cif_Hall(file_dat,n_ini,n_end,Spp)
 
+
+       !write(*,"(a)") "  Symbol before setting space group: "//Spp
        if (len_trim(Spp) == 0) then
           n_ini=ip(iph)           !Updated values to handle non-conventional order
           n_end=ip(iph+1)
