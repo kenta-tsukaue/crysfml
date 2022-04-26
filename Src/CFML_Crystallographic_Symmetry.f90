@@ -9660,7 +9660,7 @@
        end do
        MSpGn%NumOps=MSpG%NumOps
        MSpGn%Centre="Non-Centrosymmetric"       ! Alphanumeric information about the center of symmetry
-       if(MSpGn%Centred == 1) then
+       if(MSpGn%Centred == 0) then
          MSpGn%Centre="Centrosymmetric, -1 not @the origin "
          MSpGn%Centre_coord=0.5*MSpGn%SymOp(m)%tr
        else if(MSpGn%Centred == 2) then

@@ -6432,12 +6432,13 @@
           end if
         end do
       end if
-      MGp%Centred=0        ! Centric or Acentric [ =0 Centric(-1 no at origin),=1 Acentric,=2 Centric(-1 at origin)]
+      MGp%Centred=1        ! Centric or Acentric [ =0 Centric(-1 no at origin),=1 Acentric,=2 Centric(-1 at origin)]
       MGp%Centre_coord=0.0 ! Fractional coordinates of the inversion centre
       do k=1,wyckoff_pos_count(j,num) !j=1 multiplicity of the general position
         if(equal_matrix(MGp%SymOp(k)%Rot,-identity,3) .and. MGp%MSymOp(k)%Phas > 0) then
           m=k
-          MGp%Centred=max(MGp%Centred,1)
+          !MGp%Centred=max(MGp%Centred,1)
+          MGp%Centred=0
           if(sum(abs(MGp%SymOp(k)%tr)) < 0.001) then
             MGp%Centred=2
             exit
@@ -6446,7 +6447,8 @@
       end do
       MGp%NumOps=wyckoff_pos_count(j,num)
       MGp%Centre="Non-Centrosymmetric"    ! Alphanumeric information about the center of symmetry
-      if(MGp%Centred == 1) then
+      !if(MGp%Centred == 1) then  !This was written an
+      if(MGp%Centred == 0) then
         MGp%Centre="Centrosymmetric, -1 not @the origin "       ! Alphanumeric information about the center of symmetry
         MGp%Centre_coord=0.5*MGp%SymOp(m)%tr
       else if(MGp%Centred == 2) then

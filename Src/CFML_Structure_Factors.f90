@@ -137,7 +137,7 @@
     !!--++ AF0
     !!--++     real(kind=cp), dimension(:,:), allocatable, private :: AF0
     !!--++
-    !!--++     Array for Atomic Factor. The dimensions are
+    !!--++     Array for Atomic Form Factors. The dimensions are
     !!--++           AF0(Natoms,NRef)
     !!--++
     !!--++ Update: December - 2003
@@ -170,8 +170,8 @@
     !!--++ AJH
     !!--++     real(kind=cp), dimension(:,:), allocatable, private :: Ajh
     !!--++
-    !!--++     Array for Aj(h). The dimensions are
-    !!--++           Ajh(Natoms,Nref)
+    !!--++     Array for Aj(h): Real part of geometrical structure factor for atom j and reflection h
+    !!--++           The dimensions are Ajh(Natoms,Nref)
     !!--++     where
     !!--++           F(h)=Sum_j[Fj(h){Aj(h)+i Bj(h)}]
     !!--++
@@ -183,8 +183,8 @@
     !!--++ BJH
     !!--++     real(kind=cp), dimension(:,:), allocatable, private :: Bjh
     !!--++
-    !!--++     Array for Bj(h). The dimensions are
-    !!--++           Bjh(Natoms,Nref)
+    !!--++     Array for Bj(h): Imaginary part of geometrical structure factor for atom j and reflection h
+    !!--++           The dimensions are Bjh(Natoms,Nref)
     !!--++     where
     !!--++           F(h)=Sum_j[Fj(h){Aj(h)+i Bj(h)}]
     !!--++
@@ -248,8 +248,8 @@
     !!--++ HR
     !!--++     type(HR_Type), dimension(:,:), allocatable, private :: Hr
     !!--++
-    !!--++     Array for HR Calculations. The dimension are
-    !!--++           HR(Natoms,NRef)
+    !!--++     Array for HR Calculations.
+    !!--++     The dimension are HR(Numops,Nref)
     !!--++
     !!--++ Update: February - 2005
     !!
@@ -323,8 +323,8 @@
     !!--++ HT
     !!--++    real(kind=cp), dimension(:,:), allocatable, private :: Ht
     !!--++
-    !!--++    Array for HT Calculations. The dimension are
-    !!--++          HT(Natoms,Nref)
+    !!--++    Array for HT Calculations.
+    !!--++    The dimension are HT(Numops,Nref)
     !!--++
     !!--++ Update: February - 2005
     !!
@@ -549,8 +549,10 @@
     !!----
     !!----   Calculates nuclear, x-rays and electrostatic structure factors from
     !!----   the list of atoms Atm, space group Grp and scattering species Scf.
+    !!----   This is valid for single crystals and isotropic scattering factors
+    !!----   Useful for calculating Schwinger scattering
     !!----
-    !!----  Created (JRC): October-2015
+    !!----  Created (JRC): October-2015, Updated April-2022
     !!----
     Subroutine Calc_General_StrFactor(hn,sn,Atm,Grp,Scf,fn,fx,fe)
        !---- Arguments ----!
@@ -562,7 +564,7 @@
        complex,                            intent(out):: fn,fx,fe
 
        !---- Local Variables ----!
-       integer                               :: i,j,k !,m
+       integer                               :: i,j,k  !,m
        real(kind=cp)                         :: arg,anis,scosr,ssinr,b !,s
        real(kind=cp)                         :: a1,a3,b1,b3,av,bv,nffr,nffi        !fn
        real(kind=cp)                         :: xa1,xa3,xb1,xb3,xav,xbv,xffr,xffi  !fx
@@ -577,12 +579,11 @@
        eb1=0.0;  eb3=0.0
        xa1=0.0;  xa3=0.0
        xb1=0.0;  xb3=0.0
-
        do i=1,Atm%natoms
           arg=0.0
           scosr=0.0
           ssinr=0.0
-          do k=1,grp%NumOps
+          do k=1,grp%Multip  !All symmetry operators used here
              h=matmul(hn,grp%Symop(k)%Rot)
              arg=tpi*(dot_product(h,Atm%atom(i)%x)+ dot_product(hn,grp%Symop(k)%tr))
              anis=1.0
@@ -631,13 +632,11 @@
 
        av = a1-a3    !real part of the Nuclear structure factor
        bv = b1+b3    !imaginary part of the Nuclear structure factor
-       fn=cmplx(av,bv) * Grp%Centred * Grp%NumLat
-
+       fn=cmplx(av,bv)
        xav = xa1-xa3    !real part of the X-rays structure factor
        xbv = xb1+xb3    !imaginary part of the X-rays structure factor
-       fx=cmplx(xav,xbv) * Grp%Centred * Grp%NumLat
-
-       fe=cmplx(ea1,eb3) * Grp%Centred * Grp%NumLat
+       fx=cmplx(xav,xbv)
+       fe=cmplx(ea1,eb3)
 
     End Subroutine Calc_General_StrFactor
 
@@ -898,7 +897,7 @@
 
        !---- Local Variables ----!
        character(len=1)                      :: modi
-       integer                               :: i,j,k,m
+       integer                               :: i,j,k,m,Numr
        real(kind=cp)                         :: arg,anis,cosr,sinr,scosr,ssinr,fr,der !,fi
        real(kind=cp)                         :: a1,a2,a3,a4,b1,b2,b3,b4,av,bv,f
        real(kind=cp),dimension(3)            :: h
@@ -923,6 +922,8 @@
        frs=0.0
        otr=0.0
        oti=0.0
+       Numr=Grp%numops
+       if(Grp%Centred == 0) Numr=Numr*2
        modi=u_case(mode(1:1))
        if(rad(1:1) == "N") then
          afpxn(:)=afp(:)
@@ -937,7 +938,7 @@
                ssinr=0.0
                drs(:,i)=0.0
                drc(:,i)=0.0
-               do k=1,grp%NumOps
+               do k=1,Numr !grp%NumOps
                   h=hr(k,nn)%h
                   arg=tpi*(dot_product(h,Atm%atom(i)%x)+ht(k,nn))
                   anis=1.0
@@ -982,7 +983,7 @@
                ssinr=0.0
                drs(:,i)=0.0
                drc(:,i)=0.0
-               do k=1,grp%NumOps
+               do k=1,Numr !grp%NumOps
                   h=hr(k,nn)%h
                   arg=tpi*(dot_product(h,Atm%atom(i)%x)+ht(k,nn))
                   anis=1.0
@@ -1179,8 +1180,8 @@
 
        !---- Local Variables ----!
        character(len=1)                      :: modi
-       integer                               :: i,j,k,m
-       real(kind=cp)                         :: arg,anis,cosr,sinr,scosr,ssinr,fr,fi,der, hnt
+       integer                               :: i,j,k,m,Numr
+       real(kind=cp)                         :: arg,anis,cosr,sinr,scosr,ssinr,fr,der, hnt
        real(kind=cp)                         :: a1,a2,a3,a4,b1,b2,b3,b4,av,bv,f,occ,b, Tob
        real(kind=cp),dimension(3)            :: h
        real(kind=cp),dimension(6)            :: beta
@@ -1203,18 +1204,17 @@
        frs=0.0
        otr=0.0
        oti=0.0
+       Numr=Grp%numops
+       if(Grp%Centred == 0) Numr=Numr*2
        modi=u_case(mode(1:1))
        !Setting up the scattering form factors and multiply by group specific
        !coefficients for calculating structure factors per conventional cell
        !---- Modify the scattering factors to include the
        !---- multipliers factors concerning centre of symmetry and
        !---- centred translations
-       fr=1.0; fi=1.0
-       if (Grp%Centred == 2) fr=2.0
-       if (Grp%NumLat  > 1)  fi=Grp%NumLat
        Select Case (rad(1:1))
           Case("N")
-              afpxn(:)=fr*fi*afp(:)
+              afpxn(:)=afp(:)
           Case("X","E")
               do i=1,Nspecies
                 ff(i)=FF_c(i)
@@ -1225,12 +1225,14 @@
               end do
               do i=1,Atm%natoms
                 j=P_a(i)   !pointer has been set up in Initialization subroutine
-                afpxn(i)= fr*fi*ff(j)
+                afpxn(i)= ff(j)
               end do
        End Select
-
        fr=1.0
-       fi=0.0
+       if(Grp%Centred == 2) fr=2.0
+       if(Grp%Numlat > 1) fr=fr*Grp%Numlat
+       afpxn=fr*afpxn
+
        if(Grp%Centred == 2) then
             do i=1,Atm%natoms
                arg=0.0
@@ -1238,7 +1240,7 @@
                ssinr=0.0
                drs(:,i)=0.0
                drc(:,i)=0.0
-               do k=1,grp%NumOps
+               do k=1,Numr !grp%NumOps
                   h=Hkl_R(hn,grp%symop(k))                   !Calculations in-lining
                   hnt=dot_product(real(hn),Grp%SymOp(k)%Tr)  !Calculations in-lining
                   arg=tpi*(dot_product(h,Atm%atom(i)%x)+hnt)
@@ -1249,11 +1251,11 @@
                          +2.0*h(1)*h(2)*beta(4)+ 2.0*h(1)*h(3)*beta(5)+2.0*h(2)*h(3)*beta(6)
                     anis=exp(-anis)
                   end if
-                  cosr=COS(arg)*anis*fr     !fr*cos{2pi(hT Rs rj+ts)}*exp(-{hTRsBetaj RsTh})
-                  scosr=scosr+cosr          !FRC= SIG fr(j,s)cos{2pi(hT Rs rj+ts)}*Ta(s)
+                  cosr=COS(arg)*anis      !fr*cos{2pi(hT Rs rj+ts)}*exp(-{hTRsBetaj RsTh})
+                  scosr=scosr+cosr        !FRC= SIG fr(j,s)cos{2pi(hT Rs rj+ts)}*Ta(s)
 
                   if(present(deriv)) then
-                     sinr=SIN(arg)*anis*fr   !fr*sin{2pi(hT Rs rj+ts)}*exp(-{hTRsBetaj RsTh})
+                     sinr=SIN(arg)*anis   !fr*sin{2pi(hT Rs rj+ts)}*exp(-{hTRsBetaj RsTh})
                      drc(1:3,i)=drc(1:3,i)+h(1:3)*sinr      ! -
                      drc(4,i)=drc(4,i)+h(1)*h(1)*cosr
                      drc(5,i)=drc(5,i)+h(2)*h(2)*cosr
@@ -1286,7 +1288,7 @@
                ssinr=0.0
                drs(:,i)=0.0
                drc(:,i)=0.0
-               do k=1,grp%NumOps
+               do k=1,Numr !grp%NumOps
                   h=Hkl_R(hn,grp%symop(k))
                   hnt=dot_product(real(hn),Grp%SymOp(k)%Tr)
                   arg=tpi*(dot_product(h,Atm%atom(i)%x)+hnt)
@@ -1297,10 +1299,10 @@
                          +2.0*h(1)*h(2)*beta(4)+ 2.0*h(1)*h(3)*beta(5)+2.0*h(2)*h(3)*beta(6)
                     anis=exp(-anis)
                   end if
-                  cosr=COS(arg)*anis*fr     !fr*cos{2pi(hT Rs rj+ts)}*exp(-{hTRsBetaj RsTh})
-                  sinr=SIN(arg)*anis*fr     !fr*sin{2pi(hT Rs rj+ts)}*exp(-{hTRsBetaj RsTh})
-                  scosr=scosr+cosr          !FRC= SIG fr(j,s)cos{2pi(hT Rs rj+ts)}*Ta(s)
-                  ssinr=ssinr+sinr          !FRS= SIG fr(j,s)sin{2pi(hT Rs rj+ts)}*Ta(s)
+                  cosr=COS(arg)*anis      !cos{2pi(hT Rs rj+ts)}*exp(-{hTRsBetaj RsTh})
+                  sinr=SIN(arg)*anis      !sin{2pi(hT Rs rj+ts)}*exp(-{hTRsBetaj RsTh})
+                  scosr=scosr+cosr        !FRC= SIG fr(j,s)cos{2pi(hT Rs rj+ts)}*Ta(s)
+                  ssinr=ssinr+sinr        !FRS= SIG fr(j,s)sin{2pi(hT Rs rj+ts)}*Ta(s)
 
                   if(present(deriv)) then
                      drc(1:3,i)=drc(1:3,i)+h(1:3)*sinr      ! -
@@ -1469,18 +1471,20 @@
        type(space_group_type), intent(in) :: Grp
 
        !---- Local Variables ----!
-       integer                       :: i,j,k
+       integer                       :: i,j,k,Multr
        real(kind=cp)                 :: arg,anis
        real(kind=cp),dimension(3)    :: h
        real(kind=cp),dimension(6)    :: beta
 
        Ajh=0.0
        Bjh=0.0
+       Multr= Grp%Numops
+       if(Grp%centred == 0)  Multr= Multr*2
        if(Grp%Centred == 2) then
          do j=1,Nref
             do i=1,Atm%natoms
                arg=0.0
-               do k=1,grp%NumOps
+               do k=1,Multr
                   h=hr(k,j)%h
                   arg=tpi*(dot_product(h,Atm%atom(i)%x)+ht(k,j))
                   anis=1.0
@@ -1498,7 +1502,7 @@
          do j=1,Nref
             do i=1,Atm%natoms
                arg=0.0
-               do k=1,grp%NumOps
+               do k=1,Multr
                   h=hr(k,j)%h
                   arg=tpi*(dot_product(h,Atm%atom(i)%x)+ht(k,j))
                   anis=1.0
@@ -1720,7 +1724,7 @@
     !!--++    integer, optional,          intent(in) :: lun
     !!--++
     !!--++    (Private)
-    !!--++    Calculate a Table of Atomic Factors for Electrons
+    !!--++    Calculate a Table of Atomic Form Factors for Electrons
     !!--++    applying the Mott-Bethe formula:
     !!--++    fe=me^2/(8pi Eps0 h^2) (Z-fx(s))/s^2
     !!--++
@@ -1810,7 +1814,7 @@
     !!--++    integer, optional,          intent(in) :: lun
     !!--++
     !!--++    (Private)
-    !!--++    Calculate a Table of Atomic Factors for X-Ray
+    !!--++    Calculate a Table of Atomic Form Factors for X-Ray
     !!--..      AF0(Natoms,Nref), AFP(Natoms), AFPP(Natoms)
     !!--++
     !!--++ Update: February - 2005
@@ -1818,7 +1822,7 @@
     Subroutine Create_Table_AF0_Xray(Reflex,Atm,lambda,lun)
        !---- Arguments ----!
        type(reflection_list_type), intent(in) :: Reflex
-       type(atom_list_type),      intent(in) :: Atm
+       type(atom_list_type),       intent(in) :: Atm
        real(kind=cp), optional,    intent(in) :: lambda
        integer, optional,          intent(in) :: lun
 
@@ -2006,10 +2010,12 @@
        type(space_group_type),     intent(in) :: Grp
 
        !---- Local Variables ----!
-       integer :: i,j
+       integer :: i,j,Multr
 
+       Multr= Grp%Numops
+       if(Grp%centred == 0)  Multr= Multr*2
        do j=1,reflex%nref
-          do i=1,grp%NumOps
+          do i=1,Multr  !grp%NumOps
              hr(i,j)%h=Hkl_R(reflex%ref(j)%h,grp%symop(i))
              ht(i,j)=dot_product(real(reflex%ref(j)%h),Grp%SymOp(i)%Tr)
           end do
@@ -2176,6 +2182,7 @@
        err_sfac=.false.
        Natm = Atm%natoms
        Multr= Grp%Numops
+       if(Grp%centred == 0)  Multr= Multr*2
 
        !---- Scattering factor tables ----!
        if (allocated(AF0)) deallocate(AF0)
@@ -2366,12 +2373,14 @@
 
        !---- Local variables ----!
        character(len=2) :: typ
-       integer          :: i,j,k,ii
+       integer          :: i,j,k,ii,Multr
        real(kind=cp)    :: arg,b,s
 
        typ="CO"
        if (present(partyp)) typ=adjustl(partyp)
        typ=U_Case(typ)
+       Multr= Grp%Numops
+       if(Grp%centred == 0)  Multr= Multr*2
 
        select case (typ)
 
@@ -2384,7 +2393,7 @@
                      i=list(ii)
                      Ajh(i,j)=0.0
                      arg=0.0
-                     do k=1,grp%NumOps
+                     do k=1,Multr
                         arg=tpi*(dot_product(hr(k,j)%h,Atm%atom(i)%x)+ht(k,j))
                         Ajh(i,j)=Ajh(i,j)+cos(arg)
                      end do ! symmetry
@@ -2399,7 +2408,7 @@
                      arg=0.0
                      Ajh(i,j)=0.0
                      Bjh(i,j)=0.0
-                     do k=1,grp%NumOps
+                     do k=1,Multr
                         arg=tpi*(dot_product(hr(k,j)%h,Atm%atom(i)%x)+ht(k,j))
                         Ajh(i,j)=Ajh(i,j)+cos(arg)
                         Bjh(i,j)=Bjh(i,j)+sin(arg)
@@ -2887,8 +2896,8 @@
        character(len=*), optional,         intent(in)     :: Mode
        real(kind=cp), optional,            intent(in)     :: lambda
 
-       
-       
+
+
        !Provisional items
        ! integer::i,j
        !---------------
@@ -2901,12 +2910,12 @@
        else
           if(present(lambda)) then
             if(.not. SF_Initialized) call Init_Structure_Factors(Reflex,Atm,Grp,Lambda=lambda)
-         else          
-            if(.not. SF_Initialized) call Init_Structure_Factors(Reflex,Atm,Grp)           
+         else
+            if(.not. SF_Initialized) call Init_Structure_Factors(Reflex,Atm,Grp)
           end if
        end if
 
-       
+
        !---- Table TH ----!
        Call Calc_Table_TH(Reflex,Atm)
 
