@@ -2,6 +2,8 @@ include(LibFindMacros)
 
 get_filename_component(COMPILER_NAME ${CMAKE_Fortran_COMPILER} NAME_WE)
 
+message("COMPILER_NAME " ${COMPILER_NAME})
+
 set(WINTERACTER "$ENV{WINTERACTER}")
 set(WINTER "$ENV{WINTER}")
 set(WINT "$ENV{WINT}")
@@ -144,7 +146,7 @@ elseif(APPLE)
     #find_library(ICONV_LIBRARY NAMES iconv PATHS ENV LD_LIBRARY_PATH)
     
 
-    find_library(WINTERACTER_LIBRARY NAMES winter wint PATHS ${WINTERACTER_MOD_DIR})
+    find_library(WINTERACTER_LIBRARY NAMES winter wint  PATHS ${WINTERACTER_MOD_DIR})
 
     find_library(WINTGL_LIBRARY NAMES winterGL wintGL PATHS ${WINTERACTER_MOD_DIR})
 
@@ -162,34 +164,50 @@ elseif(APPLE)
                                  XINERAMA_LIBRARY)
    
 else()
-    # Linux
+  # Linux
 
-    if(COMPILER_NAME STREQUAL ifort)
+  message("Linux Winteracter cmake Find Macros")
+  message("WINTERACTER " ${WINTERACTER})
 
-	    find_path(WINTERACTER_MOD_DIR
-                   NAMES winteracter.mod
-                   PATHS ${WINTERACTER}/lib.i64
-                         ${WINTER}/lib.i64
-                         ${WINT}/lib.i64
-                         ${HOME}/wint/lib.i64
-                         ${HOME}/lib.i64
-                         /usr/local/lib/wint/lib.i64
-                         /usr/lib/wint/lib.i64
-                         /opt/lib/wint/lib.i64)
-		
+    if (COMPILER_NAME STREQUAL ifort)
+      
+      message("ifort")
+      
+      find_path(WINTERACTER_MOD_DIR
+        NAMES winteracter.mod
+        PATHS ${WINTERACTER}/lib.i64
+        ${WINTER}/lib.i64
+        ${WINT}/lib.i64
+        ${HOME}/wint/lib.i64
+        ${HOME}/lib.i64
+        /usr/local/lib/wint/lib.i64
+        /usr/lib/wint/lib.i64
+        /opt/lib/wint/lib.i64
+	/users/ci/projects/fullprof/wint13/lib.i64
+	NO_CACHE
+	)
+      
+      message("WINTERACTER_MOD_DIR " ${WINTERACTER_MOD_DIR})	       
+      
     elseif(COMPILER_NAME STREQUAL gfortran)
+      
+      message("gfortran")
+      
+      find_path(WINTERACTER_MOD_DIR
+        NAMES winteracter.mod
+        PATHS ${WINTERACTER}/lib.gnu64/8.3
+        ${WINTER}/lib.gnu64/8.3
+        ${WINT}/lib.gnu64/8.3
+        ${HOME}/wint/lib.gnu64/8.3
+        ${HOME}/lib.gnu64/8.3
+        /usr/local/lib/wint/lib.gnu64/8.3
+        /usr/lib/wint/lib.gnu64/8.3
+        /opt/lib/wint/lib.gnu64/8.3)
 
-        find_path(WINTERACTER_MOD_DIR
-                  NAMES winteracter.mod
-                  PATHS ${WINTERACTER}/lib.gnu64/8.3
-                        ${WINTER}/lib.gnu64/8.3
-                        ${WINT}/lib.gnu64/8.3
-                        ${HOME}/wint/lib.gnu64/8.3
-                        ${HOME}/lib.gnu64/8.3
-                        /usr/local/lib/wint/lib.gnu64/8.3
-                        /usr/lib/wint/lib.gnu64/8.3
-                        /opt/lib/wint/lib.gnu64/8.3)
+    else()
 
+      message("compiler not recognized " ${COMPILER_NAME})
+      
     endif()
 
     #libfind_library(XM Xm)
@@ -214,9 +232,16 @@ else()
     find_library(FONTCONFIG_LIBRARY NAMES fontconfig PATHS ENV LD_LIBRARY_PATH)
     find_library(XINERAMA_LIBRARY NAMES Xinerama PATHS ENV LD_LIBRARY_PATH)
 
-    find_library(WINTERACTER_LIBRARY NAMES winter wint PATHS ${WINTERACTER_MOD_DIR})
-
-    find_library(WINTGL_LIBRARY NAMES winterGL wintGL PATHS ${WINTERACTER_MOD_DIR})
+    find_library(WINTERACTER_LIBRARY
+      NAMES winter wint
+      PATHS ${WINTERACTER_MOD_DIR}
+      ${WINTERACTER}/lib.i64
+      ENV LD_LIBRARY_PATH)
+    
+    find_library(WINTGL_LIBRARY
+      NAMES winterGL wintGL
+      PATHS ${WINTERACTER_MOD_DIR} ${WINTERACTER}/lib.i64
+      ENV LD_LIBRARY_PATH)
 
     set(WINTERACTER_PROCESS_MODS WINTERACTER_MOD_DIR)
 
