@@ -32,6 +32,7 @@ Program Calc_Magnetic_Structure_Factors
    character(len=256)          :: filcod     !Name of the input file
    character(len=132)          :: line
    character(len=15)           :: sinthlamb  !String with stlmax (2nd cmdline argument)
+   character(len=6)            :: Mode !"Powder", "SXtal"
    real                        :: stlmax     !Maximum Sin(Theta)/Lambda
    real                        :: Lambda
    integer                     :: lun=1, ier,i,codini=0
@@ -106,19 +107,27 @@ Program Calc_Magnetic_Structure_Factors
         call Get_moment_ctr(A%Atom(i)%X,A%Atom(i)%M_xyz,Spg,codini,codes,Ipr=lun)
       end do
       call Write_Atom_List(A,level=2,lun=lun)
-      !Look for wavelength in CFL file
+      !Look for wavelength and Mode in CFL file
       lambda=0.70926 !Mo kalpha (used only for x-rays)
-       do i=1,fich_cfl%nlines
+      Mode="Powder"
+
+      do i=1,fich_cfl%nlines
          line=adjustl(fich_cfl%line(i))
          if(U_Case(line(1:6)) == "LAMBDA") then
            read(unit=line(7:),fmt=*,iostat=ier) lambda
            if(ier /= 0) lambda=0.70926
          end if
-       end do
-
-      call Magnetic_Structure_Factors(Cell,A,SpG,stlmax,hkl,Stf,lun)
+         if(U_Case(line(1:4)) == "MODE") then
+           read(unit=line(5:),fmt=*,iostat=ier) Mode
+           if(ier /= 0) then
+             Mode="Powder"
+           else
+             Mode=adjustl(Mode)
+           end if
+         end if
+      end do
+      call Magnetic_Structure_Factors(Mode,Cell,A,SpG,stlmax,hkl,Stf,lun)
       call Write_Structure_Factors(lun,hkl,stf,full)
-
 
       write(unit=*,fmt="(a)") " Normal End of: PROGRAM Magnetic STRUCTURE FACTORS "
       write(unit=*,fmt="(a)") " Results in File: "//trim(filcod)//".sfa"

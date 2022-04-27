@@ -641,8 +641,8 @@
     End Subroutine Calc_General_StrFactor
 
     !!----
-    !!---- Subroutine Calc_Mag_Structure_Factor(mode,hm,Cell,Grp,Atm,Scf,Strf,magonly,mdom,tdom,twin)
-    !!----   character(len=*),                   intent(in) :: mode !S-XTAL (S) or Powder (P)
+    !!---- Subroutine Calc_Mag_Structure_Factor(Mode,hm,Cell,Grp,Atm,Scf,Strf,magonly,mdom,tdom,twin)
+    !!----   character(len=*),                   intent(in) :: mode !SXTAL (S) or Powder (P)
     !!----   type(Reflect_Type),                 intent(in) :: hn     !Contains hkl,s,mult and imag within Reflect_List_Type
     !!----   type(Crystal_Cell_type),            intent(in) :: Cell
     !!----   type(Matom_list_type),              intent(in) :: Atm
@@ -714,7 +714,7 @@
 
       !---------------------------
       DO i=1,Atm%natoms           !loop over atoms
-      !---------------------------        ipiof=i+iof
+      !---------------------------
         xi=Atm%atom(i)%x
         betas=Atm%atom(i)%U
         !Modify the first atom position according to the interpretation of domains with translations
@@ -760,7 +760,7 @@
           scosr=scosr+cosr          !FRC= SIG fr(j,s)cos{2pi(hT Rs rj+ts)}*Ta(s)
           sinr=SIN(arg)*exparg      !sin{2pi(hT Rs rj+ts)}*exp(-{hTRsBetaj RsTh})
 
-          IF(Grp%centred == 1) then
+          IF(Grp%centred /= 2) then
            ssinr=ssinr+sinr          !FRS= SIG fr(j,s)sin{2pi(hT Rs rj+ts)}*Ta(s)
           END IF
           IF(mag) Then
@@ -781,7 +781,7 @@
            a1 = a1 + otr(i)*frc(i)    ! components of A  and B
            b1 = b1 + oti(i)*frc(i)    ! A(h) = a1 - a3
                                       ! B(h) = b1 + b3
-           IF(Grp%centred == 1) THEN
+           IF(Grp%centred /= 2) THEN
              a3 = a3 + oti(i)*frs(i)
              b3 = b3 + otr(i)*frs(i)
            END IF
@@ -811,7 +811,7 @@
         ! performed using only the diagonal terms.
         !     FNN = av*av + bv*bv !For a single crystal
 
-        if(mode=="S") then
+        if(mode(1:1)=="S") then
           Strf%sqNuc = av*av+bv*bv
         else
           Strf%sqNuc = a1*a1 + a3*a3 + b1*b1 + b3*b3
@@ -2310,7 +2310,8 @@
     !!----
     !!---- Update: February - 2005
     !!
-    Subroutine Magnetic_Structure_Factors(Cell,Atm,Grp,maxs,Reflex,Stf,lun)
+    Subroutine Magnetic_Structure_Factors(Mode,Cell,Atm,Grp,maxs,Reflex,Stf,lun)
+       character(len=*),                   intent(in)     :: Mode
        type(Crystal_Cell_type),            intent(in)     :: Cell
        type(atom_list_type),               intent(in out) :: Atm
        type(magnetic_space_group_type),    intent(in)     :: Grp
@@ -2340,7 +2341,7 @@
        end if
        do i=1,Reflex%Nref
          Reflex%Ref(i)=rf(i)
-         call Calc_Mag_Structure_Factor("P",Reflex%Ref(i),Cell,Grp,Atm,Scf,Stf%Strf(i))
+         call Calc_Mag_Structure_Factor(Mode,Reflex%Ref(i),Cell,Grp,Atm,Scf,Stf%Strf(i))
        end do
        return
     End Subroutine Magnetic_Structure_Factors
