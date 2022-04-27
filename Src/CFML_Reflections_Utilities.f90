@@ -3060,7 +3060,7 @@
     End Subroutine Hkl_Gen
 
     !!----
-    !!---- Subroutine  Hkl_GenShub(Crystalcell,Spacegroup,ShubG,sintlmax,Num_Ref,Reflex)
+    !!---- Subroutine  Hkl_GenShub(Crystalcell,ShubG,sintlmax,Num_Ref,Reflex)
     !!----    Type (Crystal_Cell_Type),          intent(in) :: CrystalCell     !Unit cell object
     !!----    Type (Magnetic_Space_Group_Type),  intent(in) :: ShubG           !Magnetic Space Group object
     !!----    real(kind=cp),                     intent(in) :: sintlmax        !Maximum SinTheta/Lambda
@@ -3068,7 +3068,7 @@
     !!----    Type (Reflect_Type), dimension(:), intent(out):: Reflex          !List of generated hkl,mult, s
     !!----
     !!----    Calculate unique reflections below the maximum
-    !!----    sin_theta/lambda provided.  The output is ordered.
+    !!----    sin_theta/lambda provided. The output is ordered.
     !!----
     !!---- Created: March - 2016, Updated: January 2020
     !!
@@ -3093,8 +3093,8 @@
        hmax=nint(CrystalCell%cell(1)*2.0*sintlmax+1.0)
        kmax=nint(CrystalCell%cell(2)*2.0*sintlmax+1.0)
        lmax=nint(CrystalCell%cell(3)*2.0*sintlmax+1.0)
-       hmin=-hmax; kmin=-kmax; lmin= -lmax
-       maxref= (2*hmax+1)*(2*kmax+1)*(2*lmax+1)
+       hmin=-hmax; kmin=-kmax; lmin= 0
+       maxref= (2*hmax+1)*(2*kmax+1)*(lmax+1)
        allocate(hkl(3,maxref),indx(maxref),sv(maxref))
 
 
@@ -3139,7 +3139,7 @@
            ini(indp)=i  !put pointers for initial and final equivalent reflections
            fin(indp)=i
            do j=i+1,num_ref  !look for equivalent reflections to the current (i) in the list
-               if(abs(sm(i)-sm(j)) > 0.000001) exit
+               if(abs(sm(i)-sm(j)) > 0.001) exit
                kk=hklm(:,j)
                if(hkl_equiv(hh,kk,ShubG)) then ! if  hh eqv kk
                  itreat(j) = i                 ! add kk to the list equivalent to i
@@ -3199,6 +3199,20 @@
        return
     End Subroutine Hkl_Gen_Shub
 
+    !!----
+    !!---- Subroutine  Hkl_Gen_General(Crystalcell,SpG,Friedel,sintlmax,Num_Ref,Reflex)
+    !!----    Type (Crystal_Cell_Type),                       intent(in) :: CrystalCell     !Unit cell object
+    !!----    Type (Space_Group_Type),                        intent(in) :: SpG             !Space Group object
+    !!----    logical,                                        intent(in) :: Friedel         !True if Friedel law is applied
+    !!----    real(kind=cp),                                  intent(in) :: sintlmax        !Maximum SinTheta/Lambda
+    !!----    Integer,                                        intent(out):: Num_Ref         !Number of generated reflections
+    !!----    Type (Reflect_Type), dimension(:), allocatable, intent(out):: Reflex          !List of generated hkl,mult, s
+    !!----
+    !!----    Calculate unique reflections below the maximum
+    !!----    sin_theta/lambda provided. The output is ordered.
+    !!----
+    !!---- Created: April - 2022
+    !!
     Subroutine Hkl_Gen_General(Crystalcell,SpG,Friedel,sintlmax,Num_Ref,Reflex)
        !---- Arguments ----!
        type (Crystal_Cell_Type),                      intent(in)     :: crystalcell
@@ -3221,8 +3235,10 @@
        hmax=nint(CrystalCell%cell(1)*2.0*sintlmax+1.0)
        kmax=nint(CrystalCell%cell(2)*2.0*sintlmax+1.0)
        lmax=nint(CrystalCell%cell(3)*2.0*sintlmax+1.0)
-       hmin=-hmax; kmin=-kmax; lmin= -lmax
-       maxref= (2*hmax+1)*(2*kmax+1)*(2*lmax+1)
+       !hmin=-hmax; kmin=-kmax; lmin= -lmax
+       hmin=-hmax; kmin=-kmax; lmin= 0
+       !maxref= (2*hmax+1)*(2*kmax+1)*(2*lmax+1)
+       maxref= (2*hmax+1)*(2*kmax+1)*(lmax+1)
        allocate(hkl(3,maxref),indx(maxref),sv(maxref))
 
 
@@ -3267,10 +3283,10 @@
            ini(indp)=i  !put pointers for initial and final equivalent reflections
            fin(indp)=i
            do j=i+1,num_ref  !look for equivalent reflections to the current (i) in the list
-               if(abs(sm(i)-sm(j)) > 0.000001) exit
+               if(abs(sm(i)-sm(j)) > 0.001) exit
                kk=hklm(:,j)
-               if(hkl_equiv(hh,kk,SpG)) then ! if  hh eqv kk
-                 itreat(j) = i                 ! add kk to the list equivalent to i
+               if(hkl_equiv(hh,kk,SpG,Friedel)) then ! if  hh eqv kk
+                 itreat(j) = i                       ! add kk to the list equivalent to i
                  fin(indp)=j
                end if
            end do
@@ -3279,7 +3295,7 @@
 
        !Selection of the most convenient independent reflections
        allocate(hkl(3,indp),sv(indp),indx(indp))
-       indx=0 !nuclear by default
+       indx=0
        do i=1,indp
          maxpos=0
          indj=ini(i)
