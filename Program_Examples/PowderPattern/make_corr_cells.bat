@@ -27,9 +27,9 @@ rem ****---- Lahey Compiler ----****
 rem
 rem ****---- Intel Compiler ----****
 :IFORT
-   ifort /c Corr_Cells.f90 /Ox /nologo /I. /I..\..\ifort\LibC
+   ifort /c Corr_Cells.f90 /Ox /nologo /I. /I..\..\ifort64\LibC
    rem ifort /exe:Corr_Cells *.obj ..\..\ifort\LibC\CrysFML.lib /link /stack:102400000
-   link /subsystem:console /stack:102400000 /out:Corr_Cells.exe *.obj ..\..\ifort\LibC\CrysFML.lib
+   link /subsystem:console /stack:102400000 /out:Corr_Cells.exe *.obj ..\..\ifort64\LibC\CrysFML.lib
    goto END
 rem
 rem **---- G95 Compiler ----**

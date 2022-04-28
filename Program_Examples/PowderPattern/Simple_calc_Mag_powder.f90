@@ -419,7 +419,7 @@
      ! Now calculate structure factors
      write(*,*) " => Calculating structure factors ..."
      call cpu_time(tini)
-     call Magnetic_Structure_Factors(Cell,A,SpG,stlmax,hkl,Stf,lun)
+     call Magnetic_Structure_Factors("Powder",Cell,A,SpG,stlmax,hkl,Stf,lun)
      if (ERR_SFac) then
          write(*,*) " => Error in calculations of Structure Factors"
          write(*,*) " => "//trim(ERR_SFac_Mess)
