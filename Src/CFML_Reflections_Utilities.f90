@@ -153,7 +153,7 @@
     !---- List of public subroutines ----!
     public :: Hkl_Equiv_List, Hkl_Gen, Hkl_Rp, Hkl_Uni, Init_Err_Refl, Init_RefList, &
               Search_Extinctions, Write_Asu, Write_RefList_Info, Hkl_Gen_Sxtal,      &
-              Hkl_Gen_Shub
+              Hkl_Gen_Shub, Hkl_Gen_General
 
     !---- List of public overloaded procedures: subroutines ----!
 
@@ -3060,7 +3060,7 @@
     End Subroutine Hkl_Gen
 
     !!----
-    !!---- Subroutine  Hkl_GenShub(Crystalcell,Spacegroup,ShubG,sintlmax,Num_Ref,Reflex)
+    !!---- Subroutine  Hkl_GenShub(Crystalcell,ShubG,sintlmax,Num_Ref,Reflex)
     !!----    Type (Crystal_Cell_Type),          intent(in) :: CrystalCell     !Unit cell object
     !!----    Type (Magnetic_Space_Group_Type),  intent(in) :: ShubG           !Magnetic Space Group object
     !!----    real(kind=cp),                     intent(in) :: sintlmax        !Maximum SinTheta/Lambda
@@ -3068,7 +3068,7 @@
     !!----    Type (Reflect_Type), dimension(:), intent(out):: Reflex          !List of generated hkl,mult, s
     !!----
     !!----    Calculate unique reflections below the maximum
-    !!----    sin_theta/lambda provided.  The output is ordered.
+    !!----    sin_theta/lambda provided. The output is ordered.
     !!----
     !!---- Created: March - 2016, Updated: January 2020
     !!
@@ -3093,8 +3093,8 @@
        hmax=nint(CrystalCell%cell(1)*2.0*sintlmax+1.0)
        kmax=nint(CrystalCell%cell(2)*2.0*sintlmax+1.0)
        lmax=nint(CrystalCell%cell(3)*2.0*sintlmax+1.0)
-       hmin=-hmax; kmin=-kmax; lmin= -lmax
-       maxref= (2*hmax+1)*(2*kmax+1)*(2*lmax+1)
+       hmin=-hmax; kmin=-kmax; lmin= 0
+       maxref= (2*hmax+1)*(2*kmax+1)*(lmax+1)
        allocate(hkl(3,maxref),indx(maxref),sv(maxref))
 
 
@@ -3139,7 +3139,7 @@
            ini(indp)=i  !put pointers for initial and final equivalent reflections
            fin(indp)=i
            do j=i+1,num_ref  !look for equivalent reflections to the current (i) in the list
-               if(abs(sm(i)-sm(j)) > 0.000001) exit
+               if(abs(sm(i)-sm(j)) > 0.001) exit
                kk=hklm(:,j)
                if(hkl_equiv(hh,kk,ShubG)) then ! if  hh eqv kk
                  itreat(j) = i                 ! add kk to the list equivalent to i
@@ -3190,7 +3190,7 @@
        if(allocated(reflex)) deallocate(reflex)
        allocate(reflex(num_ref))
        do i=1,num_ref
-         hh=hkl(:,i)
+         hh=hklm(:,i)
          reflex(i)%h    = hh
          reflex(i)%s    = sm(i)
          reflex(i)%mult = hkl_mult(hh,ShubG)
@@ -3199,6 +3199,140 @@
        return
     End Subroutine Hkl_Gen_Shub
 
+    !!----
+    !!---- Subroutine  Hkl_Gen_General(Crystalcell,SpG,Friedel,sintlmax,Num_Ref,Reflex)
+    !!----    Type (Crystal_Cell_Type),                       intent(in) :: CrystalCell     !Unit cell object
+    !!----    Type (Space_Group_Type),                        intent(in) :: SpG             !Space Group object
+    !!----    logical,                                        intent(in) :: Friedel         !True if Friedel law is applied
+    !!----    real(kind=cp),                                  intent(in) :: sintlmax        !Maximum SinTheta/Lambda
+    !!----    Integer,                                        intent(out):: Num_Ref         !Number of generated reflections
+    !!----    Type (Reflect_Type), dimension(:), allocatable, intent(out):: Reflex          !List of generated hkl,mult, s
+    !!----
+    !!----    Calculate unique reflections below the maximum
+    !!----    sin_theta/lambda provided. The output is ordered.
+    !!----
+    !!---- Created: April - 2022
+    !!
+    Subroutine Hkl_Gen_General(Crystalcell,SpG,Friedel,sintlmax,Num_Ref,Reflex)
+       !---- Arguments ----!
+       type (Crystal_Cell_Type),                      intent(in)     :: crystalcell
+       type (Space_Group_Type) ,                      intent(in)     :: SpG
+       logical,                                       intent(in)     :: Friedel
+       real(kind=cp),                                 intent(in)     :: sintlmax
+       integer,                                       intent(out)    :: num_ref
+       type (Reflect_Type), dimension(:), allocatable,intent(out)    :: reflex
+
+       !---- Local variables ----!
+       real(kind=cp)         :: sval !,vmin,vmax
+       integer               :: h,k,l,hmin,kmin,lmin,hmax,kmax,lmax, maxref,i,j,indp,indj, &
+                                maxpos, mp, iprev
+       integer, dimension(3) :: hh,kk,nulo
+       integer, dimension(:,:), allocatable :: hkl,hklm
+       integer, dimension(:),   allocatable :: indx,ini,fin,itreat
+       real,    dimension(:),   allocatable :: sv,sm
+
+       nulo=0
+       hmax=nint(CrystalCell%cell(1)*2.0*sintlmax+1.0)
+       kmax=nint(CrystalCell%cell(2)*2.0*sintlmax+1.0)
+       lmax=nint(CrystalCell%cell(3)*2.0*sintlmax+1.0)
+       !hmin=-hmax; kmin=-kmax; lmin= -lmax
+       hmin=-hmax; kmin=-kmax; lmin= 0
+       !maxref= (2*hmax+1)*(2*kmax+1)*(2*lmax+1)
+       maxref= (2*hmax+1)*(2*kmax+1)*(lmax+1)
+       allocate(hkl(3,maxref),indx(maxref),sv(maxref))
+
+
+       num_ref=0
+       ext_do: do h=hmin,hmax
+          do k=kmin,kmax
+             do l=lmin,lmax
+
+                hh=(/h,k,l/)
+                if (hkl_equal(hh,nulo)) cycle
+                sval=hkl_s(hh,crystalcell)
+                if (sval > sintlmax) cycle
+                if (Hkl_Lat_Absent(hh,SpG%Latt_trans,SpG%NumLat)) cycle
+                num_ref=num_ref+1
+                if(num_ref > maxref) then
+                   num_ref=maxref
+                   exit ext_do
+                end if
+                sv(num_ref)=sval
+                hkl(:,num_ref)=hh
+             end do
+          end do
+       end do ext_do
+
+       call sort(sv,num_ref,indx)
+
+       allocate(hklm(3,num_ref),sm(num_ref),ini(num_ref),fin(num_ref),itreat(num_ref))
+       do i=1,num_ref
+         j=indx(i)
+         hklm(:,i)=hkl(:,j)
+         sm(i)=sv(j)
+       end do
+       deallocate(hkl,sv,indx)
+       itreat=0; ini=0; fin=0
+       indp=0
+       do i=1,num_ref              !Loop over all reflections
+         !write(*,"(i6,3i5,i8)") i, hklm(:,i),itreat(i)
+         if(itreat(i) == 0) then   !If not yet treated do the following
+           hh(:)=hklm(:,i)
+           indp=indp+1  !update the number of independent reflections
+           itreat(i)=i  !Make this reflection treated
+           ini(indp)=i  !put pointers for initial and final equivalent reflections
+           fin(indp)=i
+           do j=i+1,num_ref  !look for equivalent reflections to the current (i) in the list
+               if(abs(sm(i)-sm(j)) > 0.001) exit
+               kk=hklm(:,j)
+               if(hkl_equiv(hh,kk,SpG,Friedel)) then ! if  hh eqv kk
+                 itreat(j) = i                       ! add kk to the list equivalent to i
+                 fin(indp)=j
+               end if
+           end do
+         end if !itreat
+       end do
+
+       !Selection of the most convenient independent reflections
+       allocate(hkl(3,indp),sv(indp),indx(indp))
+       indx=0
+       do i=1,indp
+         maxpos=0
+         indj=ini(i)
+         iprev=itreat(indj)
+         do j=ini(i),fin(i)
+           if(iprev /= itreat(j)) cycle
+           hh=hklm(:,j)
+           mp=count(hh > 0)
+           if(mp > maxpos) then
+             indj=j
+             maxpos=mp
+           end if
+         end do !j
+         hkl(:,i)=hklm(:,indj)
+         if(hkl(1,i) < 0) hkl(:,i)=-hkl(:,i)
+         sv(i)=sm(indj)
+       end do
+       !Now apply systematic absences other than lattice type
+       num_ref=0
+       do i=1,indp
+         hh=hkl(:,i)
+         if(Hkl_Absent(hh,SpG)) cycle
+         num_ref=num_ref+1
+         hklm(:,num_ref)=hh
+         sm(num_ref) = sv(i)
+       end do
+       !Final assignments
+       if(allocated(reflex)) deallocate(reflex)
+       allocate(reflex(num_ref))
+       do i=1,num_ref
+         hh=hklm(:,i)
+         reflex(i)%h    = hh
+         reflex(i)%s    = sm(i)
+         reflex(i)%mult = hkl_mult(hh,SpG,Friedel)
+         reflex(i)%imag = indx(i)
+       end do
+    End Subroutine Hkl_Gen_General
     !!----
     !!---- Subroutine  Hkl_Gen_Sxtal (Crystalcell,Spacegroup,stlmin,stlmax,Num_Ref,Reflex,ord,hlim)
     !!----    Type (Crystal_Cell_Type),          intent(in) :: CrystalCell     !Unit cell object

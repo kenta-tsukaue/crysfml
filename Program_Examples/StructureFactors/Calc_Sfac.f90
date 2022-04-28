@@ -13,8 +13,8 @@ Program Calc_Structure_Factors
    use CFML_Crystal_Metrics,           only: Crystal_Cell_Type, Write_Crystal_Cell
    use CFML_Reflections_Utilities,     only: Reflection_List_Type, Hkl_Uni, get_maxnumref
    use CFML_IO_Formats,                only: Readn_set_Xtal_Structure,err_form_mess,err_form,file_list_type
-   use CFML_Structure_Factors,         only: Structure_Factors, Write_Structure_Factors, &
-                                             Init_Structure_Factors,Calc_StrFactor
+   use CFML_Structure_Factors,         only: Structure_Factors, Write_Structure_Factors,Init_Calc_hkl_StrFactors, &
+                                             Init_Structure_Factors,Calc_StrFactor, Calc_hkl_StrFactor
    use CFML_String_Utilities,          only: u_case
 
    !---- Variables ----!
@@ -24,13 +24,13 @@ Program Calc_Structure_Factors
    type (space_group_type)     :: SpG
    type (Atom_list_Type)       :: A
    type (Crystal_Cell_Type)    :: Cell
-   type (Reflection_List_Type) :: hkl
+   type (Reflection_List_Type) :: hkl,hkl_sing
 
    character(len=256)          :: filcod     !Name of the input file
    character(len=132)          :: line
    character(len=15)           :: sinthlamb  !String with stlmax (2nd cmdline argument)
    real                        :: stlmax     !Maximum Sin(Theta)/Lambda
-   real                        :: sn,sf2, Lambda
+   real                        :: sn,sf2, Lambda, delta
    integer                     :: MaxNumRef, lun=1, ier,i
    complex                     :: fc
 
@@ -116,13 +116,39 @@ Program Calc_Structure_Factors
       !> Calculation for neutron scattering
       call Init_Structure_Factors(hkl,A,Spg,mode="NUC",lun=lun)
       call Structure_Factors(A,SpG,hkl,mode="NUC")
+      hkl_sing=hkl
       call Write_Structure_Factors(lun,hkl,mode="NUC")
 
       !> Test of another structure factor subroutine
+      write(unit=lun,fmt="(/,a,/)") " => Calculation with subroutine Calc_StrFactor"
+      write(unit=*,fmt="(/,a,/)") " => Calculation with subroutine Calc_StrFactor"
       write(unit=lun,fmt="(/,a,/)") "   H   K   L   Mult  SinTh/Lda    |Fc|       Phase        F-Real      F-Imag      Num"
       do i=1, hkl%nref
          sn=hkl%ref(i)%s * hkl%ref(i)%s
          call Calc_StrFactor("P","N",i,sn,A,Spg,sf2,fc=fc)
+         delta=abs(hkl%ref(i)%Fc-sqrt(sf2))
+         if(delta > 0.01) write(*,"(3i4,3f14.4)") hkl%ref(i)%h,hkl%ref(i)%Fc,sqrt(sf2),delta
+         delta=abs(hkl%ref(i)%A-real(fc))
+         if(delta > 0.01) write(*,"(3i4,3f14.4)") hkl%ref(i)%h,hkl%ref(i)%A,real(fc),delta
+         delta=abs(hkl%ref(i)%B-aimag(fc))
+         if(delta > 0.01) write(*,"(3i4,3f14.4)") hkl%ref(i)%h,hkl%ref(i)%B,aimag(fc),delta
+         write(unit=lun,fmt="(3i4,i5,5f12.5,i8,f12.5)") hkl%ref(i)%h, hkl%ref(i)%mult, &
+              hkl%ref(i)%S, hkl%ref(i)%Fc, hkl%ref(i)%Phase, real(fc), aimag(fc), i, sqrt(sf2)
+      end do
+
+      write(unit=lun,fmt="(/,a,/)") " => Calculation with subroutine Calc_hkl_StrFactor"
+      write(unit=*,fmt="(/,a,/)") " => Calculation with subroutine Calc_hkl_StrFactor"
+      write(unit=lun,fmt="(/,a,/)") "   H   K   L   Mult  SinTh/Lda    |Fc|       Phase        F-Real      F-Imag      Num"
+      call Init_Calc_hkl_StrFactors(A,"NUC")
+      do i=1, hkl%nref
+         sn=hkl%ref(i)%s * hkl%ref(i)%s
+         call Calc_hkl_StrFactor("P","N",hkl%ref(i)%h,sn,A,SpG,sf2,fc=fc)
+         delta=abs(hkl%ref(i)%Fc-sqrt(sf2))
+         if(delta > 0.01) write(*,"(3i4,3f14.4)") hkl%ref(i)%h,hkl%ref(i)%Fc,sqrt(sf2),delta
+         delta=abs(hkl%ref(i)%A-real(fc))
+         if(delta > 0.01) write(*,"(3i4,3f14.4)") hkl%ref(i)%h,hkl%ref(i)%A,real(fc),delta
+         delta=abs(hkl%ref(i)%B-aimag(fc))
+         if(delta > 0.01) write(*,"(3i4,3f14.4)") hkl%ref(i)%h,hkl%ref(i)%B,aimag(fc),delta
          write(unit=lun,fmt="(3i4,i5,5f12.5,i8,f12.5)") hkl%ref(i)%h, hkl%ref(i)%mult, &
               hkl%ref(i)%S, hkl%ref(i)%Fc, hkl%ref(i)%Phase, real(fc), aimag(fc), i, sqrt(sf2)
       end do
