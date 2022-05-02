@@ -741,7 +741,7 @@
        Job_Info%W = 0.0
        Job_Info%X = 0.0
        Job_Info%Y = 0.0
-       
+
        Job_Info%theta_step = 0.0
        Job_Info%bkg = 0.0
 
@@ -749,10 +749,10 @@
           line=u_case(adjustl(file_dat(i)))
           if (line(1:5) == "TITLE") Job_info%title=line(7:)
           if (line(1:5) == "NPATT") then
-             
+
              read(unit=line(7:), fmt=*,iostat=ier) Job_info%Num_Patterns
              if (ier /= 0) Job_info%Num_Patterns=1
-          
+
           end if
           if (line(1:6) == "PHASE_") then
              nphas=nphas+1
@@ -775,7 +775,7 @@
              end if
           end if
 
-          if (line(1:4) == "STEP") then         
+          if (line(1:4) == "STEP") then
              read(unit=line(5:),fmt=*,iostat=ier) Job_info%theta_step
              if (ier /= 0) then
                 Job_info%theta_Step = 0.05
@@ -787,7 +787,7 @@
              read(unit=line(7:),fmt=*,iostat=ier) Job_info%bkg
              if(ier /= 0) Job_info%bkg=20.0
           end if
-          
+
        end do
 
        if (nphas == 0) then
@@ -859,8 +859,8 @@
        Job_Info%ratio = 0.0
        Job_Info%dtt1 = 0.0
        Job_Info%dtt2 = 0.0
-       
-       
+
+
        if (ncmd > 0) then
           if (allocated(Job_Info%cmd)) deallocate(Job_Info%cmd)
           allocate(Job_Info%cmd(ncmd))
@@ -2044,26 +2044,28 @@
        np1=nline_ini
        call Read_Key_Str(filevar,nline_ini,nline_end, &
                             "_symmetry_space_group_name_H-M",spgr_hm)
-       !if (len_trim(spgr_hm) ==0 ) spgr_hm=adjustl(filevar(nline_ini+1))
+       !write(*,"(a)") " From Read_Key_Str _symmetry_space_group_name_H-M: "//spgr_hm
+       !if (len_trim(spgr_hm) == 0 ) spgr_hm=adjustl(filevar(nline_ini+1))
        !nline_ini=np1
        ! TR  feb. 2015 .(re-reading the same item with another name)
        if(len_trim(spgr_hm) == 0) then
         nline_ini=np1
         spgr_hm = " "
         call Read_Key_Str(filevar,nline_ini,nline_end, "_space_group_name_H-M_alt",spgr_hm)
-        if (len_trim(spgr_hm) ==0 ) spgr_hm=adjustl(filevar(nline_ini+1))
+        if (len_trim(spgr_hm) == 0 ) spgr_hm=adjustl(filevar(nline_ini+1))
+        !write(*,"(a)") " From Read_Key_Str _space_group_name_H-M_alt: "//spgr_hm
        end if
 
-       if (spgr_hm =="?" .or. spgr_hm=="#") then
+       if (spgr_hm == "?" .or. spgr_hm == "#") then
           spgr_hm=" "
        else
           np1=index(spgr_hm,"'")
-          np2=index(spgr_hm,"'",back=.true.)
+          np2=index(spgr_hm,"'",back = .true.)
           if (np1 > 0 .and. np2 > 0 .and. np2 > np1) then
              spgr_hm=spgr_hm(np1+1:np2-1)
           else
              np1=index(spgr_hm,'"')
-             np2=index(spgr_hm,'"',back=.true.)
+             np2=index(spgr_hm,'"',back = .true.)
              if (np1 > 0 .and. np2 > 0 .and. np2 > np1) then
                 spgr_hm=spgr_hm(np1+1:np2-1)
              else
@@ -2071,6 +2073,7 @@
              end if
           end if
        end if
+       !write(*,"(a)") " After first processing: "//spgr_hm
 
        !---- Adapting Nomenclature from ICSD to our model ----!
        np1=len_trim(spgr_hm)
@@ -2080,16 +2083,21 @@
              case("1")
                 csym2=u_case(spgr_hm(np1-1:np1-1))
                 if (csym2 == "Z" .or. csym2 =="S") then
-                   spgr_hm=spgr_hm(:np1-2)//":1"
+                   spgr_hm=trim(spgr_hm(:np1-2))//":1"
+                else
+                   np2=index(spgr_hm,":1")
+                   if(np2 /= 0) then
+                     spgr_hm=trim(spgr_hm(:np2-1))//":1"
+                   end if
                 end if
 
              case("S","Z")
                 csym2=u_case(spgr_hm(np1-1:np1-1))
                 select case (csym2)
                    case ("H")
-                      spgr_hm=spgr_hm(:np1-2)
+                      spgr_hm=trim(spgr_hm(:np1-2))
                    case ("R")
-                      spgr_hm=spgr_hm(:np1-2)//":R"
+                      spgr_hm=trim(spgr_hm(:np1-2))//":R"
                    case default
                       spgr_hm=spgr_hm(:np1-1)
                 end select
@@ -2097,19 +2105,19 @@
              case("R")
                 csym2=u_case(spgr_hm(np1-1:np1-1))
                 if (csym2 == "H" ) then
-                   spgr_hm=spgr_hm(:np1-2)
+                   spgr_hm=trim(spgr_hm(:np1-2))
                 else
-                   spgr_hm=spgr_hm(:np1-1)//":R"
+                   spgr_hm=trim(spgr_hm(:np1-2))//":R"
                 end if
              case("H")
-                spgr_hm=spgr_hm(:np1-1)
+                spgr_hm=trim(spgr_hm(:np1-1))
                 csym2=u_case(spgr_hm(np1-1:np1-1))
-                if(csym2 == ":") spgr_hm=spgr_hm(:np1-2)
+                if(csym2 == ":") spgr_hm=trim(spgr_hm(:np1-2))
 
           end select
        end if
+       !write(*,"(a)") " After last processing: "//spgr_hm
 
-       return
     End Subroutine Read_Cif_Hm
 
     !!----
@@ -5346,12 +5354,14 @@
        n_end=ip(iph+1)
        if (len_trim(Spp) == 0) call Read_Cif_Hall(file_dat,n_ini,n_end,Spp)
 
+
+       !write(*,"(a)") "  Symbol before setting space group: "//Spp
        if (len_trim(Spp) == 0) then
           n_ini=ip(iph)           !Updated values to handle non-conventional order
           n_end=ip(iph+1)
           call Read_Cif_Symm(file_dat,n_ini,n_end,noper,symm_car)
 
-          if (noper ==0) then
+          if (noper == 0) then
              err_form=.true.
              ERR_Form_Mess=" => No Space Group/No Symmetry information in this file "
              return
@@ -6422,12 +6432,13 @@
           end if
         end do
       end if
-      MGp%Centred=0        ! Centric or Acentric [ =0 Centric(-1 no at origin),=1 Acentric,=2 Centric(-1 at origin)]
+      MGp%Centred=1        ! Centric or Acentric [ =0 Centric(-1 no at origin),=1 Acentric,=2 Centric(-1 at origin)]
       MGp%Centre_coord=0.0 ! Fractional coordinates of the inversion centre
       do k=1,wyckoff_pos_count(j,num) !j=1 multiplicity of the general position
         if(equal_matrix(MGp%SymOp(k)%Rot,-identity,3) .and. MGp%MSymOp(k)%Phas > 0) then
           m=k
-          MGp%Centred=max(MGp%Centred,1)
+          !MGp%Centred=max(MGp%Centred,1)
+          MGp%Centred=0
           if(sum(abs(MGp%SymOp(k)%tr)) < 0.001) then
             MGp%Centred=2
             exit
@@ -6436,7 +6447,8 @@
       end do
       MGp%NumOps=wyckoff_pos_count(j,num)
       MGp%Centre="Non-Centrosymmetric"    ! Alphanumeric information about the center of symmetry
-      if(MGp%Centred == 1) then
+      !if(MGp%Centred == 1) then  !This was written an
+      if(MGp%Centred == 0) then
         MGp%Centre="Centrosymmetric, -1 not @the origin "       ! Alphanumeric information about the center of symmetry
         MGp%Centre_coord=0.5*MGp%SymOp(m)%tr
       else if(MGp%Centred == 2) then
