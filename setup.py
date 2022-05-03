@@ -1,4 +1,3 @@
-
 import os
 import pathlib
 import pkgutil
@@ -326,9 +325,9 @@ class BuildCommand(distutils.command.build.build):
 
 
 setup(name="CFML",
-      version="0.0.1",
-      author="Simon Ward",
-      author_email="simon.ward@ess.eu",
+      version="0.0.2",
+      author="Juan Rodriguez-Carvajal, Elisa Rebolini, Simon Ward",
+      author_email="rebolini@ill.fr",
       description="The Crystallographic Fortran Modules Library (CrysFML) is a set of modules containing "
                   "procedures of interest in Crystallographic applications.",
       ext_modules=[CMakeExtension(name=PACKAGE_NAME)],
