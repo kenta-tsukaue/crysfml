@@ -69,6 +69,7 @@ module API_init
        IO_Formats_get_num_patterns, &
        IO_Formats_get_num_cmd, &
        IO_Formats_get_patt_typ, &
+       IO_Formats_set_patt_typ, &
        IO_Formats_get_phas_nam, &
        IO_Formats_get_cmd, &
        IO_Formats_get_range_stl, &
@@ -80,6 +81,7 @@ module API_init
        IO_Formats_get_lambda, &
        IO_formats_set_lambda, &
        IO_Formats_get_ratio, &
+       IO_Formats_set_ratio, &
        IO_Formats_get_dtt1, &
        IO_Formats_get_dtt2, &
        IO_Formats_get_U, &
@@ -271,7 +273,7 @@ CONTAINS
     !--------------------------
     !Total number of method in the binding
     !--------------------------
-    call method_table%init(208)
+    call method_table%init(210)
 
 
 
@@ -708,7 +710,7 @@ CONTAINS
 
 
     !--------------------------
-    ! IO formats (35)
+    ! IO formats (37)
     !--------------------------
     call method_table%add_method("IO_Formats_readn_set_xtal_structure", &                  ! method name
          "read an input file and construct the crystal structure in terms of Cell, SpG and A", &  !doc-string
@@ -749,6 +751,11 @@ CONTAINS
          "pat_typ getter", &  !doc-string
          METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
          c_funloc(IO_Formats_get_patt_typ))  ! address of Fortran function to add
+
+    call method_table%add_method("IO_Formats_set_patt_typ", &                  ! method name
+         "pat_typ setter", &  !doc-string
+         METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
+         c_funloc(IO_Formats_set_patt_typ))  ! address of Fortran function to add
     
     call method_table%add_method("IO_Formats_get_phas_nam", &                  ! method name
          "phas_nam getter", &  !doc-string
@@ -804,6 +811,11 @@ CONTAINS
          "ratio getter", &  !doc-string
          METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
          c_funloc(IO_Formats_get_ratio))  ! address of Fortran function to add
+
+    call method_table%add_method("IO_Formats_set_ratio", &                  ! method name
+         "ratio setter", &  !doc-string
+         METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
+         c_funloc(IO_Formats_set_ratio))  ! address of Fortran function to add
     
     call method_table%add_method("IO_Formats_get_dtt1", &                  ! method name
          "dtt1 getter", &  !doc-string

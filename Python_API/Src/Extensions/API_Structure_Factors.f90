@@ -136,16 +136,21 @@ contains
     call get_reflection_list_from_arg(args, reflection_list_p, 2)
 
     call get_job_info_type_from_arg(args, job_p, 3)
-    
+
+    write(*,*) job_p%p%patt_typ(1)
 
     select case (job_p%p%patt_typ(1))
     case ("XRAY_2THE", "XRAY_SXTAL", "XRAY_ENER")
-       mode = "NUC"
-       call Structure_Factors(atom_list_p%p, spg_p%p, reflection_list_p%p, mode) 
-    case("NEUT_2THE", "NEUT_SXTAL", "NEUT_TOF" )
        mode = "XRA"
+       !write(*,*) "X-Ray calculation"
        lambda = job_p%p%lambda(1)%mina
-       call Structure_Factors(atom_list_p%p, spg_p%p, reflection_list_p%p, mode, lambda) 
+       call Structure_Factors(atom_list_p%p, spg_p%p, reflection_list_p%p, mode, lambda)
+       
+    case("NEUT_2THE", "NEUT_SXTAL", "NEUT_TOF" )
+       mode = "NUC"
+       !write(*,*) "Neutron calculation"
+       call Structure_Factors(atom_list_p%p, spg_p%p, reflection_list_p%p, mode) 
+       
     case default
        write(*,*) 'Default calculation'
        call Structure_Factors(atom_list_p%p, spg_p%p, reflection_list_p%p)
