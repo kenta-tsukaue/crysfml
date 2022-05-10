@@ -331,7 +331,7 @@ setup(name="CFML",
       description="The Crystallographic Fortran Modules Library (CrysFML) is a set of modules containing "
                   "procedures of interest in Crystallographic applications.",
       ext_modules=[CMakeExtension(name=PACKAGE_NAME)],
-      long_description=open("./README", 'r').read(),
+      long_description=open("./README.md", 'r').read(),
       long_description_content_type="text/markdown",
       keywords="crystallography, physics, neutron, diffraction",
       classifiers=["Intended Audience :: Developers",
