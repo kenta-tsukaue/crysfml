@@ -58,17 +58,17 @@ Here are the instructions to run cmake in order to build the CrysFML library.
            If OFF, only CrysFML will be built.
            If ON, both CrysFML and WCrysFML libraries will be built
 
-	 * ARCH32: ON|OFF
-	   Default ON
-	   If ON 32-bits architecture is built
+	       * ARCH32: ON|OFF
+	        Default ON
+	        If ON 32-bits architecture is built
 
-	 * HEAP_ARRAYS: ON|OFF
-	   Default OFF
-	   Put arrays in heap instead of stack (only for Windows ifort)
+	       * HEAP_ARRAYS: ON|OFF
+	        Default OFF
+	        Put arrays in heap instead of stack (only for Windows ifort)
 
-	 * PYTHON_API: ON|OFF
-	   Default OFF
-	   If ON, build the Python API
+	       * PYTHON_API: ON|OFF
+	        Default OFF
+	        If ON, build the Python API
 
          * CMAKE_Fortran_COMPILER: ifort|g95|gfortran.
            Default ifort.
