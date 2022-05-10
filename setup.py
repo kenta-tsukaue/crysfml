@@ -325,7 +325,7 @@ class BuildCommand(distutils.command.build.build):
 
 
 setup(name="CFML",
-      version="0.0.2",
+      version="0.0.3",
       author="Juan Rodriguez-Carvajal, Elisa Rebolini, Simon Ward",
       author_email="rebolini@ill.fr",
       description="The Crystallographic Fortran Modules Library (CrysFML) is a set of modules containing "

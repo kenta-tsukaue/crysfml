@@ -127,7 +127,17 @@ class JobInfo(CFML_api.FortranBindedClass):
             key=0
         return CFML_api.crysfml_api.IO_Formats_get_patt_typ(self.get_fortran_address(), key+1)["patt_typ"]
 
-    pattern_type = property(get_pattern_types)
+    def set_pattern_types(self, patt, indx=None):
+        """
+        String with the pattern type of indx in [0, num_patterns-1]
+        """
+        if indx:
+            key=indx
+        else:
+            key=0
+        return CFML_api.crysfml_api.IO_Formats_set_patt_typ(self.get_fortran_address(), patt, key+1)
+    
+    pattern_type = property(get_pattern_types, set_pattern_types)
 
     def get_phase_names(self, indx=None):
         """
@@ -278,7 +288,14 @@ class JobInfo(CFML_api.FortranBindedClass):
             key=0
         return CFML_api.crysfml_api.IO_Formats_get_ratio(self.get_fortran_address(),key+1)["ratio"]
 
-    lambda_ratio = property(get_lambda_ratio)
+    def set_lambda_ratio(self, ratio, indx=None):
+        if indx:
+            key=indx
+        else:
+            key=0
+        CFML_api.crysfml_api.IO_Formats_set_ratio(self.get_fortran_address(), ratio, key+1)
+    
+    lambda_ratio = property(get_lambda_ratio, set_lambda_ratio)
     
     @property
     def d_to_tof_1(self):

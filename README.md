@@ -4,35 +4,23 @@ workspaces that can be used in the compiler environment of your choice.
 
 Here are the instructions to run cmake in order to build the CrysFML library.
 
-                             ***
+1. download and install a recent version of cmake (>= 3.0.0 required)
 
-1) download and install a recent version of cmake (>= 2.8.0 required)
-
-                             ***
-
-2) check that the cmake binary directory is in the PATH altogether 
+2. check that the cmake binary directory is in the PATH altogether 
    with the different compilers that will be used for the build.
 
-                             ***
-
-3) set the environment variable CRYSFML to the directory where the README is 
+3. set the environment variable CRYSFML to the directory where the README.md is 
    located.
 
-                             ***
-                             
-4) create a directory wherever you want that will contain the files 
+4. create a directory wherever you want that will contain the files 
    generated during the build (e.g. ${CRYSFML}/build).
    If you intend to do the build as superuser, this directory should 
    give recursively the writing rights for every user.     
    Now you are ready for the cmake run that will configure your build.
-
-                             ***
     
-5) change directory to the build directory created in step 4.
+5. change directory to the build directory created in step 4.
  
-                             ***
-
-6) the CMake usage is:
+6. the CMake usage is:
       
       cmake -G generator -Dvariable=value path_to_your_source_directory
 
@@ -61,7 +49,7 @@ Here are the instructions to run cmake in order to build the CrysFML library.
        
       Useful CMake variables (case sensitive):
        
-         * USE_HDF: ON|OFF.
+         * USE_HDF: ON|OFF. (Deprecated)
            Default OFF
            If ON, CrysFML will be able to read NeXuS input data files.
            
@@ -69,7 +57,19 @@ Here are the instructions to run cmake in order to build the CrysFML library.
            Default OFF
            If OFF, only CrysFML will be built.
            If ON, both CrysFML and WCrysFML libraries will be built
-           
+
+	 * ARCH32: ON|OFF
+	   Default ON
+	   If ON 32-bits architecture is built
+
+	 * HEAP_ARRAYS: ON|OFF
+	   Default OFF
+	   Put arrays in heap instead of stack (only for Windows ifort)
+
+	 * PYTHON_API: ON|OFF
+	   Default OFF
+	   If ON, build the Python API
+
          * CMAKE_Fortran_COMPILER: ifort|g95|gfortran.
            Default ifort.
            Sets the compiler to use for the build.
@@ -93,9 +93,8 @@ Here are the instructions to run cmake in order to build the CrysFML library.
            Sets the name of the subdirectory within CMAKE_INSTALL_PREFIX where 
            wcrysfml will be installed.
 
-                             ***
            
-7) the final step is now to build and install the library. The command to invoke will 
+7. the final step is now to build and install the library. The command to invoke will 
    depend on the generator used for the build.
 
    Examples:

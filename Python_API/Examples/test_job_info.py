@@ -12,7 +12,7 @@ print("========\nCreate job_info from string")
 dat = [
 'Title SrTiO3',
 'Npatt 1',
-'Patt_1 NEUT_2THE  1.54056    1.54056    1.00      0.0        135.0',
+'Patt_1 XRAY_2THE  1.54056    1.54056    1.00      0.0        135.0',
 'UVWXY        0.025  -0.00020   0.01200   0.00150  0.00465',
 'STEP         0.05 ',
 'Backgd       50.000']
@@ -22,6 +22,10 @@ job_info.print_description()
 
 job_info.range_2theta = (0.0, 12.0)
 
+job_info.pattern_type = "NEUT_2THE"
+job_info.lambda_ratio = 0.5
+
 job_info.print_description()
+
 
 #help(CFML_api.JobInfo)
