@@ -7479,11 +7479,11 @@
     End Subroutine Get_T_SubGroups
 
     !!----
-    !!---- Subroutine Get_Trasfm_Symbol(Mat,tr,abc_symb,oposite)
+    !!---- Subroutine Get_Trasfm_Symbol(Mat,tr,abc_symb,opposite)
     !!----    integer, dimension(3,3), intent(in) :: Mat
     !!----    real,    dimension(3),   intent(in) :: tr
     !!----    character(len=*),        intent(out):: abc_symb
-    !!----    logical,optional,        intent(in) :: oposite
+    !!----    logical,optional,        intent(in) :: opposite
     !!----
     !!----    Provides the short symbol for a setting change defined by
     !!----    the transfomation matrix Mat and origin given by the translation
@@ -7494,17 +7494,17 @@
     !!----     1  0  1                      c'=a+c
     !!----     And the change of origin given by (0.5,0.0,0.5)
     !!----     The subroutine provide the symbol: (1/2,0,1/2; a-c,2b,a+c)
-    !!----     If "oposite" is provided then the output is the symbol: (a-c,2b,a+c; 1/2,0,1/2)
+    !!----     If "opposite" is provided then the output is the symbol: (a-c,2b,a+c; 1/2,0,1/2)
     !!----     Warning! This procedure works only for integer matrices, for rational matrices
     !!----     please use the procedure Get_Symb_From_Mat in CFML_String_Utilities module.
     !!----
     !!---- Update: November - 2012, February 2016 (optional argument)
     !!
-    Subroutine Get_Trasfm_Symbol(Mat,tr,abc_symb,oposite)
+    Subroutine Get_Trasfm_Symbol(Mat,tr,abc_symb,opposite)
       integer,       dimension(3,3), intent(in) :: Mat
       real(kind=cp), dimension(3),   intent(in) :: tr
       character(len=*),              intent(out):: abc_symb
-      logical,optional,              intent(in) :: oposite
+      logical,optional,              intent(in) :: opposite
       !---- Local variables ----!
       integer :: i
       character(len=40) :: xyz_op, transl
@@ -7527,7 +7527,7 @@
       end do
       transl=Pack_string(transl)
       abc_symb="("//trim(transl)//" "//trim(xyz_op)//")"
-      if(present(oposite)) then
+      if(present(opposite)) then
         i=len_trim(transl)
         abc_symb="("//trim(xyz_op)//"; "//transl(1:i-1)//")"
       end if
