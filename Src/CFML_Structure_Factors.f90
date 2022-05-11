@@ -682,7 +682,7 @@
       real(kind=cp), dimension(6)              :: betas
       Real(Kind=Cp), Dimension(3,3)            :: sm,SMcos,SMsin
       complex(kind=cp),dimension(3)            :: Mc
-      logical                                  :: mag,nuc,mag_only
+      logical                                  :: mag,nuc,mag_only,magAtm
       character(len=1)                         :: tw
       real(kind=cp) :: ffr, ffi, ffx, cosr, sinr, scosr, ssinr, temp,snexi !,x1, yy, z
       real(kind=cp) :: x, arg, arg2, exparg,ssnn
@@ -717,6 +717,8 @@
       !---------------------------
         xi=Atm%atom(i)%x
         betas=Atm%atom(i)%U
+        magAtm=.false.
+        if(Atm%atom(i)%ind(2) > 0) magAtm=.true.
         !Modify the first atom position according to the interpretation of domains with translations
         if(present(tdom)) xi(1:3) = matmul(real(mdom),xi(1:3))+tdom(1:3)
         temp=EXP(-Atm%atom(i)%Biso*ssnn)   !exp{-Bi (sintheta/Lambda)^2}
@@ -729,8 +731,8 @@
            ffi=0.0
         end if
         ffx=0.0
-
-        IF(mag) Then
+        snexi=0.0
+        IF(mag .and. magAtm) Then
           ni=Atm%atom(i)%ind(2)
           ffx=Scf%Mcoef(ni)%SctM(7)
           DO ii=1,5,2
@@ -763,7 +765,7 @@
           IF(Grp%centred /= 2) then
            ssinr=ssinr+sinr          !FRS= SIG fr(j,s)sin{2pi(hT Rs rj+ts)}*Ta(s)
           END IF
-          IF(mag) Then
+          IF(mag .and. magAtm) Then
             SMcos(:,:)=SMcos(:,:)+cosr*Grp%MSymop(ir)%Rot(:,:)
             SMsin(:,:)=SMsin(:,:)+sinr*Grp%MSymop(ir)%Rot(:,:)
           END IF
@@ -787,7 +789,7 @@
            END IF
         end if
         !Magnetic structure factor components
-        IF(mag) Then
+        IF(mag .and. magAtm) Then
            ar = matmul(SMcos,Atm%atom(i)%M_xyz(:)/side)*side  !The introduction of Cell%cell
            br = matmul(SMsin,Atm%atom(i)%M_xyz(:)/side)*side  !of using non conventional settings for
            aa(:)= aa(:) + snexi*ar(:)
