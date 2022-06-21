@@ -62,7 +62,7 @@ Module CFML_EoS
    !---- Use Modules ----!
    Use CFML_GlobalDeps,       only: CP, PI, TO_RAD
    Use CFML_Math_General,     only: Debye,ERR_MathGen,ERR_MathGen_Mess,First_Derivative,Second_Derivative, &
-                                    splint,Diagonalize_SH,tand,cosd,sind,asind
+                                    splint,Diagonalize_SH,tand,cosd,sind,asind,locate
    Use CFML_Crystal_Metrics,  only: Crystal_Cell_Type,Get_Cryst_Family,Volume_Sigma_from_Cell,Strain_Tensor_type,&
                                     Fix_tensor,Set_Crystal_Cell,Orient_Eigenvectors,Calc_Paxes_Angles,Init_Strain_Tensor
    Use CFML_String_Utilities
@@ -1266,13 +1266,13 @@ Contains
       if (T < 1) then
          Eth=0.0_cp
       else
-         i=find_index(T,eos%cv_table(1:,1),size(eos%cv_table,dim=1))     ! i is the index to the entry with biggest T < Trequest
+         i=locate(eos%cv_table(1:,1),size(eos%cv_table,dim=1),T)     ! i is the index to the entry with biggest T < Trequest
             if(i > Ubound(eos%cv_table,dim=1)-1)then
                 warn_eos=.true.
                 warn_eos_mess='Request to Ethtable with T > Tmax'
                 i=Ubound(eos%cv_table,dim=1)
                 Eth=(nint(T)-eos%cv_table(i,1))*eos%cv_table(i,2) +eos%cv_table(i,3)
-            elseif(i < 1)then
+            elseif(i == 1)then
                 warn_eos=.true.
                 warn_eos_mess='Request to Ethtable with T < Tmin'
                 Eth=eos%cv_table(1,3)
@@ -1996,12 +1996,12 @@ Contains
             
          case(9) ! Cv Table - just do look-up
                  ! Cv for this model is independent of P
-                 i=find_index(T,eos%cv_table(1:,1),size(eos%cv_table,dim=1))     ! i is the index to the entry with biggest T < Trequest
+                 i=locate(eos%cv_table(1:,1),size(eos%cv_table,dim=1),T)     ! i is the index to the entry with biggest T < Trequest
                  if(i > Ubound(eos%cv_table,dim=1)-1)then
                      warn_eos=.true.
                      warn_eos_mess='Request to Cv table with T > Tmax'
                      i=Ubound(eos%cv_table,dim=1)-1
-                 elseif(i < 1)then
+                 elseif(i == 1)then
                      warn_eos=.true.
                      warn_eos_mess='Request to Cv table with T < Tmin'
                      i=1
@@ -2055,32 +2055,7 @@ Contains
       return
    End Function Get_Cv
    
-   Function find_index(T,X,N) result(i)
-      !---- Arguments ----!
-      real(kind=cp)             :: T       ! Temperature to be found
-      real(kind=cp),dimension(n):: X       ! Array of T values
-      integer                   :: N        ! size of array X
-      integer                   :: i        ! returned index so X(i) < T < X(i+1)
-      !---- Local Variables ----!
-      integer                   :: jl,ju,jm
-      
-      !method from Numerical recipes p90
-      jl=0
-      ju=n+1
-      
-      do
-          if(ju-jl <= 1)exit
-            jm=(ju+jl)/2
-            if(T > x(jm))then
-                jl=jm
-            else
-                ju=jm
-            endif
-      enddo
-      i=jl
-   
-      return
-   End Function find_index
+
    !!----
    !!---- FUNCTION GET_DEBYET
    !!----
