@@ -9,9 +9,7 @@ option(MINGW_HDF_TRICK "Help building with MinGW" OFF)
 option(USE_HDF "Build crysfml with HDF5 library" OFF)
 option(GUI "Build crysfml and wcrysfml library" OFF)
 option(ARCH32 "32 or 64 bit architecture" ON)
-option(CRYSFML08 "Build CrysFML08" OFF)
 option(HEAP_ARRAYS "Put arrays in heap instead of stack (only for Windows ifort)" OFF)
-option(PROG_EX "Build the Program Examples" ON)
 option(PYTHON_API "Build Python API" OFF)
 option(QPARALLEL "qparallel option for Ifort on Windows" ON)
 option(PYSETUP "Building from setup.py" OFF)
@@ -42,12 +40,9 @@ message(STATUS "Setting CMAKE_INSTALL_PREFIX to ${CMAKE_INSTALL_PREFIX}")
 if (DEFINED CRYSFML_PREFIX)
     set(CRYSFML_PREFIX ${CRYSFML_PREFIX})
 else()
-    if(CRYSFML08)
-        set(CRYSFML_PREFIX LibC08)
-    else()
-        set(CRYSFML_PREFIX LibC)
-    endif()
+  set(CRYSFML_PREFIX LibC)
 endif()
+
 set (CRYSFML_PREFIX ${CMAKE_INSTALL_PREFIX}/${CRYSFML_PREFIX})
 message(STATUS "CrysFML installation path set to ${CRYSFML_PREFIX}")
 
@@ -84,17 +79,17 @@ message(STATUS "CrysFML installation path set to ${CRYSFML_PREFIX}")
 
 # Include and library paths for HDF5.
 # They must be set by the user.
-if(DEFINED HDF5_INCLUDE_PATH)
-    set(HDF5_INCLUDE_PATH ${HDF5_INCLUDE_PATH} CACHE PATH "HDF5 include path")
-else()
-    set(HDF5_INCLUDE_PATH "" CACHE PATH "HDF5 include path")
-endif()
+# if(DEFINED HDF5_INCLUDE_PATH)
+#     set(HDF5_INCLUDE_PATH ${HDF5_INCLUDE_PATH} CACHE PATH "HDF5 include path")
+# else()
+#     set(HDF5_INCLUDE_PATH "" CACHE PATH "HDF5 include path")
+# endif()
 
-if(DEFINED HDF5_LIBRARY_PATH)
-    set(HDF5_LIBRARY_PATH ${HDF5_LIBRARY_PATH} CACHE PATH "HDF5 library path")
-else()
-    set(HDF5_LIBRARY_PATH "" CACHE PATH "HDF5 library path")
-endif()
+# if(DEFINED HDF5_LIBRARY_PATH)
+#     set(HDF5_LIBRARY_PATH ${HDF5_LIBRARY_PATH} CACHE PATH "HDF5 library path")
+# else()
+#     set(HDF5_LIBRARY_PATH "" CACHE PATH "HDF5 library path")
+# endif()
 
 #################################
 # Project section
@@ -126,17 +121,12 @@ endif()
 # Includes some modules and build the project.
 include(add_prefix)
 include(add_suffix)
-if (NOT CRYSFML08)
-    include(set_compiler_flags)
-    set_compiler_flags()
-    # The subdirectories of the project.
-    add_subdirectory(Src)
-else()
-    include(set_compiler_flags_08)
-    set_compiler_flags_08()
-    # The subdirectories of the project.
-    add_subdirectory(Src08)
-endif()
+
+include(set_compiler_flags)
+set_compiler_flags()
+# The subdirectories of the project.
+add_subdirectory(Src)
+
 
 # Build the program example executables and use them as functional tests
 if (PROG_EX)

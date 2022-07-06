@@ -1270,6 +1270,62 @@ contains
   !---------------------
   !Setters
   !---------------------
+  function IO_Formats_set_patt_typ(self_ptr, args_ptr) result(r) bind(c)
+
+    type(c_ptr), value :: self_ptr
+    type(c_ptr), value :: args_ptr
+    type(c_ptr) :: r
+    type(tuple) :: args
+    type(dict) :: retval
+    integer :: num_args
+    integer :: ierror
+    type(Job_info_Type_p) :: job_p
+
+    type(object) :: val_obj, indx_obj
+    character(len=:), allocatable :: val
+    integer :: indx
+
+    r = C_NULL_PTR   ! in case of an exception return C_NULL_PTR
+    ! use unsafe_cast_from_c_ptr to cast from c_ptr to tuple
+    call unsafe_cast_from_c_ptr(args, args_ptr)
+    ! Check if the arguments are OK
+    ierror = args%len(num_args)
+    ! we should also check ierror, but this example does not do complete error checking for simplicity
+    if (num_args /= 3) then
+       call raise_exception(TypeError, "set_pattern_types expects exactly 3 arguments")
+       !self, new_value
+       call args%destroy
+       return
+    endif
+
+    ! Doing boring stuff
+    call get_job_info_type_from_arg(args, job_p)
+
+    
+    ierror = args%getitem(val_obj, 1) !get the value
+    ierror = cast_nonstrict(val, val_obj)
+
+    ierror = args%getitem(indx_obj, 2) !get the indx
+    ierror = cast_nonstrict(indx, indx_obj)
+
+    
+    select case (val)
+    case ("XRAY_2THE", "XRAY_SXTAL", "XRAY_ENER","NEUT_2THE", "NEUT_SXTAL", "NEUT_TOF" )
+       job_p%p%patt_typ(indx) = val
+    case default
+       write(*,*) val, " is not a valid pattern type"
+    end select
+       
+    ierror = dict_create(retval)
+    r = retval%get_c_ptr()
+
+    call args%destroy
+    call val_obj%destroy
+    call indx_obj%destroy
+    
+    
+  end function IO_Formats_set_patt_typ
+  
 
     function IO_Formats_set_range_2theta(self_ptr, args_ptr) result(r) bind(c)
         
@@ -1405,6 +1461,55 @@ contains
     call maxb_obj%destroy
 
   end function IO_Formats_set_lambda
+
+  function IO_Formats_set_ratio(self_ptr, args_ptr) result(r) bind(c)
+        
+    type(c_ptr), value :: self_ptr
+    type(c_ptr), value :: args_ptr
+    type(c_ptr) :: r
+    type(tuple) :: args
+    type(dict) :: retval
+    integer :: num_args
+    integer :: ierror
+    type(Job_info_Type_p) :: job_p
+
+    type(object) :: val_obj, indx_obj
+    real(kind=cp) :: val
+    integer :: indx
+  
+    r = C_NULL_PTR   ! in case of an exception return C_NULL_PTR
+    ! use unsafe_cast_from_c_ptr to cast from c_ptr to tuple
+    call unsafe_cast_from_c_ptr(args, args_ptr)
+    ! Check if the arguments are OK
+    ierror = args%len(num_args)
+    ! we should also check ierror, but this example does not do complete error checking for simplicity
+    if (num_args /= 3) then
+       call raise_exception(TypeError, "set_lambda_ratio expects exactly 3 arguments")
+       !self, new_value, indx
+       call args%destroy
+       return
+    endif
+    
+    ! Doing boring stuff
+    call get_job_info_type_from_arg(args, job_p)
+
+    ierror = args%getitem(val_obj, 1) !get the value
+    ierror = cast_nonstrict(val, val_obj)
+
+    ierror = args%getitem(indx_obj, 2) !get the phase number
+    ierror = cast_nonstrict(indx, indx_obj)
+
+    job_p%p%ratio(indx) = val
+    
+    ierror = dict_create(retval)
+    r = retval%get_c_ptr()
+
+    call args%destroy
+    call val_obj%destroy
+    call indx_obj%destroy
+     
+  end function IO_Formats_set_ratio
+  
   
   function IO_Formats_set_U(self_ptr, args_ptr) result(r) bind(c)
         
