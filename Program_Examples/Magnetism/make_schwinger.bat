@@ -27,9 +27,9 @@ rem ****---- Lahey Compiler ----****
 rem
 rem ****---- Intel Compiler ----****
 :IFORT
-   ifort /c Schwinger.f90 /Ox /nologo /I. /IC:\CrysFML\ifort\LibC
+   ifort /c Schwinger.f90 /Ox /nologo /I. /I%CrysFML%\ifort64\LibC
    rem ifort /exe:magref_if *.obj C:\CrysFML\ifort\LibC\CrysFML.lib /link /stack:102400000
-   link /subsystem:console /stack:102400000 /out:Schwinger.exe *.obj C:\CrysFML\ifort\LibC\CrysFML.lib
+   link /subsystem:console /stack:102400000 /out:Schwinger.exe *.obj %CrysFML%\ifort64\LibC\CrysFML.lib
    goto END
 rem
 rem **---- G95 Compiler ----**

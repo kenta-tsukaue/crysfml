@@ -22,31 +22,31 @@ rem
 rem
 rem ****---- Lahey Compiler ----****
 :LF95
-   lf95 -c MagPolar3D.f90    -info  -o1 -chk -mod ".;C:\crysFML\lahey\libC"
-   lf95 *.obj -out MagPolar3D_lf  -o1 -lib C:\crysFML\lahey\libC\crysFML
+   lf95 -c MagPolar3D.f90    -info  -o1 -chk -mod ".;%CRYSFML%\lahey\libC"
+   lf95 *.obj -out MagPolar3D_lf  -o1 -lib %CRYSFML%\lahey\libC\crysFML
    goto END
 rem
 rem ****---- Intel Compiler ----****
 :IFORT
-   ifort /c MagPolar3D.f90 /O2 /nologo /I. /IC:\CrysFML\ifort\LibC
-   link /subsystem:console /stack:102400000 /out:MagPolar3D.exe *.obj C:\CrysFML\ifort\LibC\CrysFML.lib
+   ifort /c MagPolar3D.f90 /O2 /nologo /I. /I%CRYSFML%\ifort64\LibC
+   link /subsystem:console /stack:102400000 /out:MagPolar3D.exe *.obj %CRYSFML%\ifort64\LibC\CrysFML.lib
    goto END
 :IFORTD
-   ifort /c MagPolar3D.f90  /debug:full /check /traceback /nologo  /I. /IC:\CrysFML\ifort_debug\LibC
-rem   ifort  *.obj /exe:MagPolar3D_if  C:\CrysFML\ifort_debug\LibC\CrysFML.lib /link /stack:102400000
-   link /subsystem:console /stack:102400000 /out:MagPolar3D.exe *.obj C:\CrysFML\ifort_debug\LibC\CrysFML.lib
+   ifort /c MagPolar3D.f90  /debug:full /check /traceback /nologo  /I. /I%CRYSFML%\ifort64_debug\LibC
+rem   ifort  *.obj /exe:MagPolar3D_if  %CRYSFML%\ifort_debug\LibC\CrysFML.lib /link /stack:102400000
+   link /subsystem:console /stack:102400000 /out:MagPolar3D.exe *.obj %CRYSFML%\ifort64_debug\LibC\CrysFML.lib
    goto END
 rem
 rem **---- G95 Compiler ----**
 :G95
-   g95 -c -O3  -std=f2003  -funroll-loops  -msse2   MagPolar3D.f90   -IC:\CrysFML\G95\LibC
-   g95  *.o -o MagPolar3D_g95 -O3  -funroll-loops  -msse2  -LC:\CrysFML\G95\LibC -lcrysfml  -Wl,--heap=0x01000000
+   g95 -c -O3  -std=f2003  -funroll-loops  -msse2   MagPolar3D.f90   -I%CRYSFML%\G95\LibC
+   g95  *.o -o MagPolar3D_g95 -O3  -funroll-loops  -msse2  -L%CRYSFML%\G95\LibC -lcrysfml  -Wl,--heap=0x01000000
    goto END
 rem
 rem **---- GFORTRAN Compiler ----**
 :GFOR
-   gfortran -c -O3  -std=f2003  -funroll-loops  -msse2   MagPolar3D.f90   -IC:\CrysFML\GFortran\LibC
-   gfortran  *.o -o MagPolar3D_gf -O3  -funroll-loops  -msse2  -LC:\CrysFML\GFortran\LibC -lcrysfml  -Wl,--heap=0x01000000
+   gfortran -c -O3  -std=f2003  -funroll-loops  -msse2   MagPolar3D.f90   -I%CRYSFML%\GFortran\LibC
+   gfortran  *.o -o MagPolar3D_gf -O3  -funroll-loops  -msse2  -L%CRYSFML%\GFortran\LibC -lcrysfml  -Wl,--heap=0x01000000
    goto END
 rem
 :END

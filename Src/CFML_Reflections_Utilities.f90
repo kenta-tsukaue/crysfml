@@ -3185,6 +3185,7 @@
          num_ref=num_ref+1
          hklm(:,num_ref)=hh
          sm(num_ref) = sv(i)
+         indx(num_ref) = indx(i)
        end do
        !Final assignments
        if(allocated(reflex)) deallocate(reflex)
@@ -3321,6 +3322,7 @@
          num_ref=num_ref+1
          hklm(:,num_ref)=hh
          sm(num_ref) = sv(i)
+         indx(num_ref)=indx(i)
        end do
        !Final assignments
        if(allocated(reflex)) deallocate(reflex)
