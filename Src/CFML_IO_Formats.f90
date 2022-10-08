@@ -2073,6 +2073,8 @@
              end if
           end if
        end if
+       np1=index(spgr_hm,":2")
+       if(np1 > 0) spgr_hm=spgr_hm(1:np1-1)
        !write(*,"(a)") " After first processing: "//spgr_hm
 
        !---- Adapting Nomenclature from ICSD to our model ----!
