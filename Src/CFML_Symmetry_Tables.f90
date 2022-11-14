@@ -83,7 +83,7 @@
 !!----
 !!---- PROCEDURES
 !!----    Functions:
-!!----
+!!----       GET_LAUE_CLASS
 !!----    Subroutines:
 !!----       GET_GENERATORS
 !!----       REMOVE_SPGR_INFO
@@ -106,7 +106,7 @@
     private
 
     !---- List of public subroutines ----!
-    public :: get_generators
+    public :: get_generators, get_laue_class
     public :: set_spgr_info, set_system_equiv, set_wyckoff_info
     public :: remove_spgr_info, remove_system_equiv, remove_wyckoff_info
 
@@ -734,6 +734,52 @@
 
  Contains
 
+    !!----
+    !!---- Function Get_Laue_Class(num) Result(laue)
+    !!----    integer, intent(in) :: num    !  number of the space group
+    !!----    character(len=5)    :: laue   ! Out -> symbol of the LAUE_CLASS
+    !!----
+    !!----    Obtain the symbol of the Laue-Class corresponding to a space
+    !!----    of number "num"
+    !!----
+    !!---- Update: November - 2022
+    !!
+    Function Get_Laue_Class(num) Result(laue)
+      integer, intent(in) :: num
+      character(len=5)    :: laue
+
+      integer :: i
+      Select Case(num)
+        Case(1:2)
+           i=1
+        Case(3:15)
+           i=2
+        Case(16:74)
+           i=3
+        Case(75:88)
+           i=4
+        Case(89:142)
+           i=5
+        Case(143:148)
+           i=8
+        Case(149:156)
+           i=9
+        Case(157:167)
+           i=10
+        Case(168:176)
+           i=11
+        Case(177:194)
+           i=12
+        Case(195:206)
+           i=13
+        Case(207:230)
+           i=14
+        Case Default
+           i=1
+      End Select
+      laue=laue_class(i)
+    End Function Get_Laue_Class
+
     !---------------------!
     !---- Subroutines ----!
     !---------------------!
@@ -997,7 +1043,7 @@
        spg_gen(146) =  "R 3       : x+1/3,y+2/3,z+2/3; -y,x-y,z "
        spg_gen(147) =  "P -3      : -y,x-y,z; -x,-y,-z "
        spg_gen(148) =  "R -3      : x+1/3,y+2/3,z+2/3; -y,x-y,z; -x,-y,-z "
-       spg_gen(149) =  "P 3 1 2   : -y,x-y,z; -y,-x,-z "
+       spg_gen(149) =  "P 3 1 2   : -y,x-y,z; -y,-x,-z "   !   "-3m1 ","-31m ",
        spg_gen(150) =  "P 3 2 1   : -y,x-y,z; y,x,-z "
        spg_gen(151) =  "P 31 1 2  : -y,x-y,z+1/3; -y,-x,-z+2/3 "
        spg_gen(152) =  "P 31 2 1  : -y,x-y,z+1/3; y,x,-z "
