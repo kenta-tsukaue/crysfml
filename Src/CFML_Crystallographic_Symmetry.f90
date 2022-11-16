@@ -3797,7 +3797,7 @@
 
        !---- Monoclinic ----!
        else if ( (nrot_2 + nrot_2b == 1)  ) then
-          if (SpaceGroup%Centred /=1) then
+          if (SpaceGroup%Centred /= 1) then
              point_car="2/m"
           else
              if (nrot_2  == 1 ) point_car="2"
@@ -9647,15 +9647,14 @@
        MSpGn%Parent_spg       = MSpG%Parent_spg
        MSpGn%standard_setting = .false.
        MSpGn%CrystalSys       = MSpG%CrystalSys
-       MSpGn%Centred=0
+       MSpGn%Centred=1
+       m=0
        do k=1,MSpGn%multip
          if(equal_matrix(MSpGn%SymOp(k)%Rot,-identity,3) .and. MSpGn%MSymOp(k)%Phas > 0) then
            m=k
-           MSpGn%Centred=max(MSpGn%Centred,1)
-           if(sum(abs(MSpGn%SymOp(k)%tr)) < 0.001) then
-             MSpGn%Centred=2
-             exit
-           end if
+           MSpGn%Centred= 0 !max(MSpGn%Centred,1)
+           if(sum(abs(MSpGn%SymOp(k)%tr)) < 0.001)  MSpGn%Centred=2
+           exit
          end if
        end do
        MSpGn%NumOps=MSpG%NumOps
@@ -11124,7 +11123,7 @@
        write(unit=lun,fmt="(a,i3)")          " => Number of reduced set of S.O.: ", SG%NumOps
        write(unit=lun,fmt="(a,i3)")          " =>         General Multiplicitiy: ", SG%Multip
        write(unit=lun,fmt="(a,i3)")          " =>                       Centred: ", SG%Centred
-       if (SG%centred == 1) then
+       if (SG%centred == 0) then
           call Frac_Trans_1Dig(SG%Centre_coord,texto(1))
           write(unit=lun,fmt="(a,a)")        " =>                     Centre at: ", trim(texto(1))
        end if
