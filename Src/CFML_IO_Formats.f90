@@ -287,28 +287,28 @@
     Interface  Read_File_Cell
        Module Procedure Read_File_Cellc  !Last Output Argument Vector Of Six Component With The Cell Parameters
        Module Procedure Read_File_Cellt  !Last output argument object of type Crystal_cell_type
-    End interface
+    End interface Read_File_Cell
 
     Interface Read_File_Atom
        Module Procedure Read_File_Atomlist   !Last Output Argument of type Atom_list_type
        Module Procedure Read_File_Pointlist  !Last output argument of type Point_list_type
-    End Interface
+    End Interface Read_File_Atom
 
     Interface Readn_Set_Xtal_Structure
        Module Procedure Readn_Set_Xtal_Structure_Molcr ! For Molecular Crystal Type
        Module Procedure Readn_Set_Xtal_Structure_Split ! For Cell, Spg, A types
        Module Procedure Readn_Set_Xtal_Structure_Magn  ! Use Shubnikov groups
-    End Interface
+    End Interface Readn_Set_Xtal_Structure
 
     Interface Write_CFL
        Module Procedure Write_CFL_Molcrys        ! For Molecular Crystal Type
        Module Procedure Write_CFL_Atom_List_Type ! For Cell, Spg, A Types
-    End Interface
+    End Interface Write_CFL
 
     Interface Write_Atoms_CFL
        Module Procedure Write_Atoms_CFL_MOLX ! For Molecular Crystal Type
        Module Procedure Write_Atoms_CFL_ATM  ! For Cell, Spg, A Types
-    End Interface
+    End Interface Write_Atoms_CFL
 
  Contains
 
@@ -663,7 +663,7 @@
          MSpG%MSymOpSymb(i)=ShOp_symb(1:j-1)
          !write(*,"(a,i6,a,i4)") ired,i, "  "//trim(MSpG%SymOpSymb(i))//"   "//trim(MSpG%MSymOpSymb(i)), nint(MSpG%MSymOp(i)%phas)
       end do
-      return
+
     End Subroutine Cleanup_Symmetry_Operators
 
     !!----
@@ -697,7 +697,6 @@
           call reading_Lines(trim(File_dat),nlines,file_list%line)
        end if
 
-       return
     End Subroutine File_To_FileList
 
     !!----
@@ -977,7 +976,6 @@
           Job_Info%cmd(i)=line(8:)
        end do
 
-       return
     End Subroutine Get_Job_Info
 
     Subroutine Get_moment_ctr(xnr,moment,Spg,codini,codes,ord,ss,att,Ipr)
@@ -1019,8 +1017,8 @@
          write(Ipr,"(/,a)")         " => Calculation of symmetry constraints for magnetic moments "
        end if
        x=xnr
-       !where(x < 0.0) x=x+1.0
-       !where(x > 1.0) x=x-1.0
+           !where(x < 0.0) x=x+1.0
+           !where(x > 1.0) x=x-1.0
 
        if(present(ord) .and. present(ss) .and. present(att)) then
          order=ord
@@ -1101,14 +1099,14 @@
          end if
 
        end if
-       return
+
     End Subroutine Get_moment_ctr
 
-    Subroutine Get_Refinement_Codes(n,vect_val,Ctr,is,multi,codd,vect_out)
+    Subroutine Get_Refinement_Codes(n,vect_val,Ctr,iss,multi,codd,vect_out)
       integer,                       intent(in)    :: n !dimension of the vector and the matrix
       real(kind=cp), dimension(:),   intent(in)    :: vect_val
       real(kind=dp), dimension(:,:), intent(in out):: Ctr
-      integer,                       intent(out)   :: is
+      integer,                       intent(out)   :: iss
       real(kind=cp), dimension(:),   intent(out)   :: multi
       character(len=*), dimension(:),intent(out)   :: codd
       real(kind=cp), dimension(:),   intent(out)   :: vect_out
@@ -1125,13 +1123,13 @@
       !The corresponding eigenvector contains the constraints of all moment components
       !Calling the general diagonalization subroutine from EisPack
       call rg_ort(n,Ctr,wr,wi,.true.,zv,ier)
-      is=0
+      iss=0
       pti=0
       kval=0
       do i=1,n
         if(abs(wr(i)-1.0_dp) < epps .and. abs(wi(i)) < epps) then
-          is=is+1   !Number of eigenvalues = 1 => number of free parameters
-          pti(is)=i !This points to the eigenvectors with eigenvalue equal to 1.
+          iss=iss+1   !Number of eigenvalues = 1 => number of free parameters
+          pti(iss)=i !This points to the eigenvectors with eigenvalue equal to 1.
           zmi=1.0e6 !normalize the eigenvectors so that the minimum (non-zero value) is 1.
           j=1
           do k=1,n
@@ -1142,49 +1140,54 @@
               j=nint(sign(1.0_dp,zv(k,i)))
             end if
           end do
-          zv(:,i)=j*zv(:,i)/zmi  !This provides directly the multipliers for a single lambda=1 eigenvalue
-          val(is)=vect_val(kval) !This is the basis value to construct the new Moment
+          zv(:,i)=j*zv(:,i)/zmi   !This provides directly the multipliers for a single lambda=1 eigenvalue
+          val(iss)=vect_val(kval) !This is the basis value to construct the new Moment
         end if
       end do
       codd="0"
       vect_out=0.0
       multi=0.0
       done=.false.
-      where(abs(vect_val) < epps) done=.true.
-      Select Case(is)
-        case(1)
-          vect_out(:)=val(1)*zv(:,pti(1))
-          where(abs(vect_out) > epps)  codd(:)=cdd(1)
-          multi(:)=zv(:,pti(1))
-        case(2:)
-          ip=0
-          do i=1,n
-            if(.not. done(i)) then
-              if(abs(vect_val(i)) > epps) then
-                ip=ip+1
-                codd(i)=cdd(ip)
-                multi(i)=1.0
-                vect_out(i)=vect_val(i)
-                done(i)=.true.
-                do j=i+1,n
-                  if(.not. done(j)) then
-                    if(abs(vect_val(i)-vect_val(j)) < epps) then
-                      codd(j)=cdd(ip)
-                      multi(j)=1.0
-                      vect_out(j)=vect_val(i)
-                      done(j)=.true.
-                    else if(abs(vect_val(i)+vect_val(j)) < epps) then
-                      codd(j)=cdd(ip)
-                      multi(j)=-1.0
-                      vect_out(j)=-vect_val(i)
-                      done(j)=.true.
-                    end if
-                  end if
-                end do
-              end if
-            end if
-          end do
+      where(abs(vect_val) < epps)
+        done=.true.
+      end where
+      Select Case(iss)
+       case(1)
+         vect_out(:)=val(1)*zv(:,pti(1))
+         where(abs(vect_out) > epps)
+            codd(:)=cdd(1)
+         end where
+         multi(:)=zv(:,pti(1))
+       case(2:)
+         ip=0
+         do i=1,n
+           if(.not. done(i)) then
+             if(abs(vect_val(i)) > epps) then
+               ip=ip+1
+               codd(i)=cdd(ip)
+               multi(i)=1.0
+               vect_out(i)=vect_val(i)
+               done(i)=.true.
+               do j=i+1,n
+                 if(.not. done(j)) then
+                   if(abs(vect_val(i)-vect_val(j)) < epps) then
+                     codd(j)=cdd(ip)
+                     multi(j)=1.0
+                     vect_out(j)=vect_val(i)
+                     done(j)=.true.
+                   else if(abs(vect_val(i)+vect_val(j)) < epps) then
+                     codd(j)=cdd(ip)
+                     multi(j)=-1.0
+                     vect_out(j)=-vect_val(i)
+                     done(j)=.true.
+                   end if
+                 end if
+               end do
+             end if
+           end if
+         end do
       End Select
+
     End Subroutine Get_Refinement_Codes
 
     !!----
@@ -2073,6 +2076,8 @@
              end if
           end if
        end if
+       np1=index(spgr_hm,":2")
+       if(np1 > 0) spgr_hm=spgr_hm(1:np1-1)
        !write(*,"(a)") " After first processing: "//spgr_hm
 
        !---- Adapting Nomenclature from ICSD to our model ----!
@@ -3718,11 +3723,11 @@
                j=index(line,"<--")
                Parent=trim(Parent)//"  "//line(23:j-1)
              end if
-!C_ac  number: "9.41"                           <--Magnetic Space Group (BNS symbol and number)
-!Transform to standard:  c,-b,a;0,0,0           <--Basis transformation from current setting to standard BNS
-!Parent Space Group: Pna2_1  IT_number:   33    <--Non-magnetic Parent Group
-!123456789012345678901234567890
-!Transform from Parent:   a,2b,2c;0,0,0         <--Basis transformation from parent to current setting
+             !C_ac  number: "9.41"                           <--Magnetic Space Group (BNS symbol and number)
+             !Transform to standard:  c,-b,a;0,0,0           <--Basis transformation from current setting to standard BNS
+             !Parent Space Group: Pna2_1  IT_number:   33    <--Non-magnetic Parent Group
+             !123456789012345678901234567890
+             !Transform from Parent:   a,2b,2c;0,0,0         <--Basis transformation from parent to current setting
              !write(*,"(a)") trim(symbol)//" "//trim(setting)//" "//trim(parent)
              ! trn_to=.true. always because magCIF considers thre transformation from the current
              ! setting to the standard setting
@@ -3808,7 +3813,7 @@
        !---- Local Variables ----!
        integer :: i,num_sym, num_constr, num_kvs,num_matom, num_mom, num_magscat, ier, j, m, n, k, L,   &
                   ncar,mult,nitems,iv, num_irreps, nitems_irreps, num_rsym, num_centering,det,kfin
-       integer,          dimension(10)     :: lugar
+       integer,          dimension(10)     :: lugar,mlugar
        integer,          dimension(7)      :: irrep_pos
        integer,          dimension(5)      :: pos
        integer,          dimension(3,3)    :: Rot
@@ -4385,40 +4390,80 @@
                       num_matom=k
                       !Treat late the list atoms
 
+
+
+
                    Case("_magnetic_atom_site_moment_label","_atom_site_moment_label","_atom_site_moment.label")
-                      !write(unit=*,fmt="(a)") "  Treating item: _atom_site_moment_label"
-                      do k=1,3
-                        i=i+1
-                        if(index(mcif%line(i),"_atom_site_moment_crystalaxis") == 0 .and. &
-                           index(mcif%line(i),"_atom_site_moment.crystalaxis") == 0) then
-                          Err_Form=.true.
-                          Err_Form_Mess=" Error reading the magnetic_atom_site_moment loop"
-                          return
+
+                      !Count the number of keywords following the _loop
+                      do k=1,15
+                        linat=adjustl(mcif%line(i+k))
+                        if(linat(1:1) /=  "_") then
+                          kfin=k+1
+                          iv=i+k
+                          exit
                         end if
                       end do
+                      mlugar=0
+                      mlugar(1)=1
+                      j=1
+                      do k=1,kfin
+                         i=i+1
+                         if(index(mcif%line(i),"_atom_site_moment.crystalaxis_x") /= 0) then
+                            j=j+1
+                            mlugar(2)=j
+                            cycle
+                         end if
+                         if(index(mcif%line(i),"_atom_site_moment.crystalaxis_y") /= 0) then
+                            j=j+1
+                            mlugar(3)=j
+                            cycle
+                         end if
+                         if(index(mcif%line(i),"_atom_site_moment.crystalaxis_z") /= 0) then
+                            j=j+1
+                            mlugar(4)=j
+                            cycle
+                         end if
+                         if(index(mcif%line(i),"_atom_site_moment.symmform") /= 0) then
+                            j=j+1
+                            mlugar(5)=j
+                            cycle
+                         end if
+                         if (index(mcif%line(i),"_atom_site_moment.spherical_modulus") /= 0 .or. &
+                             index(mcif%line(i),"_atom_site_moment.magnitude") /= 0 ) then
+                            j=j+1
+                            mlugar(6)=j
+                            cycle
+                         end if
+                         if (index(mcif%line(i),"_atom_site_moment.spherical_azimuthal") /= 0) then
+                            j=j+1
+                            mlugar(7)=j
+                            cycle
+                         end if
+                         if (index(mcif%line(i),"_atom_site_moment.spherical_polar") /= 0) then
+                            j=j+1
+                            mlugar(8)=j
+                            cycle
+                         end if
+                         exit
+                      end do
 
-                      i=i+1
-                      if(index(mcif%line(i),"_atom_site_moment.spherical_modulus") /= 0) then !should appear before symmform
-                        !write(*,*) " _atom_site_moment.spherical_modulus FOUND"
-                        mom_modulus=.true.
-                      else
-                        i=i-1
+                      if (any(mlugar(2:4) == 0)) then
+                          Err_Form=.true.
+                          Err_Form_Mess=" Error reading the magnetic moments of magnetic atoms"
+                          return
                       end if
 
-                      i=i+1
-                      if(index(mcif%line(i),"_atom_site_moment.symmform") /= 0) then
-                        !write(*,*) " _atom_site_moment.symmform FOUND"
-                        mom_symmform=.true.
-                      else
-                        i=i-1
-                      end if
+                      i=iv-1
+                      nitems=count(mlugar > 0)
+
                       k=0
                       do
                         i=i+1
                         if(i > mcif%nlines) exit
                         if(len_trim(mcif%line(i)) == 0) exit
                         k=k+1
-                        mom_strings(k)=mcif%line(i)
+                        mom_strings(k)=adjustl(mcif%line(i))
                       end do
                       num_mom=k
                       !Treat later the magnetic moment of the atoms
@@ -4779,38 +4824,36 @@
        !Treating moments of magnetic atoms
        if(num_mom /= 0) then
           !write(*,"(a,i4)") " Treating magnetic moments:  ",num_mom
-          m=4
-          if(mom_symmform) m=m+1
-          if(mom_modulus) m=m+1
+          !m=4
+          !if(mom_symmform) m=m+1
+          !if(mom_modulus) m=m+1
           do i=1,num_mom
             call getword(mom_strings(i),lab_items,iv)
             !write(*,"(2i6,tr4,5(a,tr3))") k,iv,lab_items(1:iv)
-            if(iv /= m) then
+            if(iv /= nitems) then
                Err_Form=.true.
                write(unit=Err_Form_Mess,fmt="(a,i4)")" Error reading magnetic moment #",i
-               Err_Form_Mess=trim(Err_Form_Mess)//" -> 4-6 items expected in this line: 'Label mx my mz', read: "// &
+               Err_Form_Mess=trim(Err_Form_Mess)//" -> The number of itemes expected for this line is not correct!, read: "// &
                                                       trim(mom_strings(i))
                return
             end if
             label=Lab_items(1)
-            kfin=3
-            if(mom_modulus) kfin=4
             do j=1,Am%natoms
                if(label == Am%Atom(j)%lab) then
-                 do k=1,kfin
-                     call getnum_std(lab_items(1+k),values,std,iv)
-                     if(k <= 3) then
-                       Am%Atom(j)%M_xyz(k)=values(1)
-                       Am%Atom(j)%sM_xyz(k)=std(1)
-                     else
-                       Am%Atom(j)%moment=values(1) !module of the magnetic moment if given
-                     end if
+                 do k=1,3
+                   call getnum_std(lab_items(mlugar(1+k)),values,std,iv)
+                   Am%Atom(j)%M_xyz(k)=values(1)
+                   Am%Atom(j)%sM_xyz(k)=std(1)
                  end do
-                 if(kfin ==3) then
-                   Am%Atom(j)%moment=99.0  !used for indicating that this atom is susceptible to bring a magnetic moment
+                 if(mlugar(6) /= 0) then
+                    call getnum_std(lab_items(mlugar(6)),values,std,iv)
+                    Am%Atom(j)%moment=values(1)
+                 else
+                    Am%Atom(j)%moment=99.0
                  end if
                end if
             end do
+
           end do
        end if
 

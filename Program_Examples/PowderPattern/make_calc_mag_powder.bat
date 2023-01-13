@@ -14,18 +14,11 @@ rem **** Author: JRC + JGP
 rem **** Revision: Nov-2008
 rem ****
 rem
-    if [%TARGET_ARCH%]==[] (set TARGET_ARCH=ia32)
-    if [%TARGET_ARCH%]==[ia32]  (
-         set  INC=/I"%CRYSFML%"\ifort\LibC
-         set  INCD=/I"%CRYSFML%"\ifort_debug\LibC
-         set  CRYSLIB="%CRYSFML%"\ifort\LibC\crysfml.lib
-         set CRYSLIBD="%CRYSFML%"\ifort_debug\libC\crysfml.lib
-      ) else (
-         set  INC=/I"%CRYSFML%"\ifort64\LibC
-         set  INCD=/I"%CRYSFML%"\ifort64_debug\LibC
-         set  CRYSLIB="%CRYSFML%"\ifort64\LibC\crysfml.lib
-         set CRYSLIBD="%CRYSFML%"\ifort64_debug\libC\crysfml.lib
-      )
+   set  INC=/I"%CRYSFML%"\ifort64\LibC
+   set  INCD=/I"%CRYSFML%"\ifort64_debug\LibC
+   set  CRYSLIB="%CRYSFML%"\ifort64\LibC\crysfml.lib
+   set CRYSLIBD="%CRYSFML%"\ifort64_debug\libC\crysfml.lib
+   
    if not x%1 == x goto CONT
    cls
    echo    MAKE_Calc_mag_powder: Make Calc_mag_powder Compilation

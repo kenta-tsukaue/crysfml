@@ -427,7 +427,8 @@ contains
           allocate(MhMultilist%Mhlist(iset)%Mh(Npol))
           MhMultilist%Mhlist(iset)%Nref= Npol
 
-          if(all(abs(MGp%kvec(:,iv)-k0(:)) < 0.001)) then
+          iv=1
+          if(all(abs(MGp%kvec(:,iv)-k0(:)) < 0.001)) then !if k=0, it should be the first propagation vector
             allocate(MNhkl%Ref(Npol))
             MNhkl%NRef=Npol
           end if
@@ -449,10 +450,10 @@ contains
             if( j == -1) sig="-"
             Mh%signp=real(-j)  ! sign "+" for H-k and "-" for H+k
 
-            if(all(abs(MGp%kvec(:,iv)-k0(:)) < 0.001)) &
-            MNhkl%Ref(iobs)%H=(/ih,ik,il/)
-
             iv=abs(m)
+
+            if(all(abs(MGp%kvec(:,iv)-k0(:)) < 0.001)) MNhkl%Ref(iobs)%H=(/ih,ik,il/)
+
             ! kvec from cfl is taken
             Mh%num_k=iv
             Mh%h= real((/ih,ik,il/)) - Mh%signp*MGp%kvec(:,iv)
@@ -462,9 +463,9 @@ contains
             PolaroMultilist%Polarolist(iset)%Polaro(iobs)%H=MhMultilist%Mhlist(iset)%Mh(iobs)%h
           end do !Loop on polarised observations
 
-          if(all(abs(MGp%kvec(:,iv)-k0(:)) < 0.001)) then
-            if(iv> 1) write(unit=*,fmt="(a)") "Presently for k=0 only one propagation vector is forseen"
-
+          iv=1
+          if(all(abs(MGp%kvec(:,iv)-k0(:)) < 0.001)) then !if k=0 only it should be the first
+            if(iv > 1) write(unit=*,fmt="(a)") "Presently for k=0 only one propagation vector is forseen"
             do iobs=1,Npol !Loop on polarised and MN observations
               call Init_Structure_Factors(MNhkl,A,Spg,mode="NUC",lun=lun)
               call Structure_Factors(A,SpG,MNhkl,mode="NUC")

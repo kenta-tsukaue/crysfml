@@ -15,10 +15,10 @@ rem
 :CONT
    if [%TARGET_ARCH%]==[] (set TARGET_ARCH=ia32)
    if [%TARGET_ARCH%]==[ia32] (
-       set LIBCRYS=C:\CrysFML\ifort\LibC
-       set LIBCRYSGF=C:\CrysFML\GFortran\LibC
+       set LIBCRYS=%CRYSFML%\ifort\LibC
+       set LIBCRYSGF=%CRYSFML%\GFortran\LibC
    ) else (
-       set LIBCRYS=C:\CrysFML\ifort64\LibC
+       set LIBCRYS=%CRYSFML%\ifort64\LibC
    )
    if x%1 == xlf95      goto LF95
    if x%1 == xg95       goto G95
@@ -28,8 +28,8 @@ rem
 rem
 rem ****---- Lahey Compiler ----****
 :LF95
-   lf95 -c magref.f90    -info  -o1 -chk -mod ".;C:\crysFML\lahey\libC"
-   lf95 *.obj -out magref_lf  -o1 -lib C:\crysFML\lahey\libC\crysFML
+   lf95 -c magref.f90    -info  -o1 -chk -mod ".;%CRYSFML%\lahey\libC"
+   lf95 *.obj -out magref_lf  -o1 -lib %CRYSFML%\lahey\libC\crysFML
    goto END
 rem
 rem ****---- Intel Compiler ----****
@@ -41,13 +41,13 @@ rem ****---- Intel Compiler ----****
 rem
 rem **---- G95 Compiler ----**
 :G95
-   g95 -c -O3  -std=f2003  -funroll-loops  -msse2   magref.f90   -IC:\CrysFML\G95\LibC
-   g95  *.o -o magref_g95 -O3  -funroll-loops  -msse2  -LC:\CrysFML\G95\LibC -lcrysfml  -Wl,--heap=0x01000000
+   g95 -c -O3  -std=f2003  -funroll-loops  -msse2   magref.f90   -I%CRYSFML%\G95\LibC
+   g95  *.o -o magref_g95 -O3  -funroll-loops  -msse2  -L%CRYSFML%\G95\LibC -lcrysfml  -Wl,--heap=0x01000000
    goto END
 rem
 rem **---- GFORTRAN Compiler ----**
 :GFOR
-   gfortran -c -O3  -std=f2003  -funroll-loops  -msse2   magref.f90   -IC:\CrysFML\GFortran\LibC
+   gfortran -c -O3  -std=f2003  -funroll-loops  -msse2   magref.f90   -I%CRYSFML%\GFortran\LibC
    gfortran  *.o -o magref_gf -O3  -funroll-loops  -msse2  -L$LIBCRYSGF -lcrysfml  -Wl,--heap=0x01000000
    goto END
 rem
