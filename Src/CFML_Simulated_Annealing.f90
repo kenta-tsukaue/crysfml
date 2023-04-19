@@ -1743,8 +1743,9 @@
 
           strings=" "
           call cpu_time(tf)
-          minut=int((tf-tini)/60.0)
-          sec=tf-real(minut)*60.0
+          sec=(tf-tini)/60.0
+          minut=int(sec)
+          sec=(sec-real(minut))*60.0
           write(unit=strings,fmt="(a,f9.5,a,i5,a,i8,a,i5,a,f8.4,a)") "  => New Temp:",temp,"  NT: ",ntp, &
                "       Number of function evaluations:",neval,"         Cumulated CPU-time: ",minut," minutes",sec," seconds"
           call mess(strings)
