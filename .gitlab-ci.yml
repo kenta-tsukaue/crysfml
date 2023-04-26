@@ -68,6 +68,7 @@ make:macos_gfortran:
 make:macos_ifort:
   stage: make
   script:
+    - source /opt/intel/oneapi/setvars.sh
     - export HDF5_INCLUDE_PATH="/Users/ci/Projects/fullprof/hdf5-ifort/include"
     - export HDF5_LIBRARY_PATH="/Users/ci/Projects/fullprof/hdf5-ifort/lib"
     - BuildServer/Unix/build.sh ifort
@@ -148,6 +149,7 @@ make_release:linux_gfortran:
 make_release:macos:
   stage: make_release
   script:
+    - source /opt/intel/oneapi/setvars.sh
     - export HDF5_INCLUDE_PATH="/Users/ci/Projects/fullprof/hdf5-ifort/include"
     - export HDF5_LIBRARY_PATH="/Users/ci/Projects/fullprof/hdf5-ifort/lib"
     - export PYTHON_LIBRARY_PATH="/Users/ci/Projects/fullprof/libpython3.7.dylib"
