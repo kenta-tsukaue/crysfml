@@ -8087,7 +8087,7 @@
          do
           j=j+1
           write(unit=lun,fmt="(a)") trim(info_lines(j))
-          if(u_case(info_lines(j)(1:14)) == "END_INFO_LINES") exit
+          if(u_case(info_lines(j)(1:14)) == "END_INFO_LINES" .or. j > 200) exit
          end do
        end if
 

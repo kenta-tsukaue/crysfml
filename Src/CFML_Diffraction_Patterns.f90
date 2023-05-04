@@ -3811,7 +3811,10 @@
               ERR_DiffPatt_Mess=" Error in Intensity file, check your instr parameter!"
               return
            end if
-           IF (i > 10 .and. ABS(pat%x(i)) < eps1 .AND. pat%y(i) < eps1 .AND.  pat%sigma(i) < eps1) exit
+           IF (i > 10 .and. ABS(pat%x(i)) < eps1 .AND. pat%y(i) < eps1 .AND.  pat%sigma(i) < eps1) then
+            i=i-1
+            exit
+           end if
            pat%x(i)=pat%x(i)*fac_x
            pat%y(i)=pat%y(i)*fac_y
            pat%ycalc(i)=pat%ycalc(i)*fac_y
@@ -3829,7 +3832,7 @@
            end if
        end do
 
-       ntt=i-1
+       ntt=i
        pat%xmin=pat%x(1)
        pat%xmax=pat%x(ntt)
        cnorm=cnorm/REAL(ntt)
