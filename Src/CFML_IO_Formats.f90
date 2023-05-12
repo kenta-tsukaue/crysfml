@@ -1727,7 +1727,7 @@
           exit
         end if
        end do
-       !Swapping the orinal atom at the first position with the first having full occupation
+       !Swapping the original atom at the first position with the first having full occupation
        if(First /= 1) Then
          aux_atm=atm%atom(1)
          atm%atom(1)=atm%atom(First)
