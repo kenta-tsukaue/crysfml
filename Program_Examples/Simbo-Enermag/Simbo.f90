@@ -13,7 +13,7 @@
 
     Use CFML_Math_general,              only: sort, negligible
     Use CFML_Crystallographic_Symmetry, only: Space_Group_Type, nlat
-    Use CFML_String_Utilities,          only: Pack_String, Frac_Trans_1Dig
+    Use CFML_String_Utilities,          only: Pack_String, Frac_Trans_1Dig, Getword
     use CFML_Geometry_Calc,             only: angle_uv, angle_dihedral,P1_dist, &
                                               Err_Geom,Err_Geom_Mess
     Use CFML_Atom_TypeDef,              only: Atoms_Cell_Type,  equiv_atm
@@ -52,21 +52,50 @@
 
     contains
 
-   Subroutine Exchange_Paths(lun,iprin,dmax,dbond,angm,angn,directex1,directex2,Cell,SpG,Ac,spaths)
-     integer,                  intent(in)       :: lun
-     logical,                  intent(in)       :: iprin
-     real,                     intent(in)       :: dmax
-     real,                     intent(in)       :: dbond,angm,angn,directex1,directex2
-     type (Crystal_cell_type), intent(in)       :: Cell
-     type (Space_Group_type),  intent(in)       :: SpG
-     type (Atoms_Cell_type),   intent(in out)   :: Ac
+   Function exclude(i,k,nx,excl,d_ex,Ac,dist) result (exclud)
+     integer,                          intent(in) :: i,k,nx
+     character(len=*), dimension(:,:), intent(in) :: excl
+     real,             dimension(:),   intent(in) :: d_ex
+     type (Atoms_Cell_type),           intent(in) :: Ac
+     real,                             intent(in) :: dist
+     logical :: exclud
+
+     integer :: n
+
+     exclud=.false.
+     if(nx > 0) then
+       !write(*,"(a,f8.4)") " Distance i-k: ",dist
+       do n=1,nx
+         !write(*,"(i3,a,f8.4)") n," "//trim(Ac%noms(i))//" "//trim(Ac%noms(k))//" -> "//trim(excl(1,n))//" "//trim(excl(2,n)), d_ex(n)
+         if((index(trim(Ac%noms(i)),trim(excl(1,n))) /= 0 .and. index(trim(Ac%noms(k)),trim(excl(2,n))) /= 0 .and. &
+              dist > d_ex(n) ) .or. &
+            (index(trim(Ac%noms(k)),trim(excl(1,n))) /= 0 .and. index(trim(Ac%noms(i)),trim(excl(2,n))) /= 0) .and. &
+              dist > d_ex(n) ) then
+                !write(*,*) " => Excluded interaction!"
+                exclud=.true.
+                exit
+         end if
+       end do
+     end if
+   End Function exclude
+
+   Subroutine Exchange_Paths(lun,iprin,nx,excl,d_ex,dmax,dbond,angm,angn,directex1,directex2,Cell,SpG,Ac,spaths)
+     integer,                              intent(in)     :: lun,nx
+     logical,                              intent(in)     :: iprin
+     character(len=*), dimension(:,:),     intent(in)     :: excl
+     real,             dimension(:),       intent(in)     :: d_ex
+     real,                                 intent(in)     :: dmax
+     real,                                 intent(in)     :: dbond,angm,angn,directex1,directex2
+     type (Crystal_cell_type),             intent(in)     :: Cell
+     type (Space_Group_type),              intent(in)     :: SpG
+     type (Atoms_Cell_type),               intent(in out) :: Ac
      type (SE_Connection), dimension (:,:),intent(in out) :: spaths
      !-- Local Variables --!
      integer, dimension(Ac%nat) :: ind_mag
      integer                    :: i,j,k,ki,kk,ji,jk,nsij,nssij
      integer                    :: n_mag,im,km
      real, dimension(3)         :: vm,vmp,va,vap,vmmp,vma,vmpap,vaap
-     real                       :: d2, ang, ang1,ang2, ang3, dis,dir1,dir2
+     real                       :: d2, ang, ang1,ang2, ang3, dis,dir1,dir2,dist
      character (len=60)         :: tangl
      character (len=40)         :: translat
 
@@ -161,189 +190,193 @@
        end do
        vm=MATMUL(Cell%Cr_Orth_cel,Ac%xyz(:,i))   !cartesian coordinates of atom i (M)
 
-       do j=1,Ac%neighb(i)                       !loop over the neighbours of atom i
-        k=Ac%neighb_atom(j,i)                    !k is the index in Ac of the j neighbour of i
-        if(Ac%moment(k) < 0.01) cycle            !Select magnetic atom k (M') connected to i (M)
-        !now k is a magnetic atom
-        !Determine the number of the magnetic atom
-        do km=1,n_mag
-         if(ind_mag(km) == k) exit !km gets the correct value
-        end do
+       doj: do j=1,Ac%neighb(i)                       !loop over the neighbours of atom i
+          k=Ac%neighb_atom(j,i)                    !k is the index in Ac of the j neighbour of i
+          if(Ac%moment(k) < 0.01) cycle            !Select magnetic atom k (M') connected to i (M)
+          !now k is a magnetic atom
+          !Determine the number of the magnetic atom
+          do km=1,n_mag
+           if(ind_mag(km) == k) exit !km gets the correct value
+          end do
 
-        !We will construct the matrix element (im,km) with all superexchange paths
-        vmp=MATMUL(Cell%Cr_Orth_cel,Ac%xyz(:,k)+Ac%trans(:,j,i))   !cartesian coordinates of atom j (M')
-        vmmp=vmp-vm                    !interatomic vector between magnetic atoms in cartesian components
-        call Frac_Trans_1Dig(Ac%trans(:,j,i),translat)
-        !translation of the atom "k" w.r.t to that situated within the reference cell
-        translat=Pack_String(translat)
-
-
-        !look for non-magnetic atoms connected to i and k
-         do ji=1,Ac%neighb(i)
-           ki=Ac%neighb_atom(ji,i)    !non-magnetic atom (anion A) connected to i (M)
-           if(Ac%moment(ki)> 0.01 .or. Ac%charge(ki) > 0.0 ) cycle    !discard cations
-           va=MATMUL(Cell%Cr_Orth_cel,Ac%xyz(:,ki)+Ac%trans(:,ji,i))  !Cartesian coordinates of anion A
-           vma=va-vm     !interatomic vector MA
-                         !                              A--->A'
-                         !discard paths with atoms: vma |    |
-                         !and |vma|>dbond               M--->M'
-                         !                               vmmp
-           if(Angle_uv(vmmp,vma) > angm ) then
-             !  write(unit=*,fmt=*) "  Angle A-M-M': ", Angle_uv(vmmp,vma), "  should be below:", angm
-             cycle
-           end if
-           if(dot_PRODUCT(vma,vma) > d2) cycle   !d2 is the maximum allowed square of d(M-A)
+          !We will construct the matrix element (im,km) with all superexchange paths
+          vmp=MATMUL(Cell%Cr_Orth_cel,Ac%xyz(:,k)+Ac%trans(:,j,i))   !cartesian coordinates of atom j (M')
+          vmmp=vmp-vm                    !interatomic vector between magnetic atoms in cartesian components
+          call Frac_Trans_1Dig(Ac%trans(:,j,i),translat)
+          !translation of the atom "k" w.r.t to that situated within the reference cell
+          translat=Pack_String(translat)
+          if(nx > 0) then
+             dist=sqrt(dot_product(vmmp,vmmp))
+             if(exclude(i,k,nx,excl,d_ex,Ac,dist)) cycle doj
+          end if
 
 
-          !In the analysis of the atoms connected to k one has to take into account that
-          !the construction of neighbouring atoms has been made using the atoms inside
-          !the unit cell, so a translation Ac%trans(:,j,i) (translation of connected k-atom to i
-          !w.r.t. the original) must be added.
-          !
-          do jk=1,Ac%neighb(k)
-            kk=Ac%neighb_atom(jk,k)   !non-magnetic atom (anion A') connected to k (M')
-            if(Ac%moment(kk)> 0.01 .or. Ac%charge(kk) > 0.0 ) cycle   !discard cations
-            vap=MATMUL(Cell%Cr_Orth_cel,Ac%xyz(:,kk)+Ac%trans(:,jk,k)+Ac%trans(:,j,i))
-            vmpap=vap-vmp !interatomic vector M'A'
-                          !                             A<---A'
-                          !discard paths with atoms:    |    | vmpap
-                          !and |vmpap|>dbond            M<---M'
-                          !                              -vmmp
-            if(Angle_uv(-vmmp,vmpap) > angm ) then
-             !write(unit=*,fmt=*) " Angle A'-M'-M: ", Angle_uv(-vmmp,vmpap), " should be below:",angm
-             cycle
-            end if
-            if(dot_PRODUCT(vmpap,vmpap) > d2) cycle
+          !look for non-magnetic atoms connected to i and k
+           do ji=1,Ac%neighb(i)
+             ki=Ac%neighb_atom(ji,i)    !non-magnetic atom (anion A) connected to i (M)
+             if(Ac%moment(ki)> 0.01 .or. Ac%charge(ki) > 0.0 ) cycle    !discard cations
+             va=MATMUL(Cell%Cr_Orth_cel,Ac%xyz(:,ki)+Ac%trans(:,ji,i))  !Cartesian coordinates of anion A
+             vma=va-vm     !interatomic vector MA
+                           !                              A--->A'
+                           !discard paths with atoms: vma |    |
+                           !and |vma|>dbond               M--->M'
+                           !                               vmmp
+             if(Angle_uv(vmmp,vma) > angm ) then
+               !  write(unit=*,fmt=*) "  Angle A-M-M': ", Angle_uv(vmmp,vma), "  should be below:", angm
+               cycle
+             end if
+             if(dot_PRODUCT(vma,vma) > d2) cycle   !d2 is the maximum allowed square of d(M-A)
 
-             vaap=vap-va
 
-            if(negligible(SUM( abs(vaap(:)) )) ) then  !Eventual super-exchange path
-                                        !                             A=A'
-                                        !Super-Exchange path         /   \
-                                        !                           M-----M'
-              nsij=nsij+1               !                             vmmp
+            !In the analysis of the atoms connected to k one has to take into account that
+            !the construction of neighbouring atoms has been made using the atoms inside
+            !the unit cell, so a translation Ac%trans(:,j,i) (translation of connected k-atom to i
+            !w.r.t. the original) must be added.
+            !
+            do jk=1,Ac%neighb(k)
+              kk=Ac%neighb_atom(jk,k)   !non-magnetic atom (anion A') connected to k (M')
+              if(Ac%moment(kk)> 0.01 .or. Ac%charge(kk) > 0.0 ) cycle   !discard cations
+              vap=MATMUL(Cell%Cr_Orth_cel,Ac%xyz(:,kk)+Ac%trans(:,jk,k)+Ac%trans(:,j,i))
+              vmpap=vap-vmp !interatomic vector M'A'
+                            !                             A<---A'
+                            !discard paths with atoms:    |    | vmpap
+                            !and |vmpap|>dbond            M<---M'
+                            !                              -vmmp
+              if(Angle_uv(-vmmp,vmpap) > angm ) then
+               !write(unit=*,fmt=*) " Angle A'-M'-M: ", Angle_uv(-vmmp,vmpap), " should be below:",angm
+               cycle
+              end if
+              if(dot_PRODUCT(vmpap,vmpap) > d2) cycle
+
+               vaap=vap-va
+
+              if(negligible(SUM( abs(vaap(:)) )) ) then  !Eventual super-exchange path
+                                          !                             A=A'
+                                          !Super-Exchange path         /   \
+                                          !                           M-----M'
+                nsij=nsij+1               !                             vmmp
+                tangl=" "
+                write(unit=tangl,fmt="(5a)") trim(Ac%noms(i)),"-",trim(Ac%noms(ki)),"-",trim(Ac%noms(k))
+
+                ang=Angle_uv(vma,vmpap)
+                !construct spaths
+                spaths(im,km)%ns=spaths(im,km)%ns+1
+                if(spaths(im,km)%ns > num_se) then
+                  write(unit=*,fmt="(4a)") &
+                  " => WARNING!: too many Super-Exchange paths between atoms:", &
+                  Ac%noms(i)," and ",Ac%noms(k)
+                  cycle
+                end if
+                spaths(im,km)%SE(spaths(im,km)%ns)%nam1=trim(Ac%noms(i))
+                spaths(im,km)%SE(spaths(im,km)%ns)%nam2=trim(Ac%noms(ki))
+                spaths(im,km)%SE(spaths(im,km)%ns)%nam3=trim(Ac%noms(k))
+                spaths(im,km)%SE(spaths(im,km)%ns)%nam=trim(tangl)//trim(translat)
+                spaths(im,km)%SE(spaths(im,km)%ns)%geom(1)=Ac%distance(ji,i)
+                spaths(im,km)%SE(spaths(im,km)%ns)%geom(2)=Ac%distance(jk,k)
+                spaths(im,km)%SE(spaths(im,km)%ns)%geom(3)=ang
+                spaths(im,km)%SE(spaths(im,km)%ns)%geom(4)=Ac%distance(j,i)
+                spaths(im,km)%SE(spaths(im,km)%ns)%coord(:,1)=Ac%xyz(:,i)
+                spaths(im,km)%SE(spaths(im,km)%ns)%coord(:,2)=Ac%xyz(:,ki)+Ac%trans(:,ji,i)
+                spaths(im,km)%SE(spaths(im,km)%ns)%coord(:,3)=Ac%xyz(:,k) +Ac%trans(:,j,i)
+                spaths(im,km)%SE(spaths(im,km)%ns)%carte(:,1)=vm(:)
+                spaths(im,km)%SE(spaths(im,km)%ns)%carte(:,2)=va(:)
+                spaths(im,km)%SE(spaths(im,km)%ns)%carte(:,3)=vmp(:)
+
+              else
+
+                     !Possible super-super-exchange path
+                     !                          A'
+                     !                        / |
+                     !                  vaap /  |
+                     !discard paths with:   /)a |
+                     !  a > 89             A--  |
+                     !and |vaap|>dbond     |    | vmpap
+                     !                     M--->M'
+                     !                      vmmp
+
+               if(Angle_uv(vmmp,vaap) > angm) then
+                  !write(unit=*,fmt=*) " Angle AA'^MM': ", Angle_uv(vmmp,vaap), "  should be below:", angm
+                  cycle
+               end if
+               dis=dot_PRODUCT(vaap,vaap)
+               if(dis > d2) cycle
+
+               ang1=Angle_uv(-vma,vaap)
+               ang2=Angle_uv(vaap,vmpap)             !
+
+               if(ang1 < angn .or. ang2 < angn) then
+                  !write(unit=*,fmt=*) " Angles MAA' and M'A'A: ", ang1,ang2, "  must be >", angn
+                  cycle
+               end if
+                      !a super-exchange path exist
+                      !
+                      !
+                      !discard paths with:
+                      ! a1 <90 or a2 <90      A-------A'
+                      !and |vaap|>dbond      / a1   a2 \ vmpap
+                      !                     M----------->M'
+                      !                       vmmp
+
+               nssij=nssij+1
+               dis=sqrt(dis)
+               ang3=angle_dihedral(vma,vaap,-vmpap)
+
+               tangl=" "
+               write(unit=tangl,fmt="(7a)") trim(Ac%noms(i)),"-",trim(Ac%noms(ki)),"-",&
+                                   trim(Ac%noms(kk)),"-",trim(Ac%noms(k))
+
+                !construct spaths
+
+                spaths(im,km)%nss=spaths(im,km)%nss+1
+                if(spaths(im,km)%nss > num_sse) then
+                  write(unit=*,fmt="(4a)") &
+                  " => WARNING!: too many Super-Super-Exchange paths between atoms:", &
+                  Ac%noms(i)," and ",Ac%noms(k)
+                  cycle
+                end if
+                spaths(im,km)%SSE(spaths(im,km)%nss)%nam1=trim(Ac%noms(i))
+                spaths(im,km)%SSE(spaths(im,km)%nss)%nam2=trim(Ac%noms(ki))
+                spaths(im,km)%SSE(spaths(im,km)%nss)%nam3=trim(Ac%noms(kk))
+                spaths(im,km)%SSE(spaths(im,km)%nss)%nam4=trim(Ac%noms(k))
+                spaths(im,km)%SSE(spaths(im,km)%nss)%nam=trim(tangl)//trim(translat)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%geom(1)=Ac%distance(ji,i)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%geom(2)=dis
+                spaths(im,km)%SSE(spaths(im,km)%nss)%geom(3)=Ac%distance(jk,k)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%geom(4)=ang1
+                spaths(im,km)%SSE(spaths(im,km)%nss)%geom(5)=ang2
+                spaths(im,km)%SSE(spaths(im,km)%nss)%geom(6)=ang3
+                spaths(im,km)%SSE(spaths(im,km)%nss)%geom(7)=Ac%distance(j,i)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%coord(:,1)=Ac%xyz(:,i)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%coord(:,2)=Ac%xyz(:,ki)+Ac%trans(:,ji,i)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%coord(:,3)=Ac%xyz(:,kk)+Ac%trans(:,jk,k)+Ac%trans(:,j,i)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%coord(:,4)=Ac%xyz(:,k)+Ac%trans(:,j,i)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%carte(:,1)=vm(:)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%carte(:,2)=va(:)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%carte(:,3)=vap(:)
+                spaths(im,km)%SSE(spaths(im,km)%nss)%carte(:,4)=vmp(:)
+
+              end if
+
+            end do  !jk
+           end do  !ji
+
+           ! Test for direct exchange
+           dis=dot_PRODUCT(vmmp,vmmp)
+           if(dis <= dir2 .and. dis > dir1) then
+              spaths(im,km)%nd=spaths(im,km)%nd+1
               tangl=" "
-              write(unit=tangl,fmt="(5a)") trim(Ac%noms(i)),"-",trim(Ac%noms(ki)),"-",trim(Ac%noms(k))
+              write(unit=tangl,fmt="(3a)") trim(Ac%noms(i)),"-",trim(Ac%noms(k))
+              spaths(im,km)%DE(spaths(im,km)%nd)%nam1=trim(Ac%noms(i))
+              spaths(im,km)%DE(spaths(im,km)%nd)%nam2=trim(Ac%noms(k))
+              spaths(im,km)%DE(spaths(im,km)%nd)%nam=trim(tangl)//trim(translat)
+              spaths(im,km)%DE(spaths(im,km)%nd)%coord(:,1)=Ac%xyz(:,i)
+              spaths(im,km)%DE(spaths(im,km)%nd)%coord(:,2)=Ac%xyz(:,k)+Ac%trans(:,j,i)
+              spaths(im,km)%DE(spaths(im,km)%nd)%carte(:,1)=vm(:)
+              spaths(im,km)%DE(spaths(im,km)%nd)%carte(:,2)=vmp(:)
+              spaths(im,km)%DE(spaths(im,km)%nd)%dist=sqrt(dis)
+           end if
 
-              ang=Angle_uv(vma,vmpap)
-              !construct spaths
-              spaths(im,km)%ns=spaths(im,km)%ns+1
-              if(spaths(im,km)%ns > num_se) then
-                write(unit=*,fmt="(4a)") &
-                " => WARNING!: too many Super-Exchange paths between atoms:", &
-                Ac%noms(i)," and ",Ac%noms(k)
-                cycle
-              end if
-              spaths(im,km)%SE(spaths(im,km)%ns)%nam1=trim(Ac%noms(i))
-              spaths(im,km)%SE(spaths(im,km)%ns)%nam2=trim(Ac%noms(ki))
-              spaths(im,km)%SE(spaths(im,km)%ns)%nam3=trim(Ac%noms(k))
-              spaths(im,km)%SE(spaths(im,km)%ns)%nam=trim(tangl)//trim(translat)
-              spaths(im,km)%SE(spaths(im,km)%ns)%geom(1)=Ac%distance(ji,i)
-              spaths(im,km)%SE(spaths(im,km)%ns)%geom(2)=Ac%distance(jk,k)
-              spaths(im,km)%SE(spaths(im,km)%ns)%geom(3)=ang
-              spaths(im,km)%SE(spaths(im,km)%ns)%geom(4)=Ac%distance(j,i)
-              spaths(im,km)%SE(spaths(im,km)%ns)%coord(:,1)=Ac%xyz(:,i)
-              spaths(im,km)%SE(spaths(im,km)%ns)%coord(:,2)=Ac%xyz(:,ki)+Ac%trans(:,ji,i)
-              spaths(im,km)%SE(spaths(im,km)%ns)%coord(:,3)=Ac%xyz(:,k) +Ac%trans(:,j,i)
-              spaths(im,km)%SE(spaths(im,km)%ns)%carte(:,1)=vm(:)
-              spaths(im,km)%SE(spaths(im,km)%ns)%carte(:,2)=va(:)
-              spaths(im,km)%SE(spaths(im,km)%ns)%carte(:,3)=vmp(:)
-
-            else
-
-                   !Possible super-super-exchange path
-                   !                          A'
-                   !                        / |
-                   !                  vaap /  |
-                   !discard paths with:   /)a |
-                   !  a > 89             A--  |
-                   !and |vaap|>dbond     |    | vmpap
-                   !                     M--->M'
-                   !                      vmmp
-
-             if(Angle_uv(vmmp,vaap) > angm) then
-                !write(unit=*,fmt=*) " Angle AA'^MM': ", Angle_uv(vmmp,vaap), "  should be below:", angm
-                cycle
-             end if
-             dis=dot_PRODUCT(vaap,vaap)
-             if(dis > d2) cycle
-
-             ang1=Angle_uv(-vma,vaap)
-             ang2=Angle_uv(vaap,vmpap)             !
-
-             if(ang1 < angn .or. ang2 < angn) then
-                !write(unit=*,fmt=*) " Angles MAA' and M'A'A: ", ang1,ang2, "  must be >", angn
-                cycle
-             end if
-                    !a super-exchange path exist
-                    !
-                    !
-                    !discard paths with:
-                    ! a1 <90 or a2 <90      A-------A'
-                    !and |vaap|>dbond      / a1   a2 \ vmpap
-                    !                     M----------->M'
-                    !                       vmmp
-
-             nssij=nssij+1
-             dis=sqrt(dis)
-             ang3=angle_dihedral(vma,vaap,-vmpap)
-
-             tangl=" "
-             write(unit=tangl,fmt="(7a)") trim(Ac%noms(i)),"-",trim(Ac%noms(ki)),"-",&
-                                 trim(Ac%noms(kk)),"-",trim(Ac%noms(k))
-
-              !construct spaths
-
-              spaths(im,km)%nss=spaths(im,km)%nss+1
-              if(spaths(im,km)%nss > num_sse) then
-                write(unit=*,fmt="(4a)") &
-                " => WARNING!: too many Super-Super-Exchange paths between atoms:", &
-                Ac%noms(i)," and ",Ac%noms(k)
-                cycle
-              end if
-              spaths(im,km)%SSE(spaths(im,km)%nss)%nam1=trim(Ac%noms(i))
-              spaths(im,km)%SSE(spaths(im,km)%nss)%nam2=trim(Ac%noms(ki))
-              spaths(im,km)%SSE(spaths(im,km)%nss)%nam3=trim(Ac%noms(kk))
-              spaths(im,km)%SSE(spaths(im,km)%nss)%nam4=trim(Ac%noms(k))
-              spaths(im,km)%SSE(spaths(im,km)%nss)%nam=trim(tangl)//trim(translat)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%geom(1)=Ac%distance(ji,i)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%geom(2)=dis
-              spaths(im,km)%SSE(spaths(im,km)%nss)%geom(3)=Ac%distance(jk,k)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%geom(4)=ang1
-              spaths(im,km)%SSE(spaths(im,km)%nss)%geom(5)=ang2
-              spaths(im,km)%SSE(spaths(im,km)%nss)%geom(6)=ang3
-              spaths(im,km)%SSE(spaths(im,km)%nss)%geom(7)=Ac%distance(j,i)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%coord(:,1)=Ac%xyz(:,i)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%coord(:,2)=Ac%xyz(:,ki)+Ac%trans(:,ji,i)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%coord(:,3)=Ac%xyz(:,kk)+Ac%trans(:,jk,k)+Ac%trans(:,j,i)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%coord(:,4)=Ac%xyz(:,k)+Ac%trans(:,j,i)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%carte(:,1)=vm(:)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%carte(:,2)=va(:)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%carte(:,3)=vap(:)
-              spaths(im,km)%SSE(spaths(im,km)%nss)%carte(:,4)=vmp(:)
-
-            end if
-
-          end do  !jk
-         end do  !ji
-
-         ! Test for direct exchange
-         dis=dot_PRODUCT(vmmp,vmmp)
-         if(dis <= dir2 .and. dis > dir1) then
-            spaths(im,km)%nd=spaths(im,km)%nd+1
-            tangl=" "
-            write(unit=tangl,fmt="(3a)") trim(Ac%noms(i)),"-",trim(Ac%noms(k))
-            spaths(im,km)%DE(spaths(im,km)%nd)%nam1=trim(Ac%noms(i))
-            spaths(im,km)%DE(spaths(im,km)%nd)%nam2=trim(Ac%noms(k))
-            spaths(im,km)%DE(spaths(im,km)%nd)%nam=trim(tangl)//trim(translat)
-            spaths(im,km)%DE(spaths(im,km)%nd)%coord(:,1)=Ac%xyz(:,i)
-            spaths(im,km)%DE(spaths(im,km)%nd)%coord(:,2)=Ac%xyz(:,k)+Ac%trans(:,j,i)
-            spaths(im,km)%DE(spaths(im,km)%nd)%carte(:,1)=vm(:)
-            spaths(im,km)%DE(spaths(im,km)%nd)%carte(:,2)=vmp(:)
-            spaths(im,km)%DE(spaths(im,km)%nd)%dist=sqrt(dis)
-         end if
-
-       end do   !j magnetic neighbours of i
+       end do  doj  !j magnetic neighbours of i
      end do !i
 
      if(iprin) then
@@ -764,7 +797,7 @@
 
   Program Simbo
    Use CFML_Crystallographic_Symmetry, only: Set_SpaceGroup, Write_SpaceGroup, Space_Group_Type
-   Use CFML_String_Utilities,          only: l_case, number_lines, reading_lines,u_case
+   Use CFML_String_Utilities,          only: l_case, number_lines, reading_lines,u_case,Getword
    use CFML_Math_general,              only: negligible
    use CFML_Math_3D,                   only: set_eps,invert_a
    use CFML_Geometry_Calc,             only: Allocate_Coordination_Type, calc_dist_angle, &
@@ -786,15 +819,17 @@
    type (Atoms_Cell_Type)   :: Acm, Ac !Magnetic atoms and all atoms inside a primitive cell
    type (SE_Connection), dimension (max_magt,max_magt) :: spaths     !a maximun of max_magt magnetic atoms in the cell
    type (Job_Info_type)     :: Job_Info
-   character(len=1)    :: ans
-   character(len=20)   :: sp1
-   character(len=80)   :: title
-   character(len=256)  :: infil,outfil,texto
-   integer, parameter  :: lun1=1,lun2=6,lun=2
-   integer :: i, j, numops, ln, nauas, nmag, lr, max_coord, L
+   character(len=1)                   :: ans
+   character(len=20)                  :: sp1,line
+   character(len=20), dimension(2,10) :: excl_pairs=" "
+   character(len=20), dimension(10)   :: dire
+   character(len=80)                  :: title= "  "
+   character(len=256)                 :: infil,outfil,texto
+   integer, parameter                 :: lun1=1,lun2=6,lun=2
+   integer :: i, j, numops, ln, nauas, nmag, lr, max_coord, L, n, nw, ier
    integer, dimension(:), allocatable :: ptr
-   integer, dimension(10) :: nif
-   real, dimension(10)  :: mom
+   integer, dimension(10)  :: nif
+   real,    dimension(10)  :: mom, d_excl=0.0
    character(len=4), dimension(10) :: scf=" "
    real  :: dmax=6.0, & !Maximum distance for distance calculations
             dangl=0.0,& !Maximun distance for angle calculations
@@ -903,6 +938,45 @@
       write(unit=*,fmt="(a)") " => Please reorder the input file putting on top magnetic atoms"
       stop
    end if
+   write(unit=*,fmt="(/,a,/)") " => List of detected magnetic atoms:"
+   write(unit=*,fmt="(a)") " Label  Type     x       y       z      occ     Biso  moment  Charge"
+   do i=1,A%natoms
+      if(A%atom(i)%moment > 0.01 ) then
+        write(unit=texto,fmt="(a,a4,a,a5,5f8.4,2f8.3)")" ", A%atom(i)%lab,"  ",&
+        A%atom(i)%ChemSymb,A%atom(i)%x,A%atom(i)%occ,A%atom(i)%Biso,A%atom(i)%moment,A%atom(i)%charge
+        write(unit=*, fmt="(a)") trim(texto)
+      end if
+   end do
+   write(unit=*,fmt="(a)", advance="no")" => Exclude some interactions ? "
+   read(unit=*,fmt="(a)") ans
+   n=0 !number of pairs to exclude
+   if(ans == "Y" .or. ans == "y") then
+     i=0
+     do
+       i=i+1
+       write(unit=*,fmt="(a,i2,a)",advance="no") " => Give the pair #",i," and the distance to exclude (eg. Fe1 Fe2 4.32): "
+       read(unit=*,fmt="(a)") line
+       if(len_trim(line) == 0) then
+         n=i-1
+         exit
+       end if
+       call Getword(line,dire,nw)
+       if(nw < 3) then
+         write(unit=*,fmt="(a)") " => Error in giving two labels and distance for excluding interactions !"
+         i=i-1
+         cycle
+       end if
+       excl_pairs(1,i)=dire(1)
+       excl_pairs(2,i)=dire(2)
+       read(dire(3),*,iostat=ier) d_excl(i)
+       if(ier /= 0) then
+          write(unit=*,fmt="(a)") " => Warning! The distance for excluding interactions of pair " &
+                       //trim(dire(1))//"  "//trim(dire(2))//" has been fixed to 3 angstroms!"
+          d_excl(i)=3.0
+       end if
+     end do
+   end if
+
 
    write(unit=*,fmt="(a,f9.3)")" => Maximum bond-distance (Dmax)                       : ",dmax
    write(unit=*,fmt="(a,f9.3)")" => Minimum distance for direct exchange (Direct1)     : ",directex1
@@ -992,7 +1066,7 @@
    read(unit=*,fmt="(a)") ans
    if(ans == "y" .or. ans == "Y") iprin=.true.
    if(.not. negligible(dbond)) &
-       call Exchange_Paths(lun,iprin,dmax,dbond,angm,angn,directex1,directex2,Cell,gP1,Ac,spaths)
+       call Exchange_Paths(lun,iprin,n,excl_pairs,d_excl,dmax,dbond,angm,angn,directex1,directex2,Cell,gP1,Ac,spaths)
    Call deAllocate_Atoms_Cell(Ac)    !From Ac we have conserved only "spaths"
    Call Allocate_Atoms_Cell(nmag, 1, dmax, Acm)
 
