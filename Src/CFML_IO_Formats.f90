@@ -2270,8 +2270,7 @@
        !nline_ini=np1
        ! TR  feb. 2015 .(re-reading the same item with another name)
        !if(len_trim(string) == 0) then
-       if(nline_ini == 1) then   ! TR june 2016
-        nline_ini=np1
+       if(nline_ini == np1) then   ! Suggested by Ross Angel
         call Read_Key_StrVal(filevar,nline_ini,nline_end, "_space_group_symop_operation_xyz",string)
        end if
 
