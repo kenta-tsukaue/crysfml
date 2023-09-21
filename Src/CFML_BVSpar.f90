@@ -444,7 +444,7 @@
     !!----
     !!---- Update: March - 2005
     !!
-    character(len=*),dimension(0:35),parameter, public :: references = (/  &
+    character(len=*),dimension(0:36),parameter, public :: references = (/  &
          "Unknown  (provided by the user)                                                 ", &  !0
          "Brown and Altermatt, (1985), Acta Cryst. B41, 244-247 (empirical)               ", &  !1
          "Brese and O'Keeffe, (1991), Acta Cryst. B47, 192-197 (extrapolated)             ", &  !2
@@ -480,7 +480,8 @@
          "J.Rodriguez-Carvajal, Private communication                                     ", &  !32
          "S. Adams and R. Prasada Rao, (2011) Phys. Status Solidi A 208, No. 8, 1746-1753 ", &  !33
          "S. Adams (2013),  Structure and Bonding (eds. Brown & Poeppelmeier) 158, 91-128 ", &  !34
-         "Adams S, Moretsky O and Canadell E (2004) Solid State Ionics 168, 281-290       "/)   !35
+         "Adams S, Moretsky O and Canadell E (2004) Solid State Ionics 168, 281-290       ", &  !35
+         "Haomin Chen and Stefan Adams (2017) IUCrJ 4, 614-625                            "/)   !36
 
     !!----
     !!---- Common_OxStates_Table
@@ -1225,9 +1226,9 @@
                    (/ 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370 /), &
                    (/     1,     1,     2,     0,     0,     1,     0,     0,    10,     0,     0,     0,     0,     0 /) )
      BVS_Table( 73)=BVS_Par_Type("FE+4", &
-                   (/ 0.000, 0.000, 0.000, 0.000, 0.000, 2.230, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000 /), &
-                   (/ 0.370, 0.370, 0.370, 0.370, 0.370, 0.350, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370 /), &
-                   (/     0,     0,     0,     0,     0,     5,     0,     0,     0,     0,     0,     0,     0,     0 /) )
+                   (/1.7656, 0.000, 0.000, 0.000, 0.000, 2.230, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000 /), &
+                   (/ 0.410, 0.370, 0.370, 0.370, 0.370, 0.350, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370 /), &
+                   (/    36,     0,     0,     0,     0,     5,     0,     0,     0,     0,     0,     0,     0,     0 /) )
      BVS_Table( 74)=BVS_Par_Type("FE+6", &
                    (/ 1.760, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000, 0.000 /), &
                    (/ 0.350, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370, 0.370 /), &
