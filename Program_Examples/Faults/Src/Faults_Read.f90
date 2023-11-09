@@ -225,8 +225,8 @@
 
     Subroutine read_fraction (line, real_num)
 
-        character(len=20), intent(in)  :: line        !string of numbers to convert to real
-        real              ,intent(out) :: real_num    ! string of real characters
+        character(len=*), intent(in)  :: line        !string of numbers to convert to real
+        real             ,intent(out) :: real_num    ! string of real characters
 
         integer                                       ::  j , ierr
         real                                          :: numerator, denominator
@@ -237,7 +237,7 @@
           read ( line, fmt=*,iostat=ierr) real_num
           if(ierr /= 0) then
             ERR_String= .true.
-            ERR_String_Mess=" Error reading a real number! "
+            ERR_String_Mess=" Error reading a real number! Line: "//trim(line)
             return
           end if
         else         !it was expressed as a ratio. delete the slash, '/'.
@@ -403,6 +403,10 @@
                   Err_crys_mess="ERROR reading radiation type"
                   logi = .false.
                   return
+                end if
+
+                if (index(txt , 'ANOMALOUS_SC') /= 0 ) then
+                   anomalous_sc=.true.
                 end if
                 ok_rad=.true.
 
@@ -1513,7 +1517,7 @@
               thmax=th2_max
               step_2th=d_theta
               n_high = nint((th2_max-th2_min)/d_theta+1.0_dp)
-              write(*,"(a,3f7.2 )") " => 2Theta max, 2Theta min, stepsize:",  th2_min, th2_max, d_theta
+              write(*,"(a,3f7.2 )") " => 2Theta min, 2Theta max, stepsize:",  th2_min, th2_max, d_theta
               th2_min = th2_min * deg2rad
               th2_max = th2_max * deg2rad
               d_theta = half * deg2rad * d_theta
@@ -1756,7 +1760,7 @@
                  read(unit=txt,fmt=*, iostat=ier)   alow(j),ahigh(j)
                  if(ier /= 0 ) then
                      Err_crys=.true.
-                     write(unit=Err_crys_mess,fmt="(a,i3)") "ERROR reading the excluded region number ",j
+                     write(unit=Err_crys_mess,fmt="(a,i3)"),"ERROR reading the excluded region number ",j
                      logi=.false.
                      return
                  end if

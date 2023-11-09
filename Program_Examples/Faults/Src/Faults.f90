@@ -1618,9 +1618,6 @@
          end do
          infile = args(1)
          arggiven=.true.
-      else
-        write(unit=*,fmt="(a)") " => ERROR ! => The Program Faults should be invoked with the name of the input file"
-        call Close_Faults()
       end if
 
       CALL salute()
@@ -1832,16 +1829,16 @@
                         ycalcdef(j)=real(i)
                     end do
 
+                    outfile=" "
                     if (replace_files) then
                         Call getfnm(filenam,outfile, '.dat', ok,replace_files)
                     else
-                        !CALL getfnm(filenam, outfile, '.dat', ok)
                         outfile=trim(outfile_notrepl)//".dat"
                     end if
 
                     write(unit=*,fmt="(a)") " => Writing the calculated Powder Pattern file: "//trim(outfile)
 
-                    OPEN(UNIT = iout, FILE = outfile, STATUS = 'replace')
+                     open(unit = iout, file = outfile, status = 'replace')
                     write(unit = iout,fmt = *)'!', outfile
                     write(unit = iout,fmt = '(3f12.4)')thmin, step_2th,thmax
                     write(unit = iout,fmt = '(8f14.2)') ( ycalcdef(j), j=1, n_high )

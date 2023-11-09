@@ -442,6 +442,7 @@
   logical                              :: unbroaden = .false. !if TRUE then streak calculates without broadening
   logical, dimension(10)               :: table = .false.  !if TRUE then a vector component of l_r and/or probabilities are written in the form of table
   logical                              :: logarithm = .false.   !if TRUE then a streak calculation is made in logarithmic scale
+  logical                              :: anomalous_sc = .false. !if true, anomalous scattering is applied
 !
 !*********************     integer*4 variables
 !
@@ -702,6 +703,9 @@
            !     in the PARAMETERS section enclosed in parentheses.
 
   Real(kind=dp), dimension(9,MAX_TA) :: x_sf !s-> X-ray scattering factors.
+  Real(kind=dp), dimension(MAX_TA)   :: fp_sf=0.0_dp,fpp_sf=0.0_dp !Vectors containing the anomalous scattering
+                                                     !correction to the form factor, They are obtained
+                                                     !from CrysFML and set up in Function SFC
 
   Real(kind=sp),dimension (max_sp)  :: ycalcdef
 

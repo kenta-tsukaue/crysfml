@@ -1,7 +1,7 @@
   Module diffax_calc
 
    use CFML_GlobalDeps,           only : sp,dp
-   use CFML_String_Utilities,     only : number_lines, reading_lines,  init_findfmt, findfmt , &
+   use CFML_String_Utilities,     only : number_lines, reading_lines,l_case,  init_findfmt, findfmt , &
                                          iErr_fmt, getword, err_string, err_string_mess, getnum, Ucase
    use CFML_Optimization_General, only : Opt_Conditions_Type
    use CFML_LSQ_TypeDef,          only : LSQ_Conditions_type
@@ -1472,6 +1472,8 @@
           IF(rad_type == x_ray) THEN
             WRITE(dmp,140) 'X-ray scattering factor data Ai, Bi',  &
                 (x_sf(n,a_type(j,i)),n=1,9)
+            WRITE(dmp,"(a,2f12.6)") " Anomalous X-ray scattering Delta_F' and Delta_F'': ",  &
+                fp_sf(a_type(j,i)), fpp_sf(a_type(j,i))
           ELSE IF(rad_type == neutrn) THEN
             WRITE(dmp,140) 'Neutron scattering factor data', n_sf(a_type(j,i))
           ELSE IF(rad_type == electn) THEN
@@ -2846,7 +2848,7 @@
       COMPLEX(kind=dp),dimension(max_l),  INTENT(IN OUT)   :: f !max_l
       Real(kind=dp),                          INTENT(IN)   :: s2
       Real(kind=dp),                          INTENT(IN)   :: l
-      INTEGER :: i, j, m, n, TYPE
+      INTEGER :: i, j, m, n, TYP
       Real(kind=dp) :: fact(max_ta), tmp(max_ta), tmp_sum, dot,  q2
       Real(kind=dp), PARAMETER :: e_factor = 0.023934D0
       COMPLEX(kind=dp) :: ctmp(max_ta), f_uniq(max_l), ctmp_sum
@@ -2862,7 +2864,9 @@
           fact(i) = x_sf(1,i) * EXP(-x_sf(2,i) * q2) +  &
               x_sf(3,i) * EXP(-x_sf(4,i) * q2) + x_sf(5,i) * EXP(-x_sf(6,i) * q2) +  &
               x_sf(7,i) * EXP(-x_sf(8,i) * q2) + x_sf(9,i)
+          if(rad_type == x_ray .and. anomalous_sc) fact(i)=fact(i)+fp_sf(i) !real part of anomalous scattering
         END DO
+
       ELSE IF(rad_type == neutrn) THEN
         fact(1:n_atoms) = n_sf(1:n_atoms)
       END IF
@@ -2893,40 +2897,41 @@
 
         IF(l_symmetry(m) == centro .AND. one_b(m)) THEN
           DO  j = 1, l_n_atoms(m)
-            TYPE = a_type(j,m)
+            TYP = a_type(j,m)
             dot = hx_ky(j,m) + l*a_pos(3,j,m)
-            tmp(TYPE) = tmp(TYPE) + a_occup(j,m) * COS(dot)
+            tmp(TYP) = tmp(TYP) + a_occup(j,m) * COS(dot)
           END DO
           DO  j = 1, n_atoms
-            tmp_sum = tmp_sum + tmp(j) * fact(j)
+            ctmp_sum=ctmp_sum+ tmp(j) * CMPLX(fact(j),fpp_sf(j))
           END DO
-! NOTE: twice since centrosymmetric
-          f_uniq(m) = two * EXP(-a_b(1,m) * q2) * tmp_sum
+          ! NOTE: twice since centrosymmetric
+          f_uniq(m) = two * EXP(-a_b(1,m) * q2) * ctmp_sum  !tmp_sum
+
 
 ! Debye-Waller is not invariant
         ELSE IF(l_symmetry(m) == centro) THEN
           DO  j = 1, l_n_atoms(m)
-            TYPE = a_type(j,m)
+            TYP = a_type(j,m)
             dot = hx_ky(j,m) + l*a_pos(3,j,m)
-            tmp(TYPE) = tmp(TYPE) + a_occup(j,m) * EXP(-a_b(j,m) * q2) * COS(dot)
-
+            tmp(TYP) = tmp(TYP) + a_occup(j,m) * EXP(-a_b(j,m) * q2) * COS(dot)
           END DO
           DO  j = 1, n_atoms
-            tmp_sum = tmp_sum + tmp(j) * fact(j)
+            !tmp_sum = tmp_sum + tmp(j) * fact(j)
+            ctmp_sum=ctmp_sum+ tmp(j) * CMPLX(fact(j),fpp_sf(j))
           END DO
-! NOTE: twice since centrosymmetric
-          f_uniq(m) = two * tmp_sum
+          ! NOTE: twice since centrosymmetric
+          f_uniq(m) = two * ctmp_sum   ! tmp_sum
 
 ! check if Debye-Waller is the only invariant
 ! f(i) will be complex
         ELSE IF(one_b(m)) THEN
           DO  j = 1, l_n_atoms(m)
-            TYPE = a_type(j,m)
+            TYP = a_type(j,m)
             dot = hx_ky(j,m) + l*a_pos(3,j,m)
-            ctmp(TYPE) = ctmp(TYPE) + a_occup(j,m) * DCMPLX(COS(dot), SIN(dot))
+            ctmp(TYP) = ctmp(TYP) + a_occup(j,m) * DCMPLX(COS(dot), SIN(dot))
           END DO
           DO  j = 1, n_atoms
-            ctmp_sum = ctmp_sum + ctmp(j) * fact(j)
+            ctmp_sum = ctmp_sum + ctmp(j) * CMPLX(fact(j),fpp_sf(j))
           END DO
           f_uniq(m) = EXP(-a_b(1,m) * q2) * ctmp_sum
 
@@ -2934,14 +2939,14 @@
 ! Nothing is invariant
         ELSE
           DO  j = 1, l_n_atoms(m)
-            TYPE = a_type(j,m)
+            TYP = a_type(j,m)
             dot = hx_ky(j,m) + l*a_pos(3,j,m)
-            ctmp(TYPE) = ctmp(TYPE) + a_occup(j,m) *  &
+            ctmp(TYP) = ctmp(TYP) + a_occup(j,m) *  &
                 EXP(-a_b(j,m) * q2) * DCMPLX(COS(dot), SIN(dot))
 
           END DO
           DO  j = 1, n_atoms
-            ctmp_sum = ctmp_sum + ctmp(j) * fact(j)
+            ctmp_sum = ctmp_sum + ctmp(j) * CMPLX(fact(j),fpp_sf(j))
           END DO
           f_uniq(m) = ctmp_sum
         END IF
@@ -6590,6 +6595,7 @@
       else
         iw=op
       end if
+      WRITE(iw,"(a)") '  '
       WRITE(iw,"(a)") ' ______________________________________________________'
       WRITE(iw,"(a)") '                                                       '
       WRITE(iw,"(a)") '               _______ FAULTS 2018 _______             '
@@ -6646,13 +6652,15 @@
 !                            i, j, n, m, length,NAME ,line ,tmp
 !     Utiliza las funciones: length externa
 !     Utiliza las subrutinas: ATOMS, touppr(NAME)
+      use CFML_Scattering_Chemical_Tables
 
-      LOGICAL :: ok, new_atom, our_atom, done
-      LOGICAL :: list(max_ta+1)
-      INTEGER*4 i, j, n, m
-      CHARACTER (LEN=4)   :: NAMEa
-      CHARACTER (LEN=120) :: line
-      REAL*4 tmp
+      logical :: ok, new_atom, our_atom, done
+      logical :: list(max_ta+1)
+      integer :: i, j, k, n, m
+      character (len=2)   :: symbcar
+      character (len=4)   :: NAMEa
+      character (len=120) :: line
+      real(kind=4) :: d,dmin, tmp
 
       ! external subroutine (Some compilers need them declared external)
       !      external ATOMS
@@ -6694,6 +6702,39 @@
         END DO
       END DO
       n_atoms = m
+
+      if(anomalous_sc) then
+        ! Looking for anomalous scattering components delta_F' and delta_F''
+
+        call Set_Delta_Fp_Fpp()
+
+        !---- Select wavelength (by default is CuKalpha1: k=5 in the list) ----!
+        dmin=1000.0
+        do i=1,5
+           d=abs(lambda-Xray_Wavelengths(i)%Kalfa(1))
+           if (d < dmin) then
+              dmin=d
+              k=i        !Selection of the index for fp and fpp lists
+           end if
+        end do
+
+        !---- Found Species on Anomalous_ScFac ----!
+        do i=1,n_atoms
+           NAMEa=l_case(atom_l(i))
+           symbcar=NAMEa
+           j=index(NAMEa,"+")
+           if(j /= 0) symbcar=NAMEa(1:j-2)
+           j=index(NAMEa,"-")
+           if(j /= 0) symbcar=NAMEa(1:j-2)
+           do j=1,Num_Delta_Fp
+              if (symbcar /= Anomalous_ScFac(j)%Symb) cycle
+              fp_sf(i)=Anomalous_ScFac(j)%fp(k)
+              fpp_sf(i)=Anomalous_ScFac(j)%fpp(k)
+              exit
+           end do
+        end do
+        call Remove_Delta_Fp_Fpp()
+      end if
       ! now find data for each atom type in file
       ! pass through file only once
    60 READ(sf, 300, END=90, ERR=200) line
@@ -6730,13 +6771,14 @@
       ! see if all the data for each atom has been read in
       ok = .true.
       DO  i = 1, n_atoms
-        IF(.NOT.list(i)) THEN
+        IF(.NOT. list(i)) THEN
           ok = .false.
           WRITE(op,330) ' => ERROR: Data for atom ''', atom_l(i),  &
               ''' NOT FOUND IN FILE ''', sfname(1:length(sfname)), ''''
           CALL atoms()
         END IF
       END DO
+
       IF(ok) THEN
         sfc = .true.
         WRITE(op,"(3a)") ' => Scattering factor data read in.'
