@@ -1727,7 +1727,7 @@
           exit
         end if
        end do
-       !Swapping the orinal atom at the first position with the first having full occupation
+       !Swapping the original atom at the first position with the first having full occupation
        if(First /= 1) Then
          aux_atm=atm%atom(1)
          atm%atom(1)=atm%atom(First)
@@ -2270,8 +2270,7 @@
        !nline_ini=np1
        ! TR  feb. 2015 .(re-reading the same item with another name)
        !if(len_trim(string) == 0) then
-       if(nline_ini == 1) then   ! TR june 2016
-        nline_ini=np1
+       if(nline_ini == np1) then   ! Suggested by Ross Angel
         call Read_Key_StrVal(filevar,nline_ini,nline_end, "_space_group_symop_operation_xyz",string)
        end if
 
@@ -3813,7 +3812,7 @@
        !---- Local Variables ----!
        integer :: i,num_sym, num_constr, num_kvs,num_matom, num_mom, num_magscat, ier, j, m, n, k, L,   &
                   ncar,mult,nitems,iv, num_irreps, nitems_irreps, num_rsym, num_centering,det,kfin
-       integer,          dimension(10)     :: lugar,mlugar
+       integer,          dimension(20)     :: lugar,mlugar
        integer,          dimension(7)      :: irrep_pos
        integer,          dimension(5)      :: pos
        integer,          dimension(3,3)    :: Rot
@@ -4136,7 +4135,7 @@
                       !write(unit=*,fmt="(a)") "  Treating item: _atom_type_symbol"
                       do k=1,3
                         i=i+1
-                        if(index(mcif%line(i),"_atom_type_symbol") == 0) then
+                        if(index(mcif%line(i),"_atom_type") == 0) then
                           Err_Form=.true.
                           Err_Form_Mess=" Error reading the _atom_type_symbol in loop"
                           return
@@ -4193,12 +4192,13 @@
                       num_sym=k
                       MGp%Multip=k
 
-                   Case("_space_group_symop_magn_operation.id","_space_group_symop_magn.id") !The second item is added to be compatible with BCS error
+                   Case("_space_group_symop_magn_operation.id","_space_group_symop_magn.id","_space_group_symop.magn_operation_id") !The second item is added to be compatible with BCS error
                       !write(unit=*,fmt="(a)") "  Treating item: _space_group_symop_magn_operation.id"
 
                       i=i+1
                       j=index(mcif%line(i),"_space_group_symop_magn_operation.xyz")
-                      if(j == 0 ) then
+                      k=index(mcif%line(i),"_space_group_symop.magn_operation_xyz")
+                      if(j == 0 .and. k == 0) then
                         Err_Form=.true.
                         Err_Form_Mess=" Error reading the _space_group_symop_magn_operation loop"
                         return
@@ -4266,15 +4266,14 @@
 
                    Case("_space_group_symop.magn_centering_id")   !here we read the translations and anti-translations
                       !write(unit=*,fmt="(a)") "  Treating item: _space_group_symop_magn_centering_id"
-                      do k=1,2
-                        i=i+1
-                        if(index(mcif%line(i),"_space_group_symop.magn_centering") == 0 .and. &
-                           index(mcif%line(i),"_space_group_symop_magn_centering") == 0 ) then
-                          Err_Form=.true.
-                          Err_Form_Mess=" Error reading the _space_group_symop_magn_centering loop"
-                          return
-                        end if
-                      end do
+                      i=i+1
+                      if(index(mcif%line(i),"_space_group_symop.magn_centering") == 0 .and. &
+                         index(mcif%line(i),"_space_group_symop_magn_centering") == 0 ) then
+                        Err_Form=.true.
+                        Err_Form_Mess=" Error reading the _space_group_symop_magn_centering loop"
+                        return
+                      end if
+                      i=i+1
                       if(index(mcif%line(i),"_space_group_symop.magn_centering_mxmymz") == 0 .and. &
                          index(mcif%line(i),"_space_group_symop_magn_centering_mxmymz") == 0 ) then
                          i=i-1
@@ -4286,13 +4285,15 @@
                         if(len_trim(mcif%line(i)) == 0) exit
                         k=k+1
                         cent_strings(k)=mcif%line(i)
+                        write(*,"(i3,a)") k,"  "//trim(cent_strings(k))
                       end do
                       num_centering=k
 
                    Case("_space_group_symop_magn_centering.id")   !here we read the translations and anti-translations
                       !write(unit=*,fmt="(a)") "  Treating item: _space_group_symop_magn_centering_id"
                       i=i+1
-                      if(index(mcif%line(i),"_space_group_symop_magn_centering.xyz") == 0) then
+                      if(index(mcif%line(i),"_space_group_symop_magn_centering.xyz") == 0 .and. &
+                         index(mcif%line(i),"_space_group_symop.magn_centering.xyz") == 0) then
                         Err_Form=.true.
                         Err_Form_Mess=" Error reading the _space_group_symop_magn_centering.xyz loop"
                         return
@@ -4309,7 +4310,7 @@
                    Case("_magnetic_atom_site_label","_atom_site_label")
                       !write(unit=*,fmt="(a)") "  Treating item: _atom_site_label"
                       !Count the number of keywords following the _loop
-                      do k=1,10
+                      do k=1,20
                         linat=adjustl(mcif%line(i+k))
                         if(linat(1:1) /=  "_") then
                           kfin=k+1
@@ -4396,7 +4397,7 @@
                    Case("_magnetic_atom_site_moment_label","_atom_site_moment_label","_atom_site_moment.label")
 
                       !Count the number of keywords following the _loop
-                      do k=1,15
+                      do k=1,20
                         linat=adjustl(mcif%line(i+k))
                         if(linat(1:1) /=  "_") then
                           kfin=k+1
@@ -4409,17 +4410,20 @@
                       j=1
                       do k=1,kfin
                          i=i+1
-                         if(index(mcif%line(i),"_atom_site_moment.crystalaxis_x") /= 0) then
+                         if(index(mcif%line(i),"_atom_site_moment.crystalaxis_x") /= 0 .or. &
+                            index(mcif%line(i),"_atom_site_moment_crystalaxis_x") /= 0 ) then
                             j=j+1
                             mlugar(2)=j
                             cycle
                          end if
-                         if(index(mcif%line(i),"_atom_site_moment.crystalaxis_y") /= 0) then
+                         if(index(mcif%line(i),"_atom_site_moment.crystalaxis_y") /= 0 .or. &
+                            index(mcif%line(i),"_atom_site_moment_crystalaxis_y") /= 0 ) then
                             j=j+1
                             mlugar(3)=j
                             cycle
                          end if
-                         if(index(mcif%line(i),"_atom_site_moment.crystalaxis_z") /= 0) then
+                         if(index(mcif%line(i),"_atom_site_moment.crystalaxis_z") /= 0 .or. &
+                            index(mcif%line(i),"_atom_site_moment_crystalaxis_z") /= 0 ) then
                             j=j+1
                             mlugar(4)=j
                             cycle
@@ -4484,7 +4488,7 @@
           Err_Form_Mess=" No symmetry operators have been provided in the MCIF file "//trim(file_mcif)
           return
        else
-          if(no_cent_mxmymz) then  !Full number of symmetry operators is not separated from the centering
+          if(no_cent_mxmymz .and. num_centering < 2) then  !Full number of symmetry operators is not separated from the centering
 
             if(allocated(Mgp%SymopSymb)) deallocate(Mgp%SymopSymb)
             allocate(Mgp%SymopSymb(num_sym))
@@ -4494,19 +4498,16 @@
             allocate(Mgp%MSymopSymb(num_sym))
             if(allocated(Mgp%MSymop)) deallocate(Mgp%MSymop)
             allocate(Mgp%MSymop(num_sym))
-            !write(unit=*,fmt="(a)") "  Decoding symmetry operators 1"
+            write(unit=*,fmt="(a)") "  Decoding symmetry operators 1"
 
-            ! Decode the symmetry operators
+            ! Decode the symmetry operators in the form x,y,z,+1
             do i=1,num_sym
               line=adjustl(sym_strings(i))
               j=index(line," ")
               line=adjustl(line(j+1:))
-              j=index(line," ")
-              MGp%SymopSymb(i)=line(1:j-1)
-              line=adjustl(line(j+1:))
-              j=index(line," ")
-              MGp%MSymopSymb(i)=line(1:j-1)
-              read(unit=line(j:),fmt=*,iostat=ier) n
+              !j=index(line," ")
+              j=index(line,",",back=.true.)
+              read(unit=line(j+1:),fmt=*,iostat=ier) n
               if(ier /= 0) then
                  Err_Form=.true.
                  Err_Form_Mess=" Error reading the time inversion in line: "//trim(sym_strings(i))
@@ -4514,6 +4515,8 @@
               else
                  MGp%MSymOp(i)%phas=real(n)
               end if
+              MGp%SymopSymb(i)=line(1:j-1)
+              MGp%MSymopSymb(i)=trim(line)
               call Read_Xsym(MGp%SymopSymb(i),1,MGp%Symop(i)%Rot,MGp%Symop(i)%tr)
               line=MGp%MSymopSymb(i)
               do k=1,len_trim(line)
@@ -4544,7 +4547,7 @@
             if(allocated(Mgp%MSymop)) deallocate(Mgp%MSymop)
             allocate(Mgp%MSymop(num_sym))
             ! Decode the symmetry operators
-            !write(unit=*,fmt="(a)") "  Decoding symmetry operators 2"
+            write(unit=*,fmt="(a)") "  Decoding symmetry operators 2"
             do i=1,num_rsym
               line=adjustl(sym_strings(i))
               j=index(line," ")
@@ -4599,7 +4602,7 @@
             end do
             !Decode lattice translations and anti-translations
 
-            !write(unit=*,fmt="(a)") "  Decoding lattice translations and anti-translations"
+            write(unit=*,fmt="(a)") "  Decoding lattice translations and anti-translations"
             m=num_rsym
             do L=2,num_centering
               line=adjustl(cent_strings(L))
