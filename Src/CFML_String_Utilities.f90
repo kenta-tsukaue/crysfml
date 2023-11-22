@@ -1080,6 +1080,10 @@
                      " => Please check your input file at line: ",Line_Nb," !"
                 return
              end if
+             !Eliminate tabs replacing them by one space
+             do i=1,len_trim(aLine)
+                if(aLine(i:i) == cTab) aLine(i:i)=" "
+             end do
              aLine=adjustl(aLine)
              if(present(trimming)) then  ! This HAS BEEN added because side effects in programs like FullProf
                 i=len_trim(UFMTfields)

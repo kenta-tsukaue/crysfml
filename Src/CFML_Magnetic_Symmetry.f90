@@ -260,6 +260,7 @@
        character(len=15)                        :: OG_number  ! as in Magnetic_Space_Group_Type
        Character(len=34)                        :: BNS_symbol !             "
        Character(len=34)                        :: OG_symbol  !             "
+       Character(len=34)                        :: UNI_symbol !             "
        Integer                                  :: MagType    !             "
        Integer                                  :: Parent_num !             "
        Character(len=20)                        :: Parent_spg !             "
@@ -441,6 +442,7 @@
        MGp%BNS_number=" "
        MGp%OG_number=" "
        MGp%BNS_symbol=" "
+       MGp%UNI_symbol=" "
        MGp%OG_symbol=" "
        MGp%MagType=0
        MGp%Parent_num=0
@@ -1648,6 +1650,13 @@
                 if(shubk(1:1) == '"' .or. shubk(1:1) == "'") shubk=adjustl(shubk(2:k-1))
                 MGp%OG_symbol=pack_string(shubk)
                 !write(unit=*,fmt="(a)") "  Treating item: _space_group.magn_name_og -> "//trim(MGp%OG_symbol)
+
+             Case("_space_group_magn.name_UNI","_space_group.magn_name_UNI")
+                shubk=adjustl(line(j+1:))
+                k=len_trim(shubk)
+                if(shubk(1:1) == '"' .or. shubk(1:1) == "'") shubk=adjustl(shubk(2:k-1))
+                MGp%UNI_symbol=pack_string(shubk)
+                !write(unit=*,fmt="(a)") "  Treating item: _space_group.magn_name_UNI -> "//trim(MGp%UNI_symbol)
 
              Case("_magnetic_space_group.transform_from_parent_pp_abc","_magnetic_space_group_transform_from_parent_pp_abc", &
                    "_parent_space_group.child_transform_pp_abc")
