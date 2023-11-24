@@ -3394,6 +3394,7 @@
     !!----
     !!----
     Subroutine Readn_Set_Magnetic_Space_Group(file_line,n_ini,n_end,MGp,mode,uvw)
+            !call Readn_Set_Magnetic_Space_Group(page_text(k,:),1,line_n,mSpG(k),"PCR","uvw")
        character(len=*),dimension(:),  intent (in)  :: file_line
        integer,                        intent (in)  :: n_ini,n_end
        type(Magnetic_Space_Group_Type),intent (out) :: MGp
@@ -3444,6 +3445,10 @@
              else
                j=index(line,"number:")
                MGp%BNS_symbol=trim(line(1:j-1))
+               if(index(MGp%BNS_symbol,".") /= 0 ) then
+                 MGp%UNI_symbol=MGp%BNS_symbol
+                 !MGp%BNS_symbol=" "
+               end if
                MGp%BNS_number=trim(line(j+7:ind-4))
              end if
              ini=n_ini+1
@@ -3452,7 +3457,12 @@
                line=adjustl(file_line(i))
                ind=index(line,"Transform to standard:")
                if(ind /= 0) then
-                 MGp%trn_to_standard=adjustl(line(ind+22:))
+                 j=index(line,"<-")
+                 if(j /= 0) then
+                    MGp%trn_to_standard=adjustl(line(ind+22:j-1))
+                 else
+                    MGp%trn_to_standard=adjustl(line(ind+22:))
+                 end if
                end if
                ind=index(line,"Parent Space Group:")
                if(ind /= 0) then
@@ -3467,7 +3477,12 @@
                end if
                ind=index(line,"Transform from Parent:")
                if(ind /= 0) then
-                 MGp%trn_from_parent=adjustl(line(ind+22:))
+                 j=index(line,"<-")
+                 if(j /= 0) then
+                    MGp%trn_from_parent=adjustl(line(ind+22:j-1))
+                 else
+                    MGp%trn_from_parent=adjustl(line(ind+22:))
+                 end if
                end if
                ind=index(line,"N_Clat")
                if(ind == 0) cycle
@@ -3728,7 +3743,7 @@
              !123456789012345678901234567890
              !Transform from Parent:   a,2b,2c;0,0,0         <--Basis transformation from parent to current setting
              !write(*,"(a)") trim(symbol)//" "//trim(setting)//" "//trim(parent)
-             ! trn_to=.true. always because magCIF considers thre transformation from the current
+             ! trn_to=.true. always because magCIF considers the transformation from the current
              ! setting to the standard setting
              if(len_trim(Parent) /= 0) then
                call Set_Magnetic_Space_Group(symbol,setting,MGp,parent,trn_to=.true.)
@@ -3900,6 +3915,13 @@
                 if(shubk(1:1) == '"' .or. shubk(1:1) == "'") shubk=adjustl(shubk(2:k-1))
                 MGp%BNS_symbol=pack_string(shubk)
                 !write(unit=*,fmt="(a)") "  Treating item: _space_group.magn_name_bns -> "//trim(MGp%BNS_symbol)
+
+             Case("_space_group_magn.name_UNI")
+                shubk=adjustl(line(j+1:))
+                k=len_trim(shubk)
+                if(shubk(1:1) == '"' .or. shubk(1:1) == "'") shubk=adjustl(shubk(2:k-1))
+                MGp%UNI_symbol=pack_string(shubk)
+                !write(unit=*,fmt="(a)") "  Treating item: _space_group_magn.name_UNI -> "//trim(MGp%UNI_symbol)
 
              Case("_magnetic_space_group_og_number","_space_group_magn.number_og","_space_group.magn_number_og")
                 shubk=adjustl(line(j+1:))
@@ -4363,9 +4385,14 @@
                             lugar(8)=j
                             cycle
                          end if
-                         if (index(mcif%line(i),"_atom_site_Wyckoff_label") /= 0) then
+                         if (index(mcif%line(i),"_atom_site_Wyckoff_label") /= 0 .or. index(mcif%line(i),"_atom_site_Wyckoff_symbol") /= 0) then
                             j=j+1
                             lugar(9)=j
+                            cycle
+                         end if
+                         if (index(mcif%line(i),"_atom_site_fract_symmform") /= 0) then
+                            j=j+1
+                            lugar(11)=j
                             cycle
                          end if
                          exit
@@ -4373,7 +4400,7 @@
 
                       if (any(lugar(3:5) == 0)) then
                           Err_Form=.true.
-                          Err_Form_Mess=" Error reading the asymmetric unit of magnetic atoms"
+                          Err_Form_Mess=" Error reading the asymmetric unit of atoms"
                           return
                       end if
 
@@ -4547,7 +4574,7 @@
             if(allocated(Mgp%MSymop)) deallocate(Mgp%MSymop)
             allocate(Mgp%MSymop(num_sym))
             ! Decode the symmetry operators
-            write(unit=*,fmt="(a)") "  Decoding symmetry operators 2"
+            !write(unit=*,fmt="(a)") "  Decoding symmetry operators 2"
             do i=1,num_rsym
               line=adjustl(sym_strings(i))
               j=index(line," ")
@@ -4602,7 +4629,7 @@
             end do
             !Decode lattice translations and anti-translations
 
-            write(unit=*,fmt="(a)") "  Decoding lattice translations and anti-translations"
+            !write(unit=*,fmt="(a)") "  Decoding lattice translations and anti-translations"
             m=num_rsym
             do L=2,num_centering
               line=adjustl(cent_strings(L))
@@ -5129,7 +5156,7 @@
        nmol=0
        do i=n_ini,n_end
           line=u_case(adjustl(file_dat(i)))
-          if (line(1:1) == " ") cycle
+          if (len_trim(line) == 0) cycle
           if (line(1:1) == "!") cycle
           npos=index(line,"MOLE")
           if (npos /= 0) nmol=nmol+1
@@ -6228,6 +6255,11 @@
       call Init_Err_Form()
       call Allocate_DataBase()
       call read_magnetic_data()
+      if(err_magg) then
+        write(unit=Err_Form_Mess,fmt="(a)") " => Error reading the magnetic database: "//trim(err_magg_mess)
+        Err_Form=.true.
+        return
+      end if
       identity=0
       do i=1,3
         identity(i,i)=1
@@ -6243,7 +6275,8 @@
         do i=1,magcount
           !write(*,"(i5,tr5,a)") i, spacegroup_label_bns(i)
           if(trim(symb) == trim(spacegroup_label_bns(i)) .or. &
-             trim(symb) == trim(spacegroup_label_og(i))) then
+             trim(symb) == trim(spacegroup_label_og(i))  .or. &
+             trim(symb) == trim(spacegroup_label_unified(i))) then
             num=i
             exit
           end if
@@ -6271,6 +6304,7 @@
       MGp%Sh_number=num
       MGp%BNS_number=nlabel_bns(num)
       MGp%OG_number= nlabel_og(num)
+      MGp%UNI_symbol=spacegroup_label_unified(num)
       MGp%BNS_symbol=spacegroup_label_bns(num)
       MGp%OG_symbol=spacegroup_label_og(num)
       MGp%MagType=magtype(num)
@@ -6503,6 +6537,7 @@
       end if
       !write(*,"(a)")    "  "//trim(MGp%Centre)
       !write(*,"(a,i4)") " Number of minimal S.O. (Numops): ",MGp%NumOps
+
       if(change_setting) then
         if(present(trn_to)) then
           call Setting_Change(setting,MGp,MSpg,trn_to)
@@ -8542,6 +8577,9 @@
        write(unit=Ipr,fmt="(a)") '_space_group.magn_number_OG '//trim(MSGp%OG_number)
        if(len_trim(MSGp%OG_symbol) /= 0) &
        write(unit=Ipr,fmt="(a)") '_space_group.magn_name_OG  "'//trim(MSGp%OG_symbol)//'"'
+       write(unit=Ipr,fmt="(a)")
+       if(len_trim(MSGp%UNI_symbol) /= 0) &
+       write(unit=Ipr,fmt="(a)") '_space_group.magn_name_UNI  "'//trim(MSGp%UNI_symbol)//'"'
        write(unit=Ipr,fmt="(a)")
 
        if(MSGp%n_irreps /= 0) then

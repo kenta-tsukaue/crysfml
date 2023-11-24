@@ -486,6 +486,7 @@
        character(len=15)                              :: OG_number=" "
        Character(len=34)                              :: BNS_symbol=" "
        Character(len=34)                              :: OG_symbol=" "
+       Character(len=34)                              :: UNI_symbol=" "
        Character(len=34)                              :: PG_symbol=" "
        Integer                                        :: MagType=0
        Integer                                        :: Parent_num=0
@@ -7598,6 +7599,7 @@
        MGp%Sh_number=0
        MGp%BNS_number=" "
        MGp%OG_number=" "
+       MGp%UNI_symbol=" "
        MGp%BNS_symbol=" "
        MGp%OG_symbol=" "
        MGp%MagType=0
@@ -9492,6 +9494,7 @@
               iorig=v
               write(unit=MSpGn%trn_from_standard,fmt="(a,f8.4)") adjustl(trim(isetting)//" -> det: "),1.0/det
               write(unit=MSpGn%trn_to_standard,fmt="(a,f8.4)") adjustl(trim(setting)//" -> det: "),det
+              det=1.0/det
             else
               write(unit=MSpGn%trn_to_standard,fmt="(a,f8.4)") adjustl(trim(isetting)//" -> det: "),1.0/det
               write(unit=MSpGn%trn_from_standard,fmt="(a,f8.4)") adjustl(trim(setting)//" -> det: "),det
@@ -11107,6 +11110,7 @@
        write(unit=lun,fmt="(a,a )")          " =>                     OG Number: ", trim(SG%OG_number)
        write(unit=lun,fmt="(a,a )")          " =>                    BNS Symbol: ", trim(SG%BNS_symbol)
        write(unit=lun,fmt="(a,a )")          " =>                     OG Symbol: ", trim(SG%OG_symbol)
+       write(unit=lun,fmt="(a,a )")          " =>                UNIFIED Symbol: ", trim(SG%UNI_symbol)
        write(unit=lun,fmt="(a,i3)")          " =>        Type of Magnetic group: ", SG%MagType
        write(unit=lun,fmt="(a,i3)")          " =>           Parent group number: ", SG%Parent_num
        write(unit=lun,fmt="(a,a)")           " =>           Parent group Symbol: ", trim(SG%Parent_spg)

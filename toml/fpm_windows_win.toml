@@ -11,7 +11,7 @@ copyright = "Copyright 2022, Juan Rodriguez-Carvajal, Javier Gonzalez-Platas, Ne
 
 [library]
 source-dir = "Src"
-include-dir = "../../wint/lib.i64"
+#include-dir = "../../wint/lib.i64"
 
 [build]
 auto-executables = false

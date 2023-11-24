@@ -2394,7 +2394,8 @@
        character(len=4)                               :: tofn
        character(len=12)                              :: modem !extension of panalytical file
        logical                                        :: esta,gr
-       integer                                        :: i, i_dat,ier
+       integer                                        :: i, i_dat,ier,n_pat
+       type (diffraction_pattern_type), dimension(:), allocatable  :: tdiffpat
 
        call init_err_diffpatt()
 
@@ -2541,6 +2542,17 @@
              dif_pat%xax_text =  "2theta(degrees)"
              dif_pat%yax_text =  "Intensity (arb. units)"
              dif_pat%instr  = " 12  - "//mode
+
+          case ("ISIS")
+             n_pat=1
+             allocate(tdiffpat(1))
+             call Read_Pattern_isis_m(i_dat,tdiffpat,n_pat)         ! ISIS file
+             dif_pat=tdiffpat(1)
+             dif_pat%diff_kind = "neutrons_tof"
+             dif_pat%scat_var =  "TOF"
+             dif_pat%xax_text =  "TOF(micro-seconds)"
+             dif_pat%yax_text =  "Intensity (arb. units)"
+             dif_pat%instr  = " 14  - "//mode
 
           case ("GSASTOF")
              call Read_Pattern_gsas(i_dat,dif_pat,tofn)         ! GSAS file for TOF

@@ -76,6 +76,7 @@
    Character(Len=12), dimension(  :),allocatable :: nlabel_og            ! nlabel_og(i): numerical label in OG setting
    Integer,           dimension(:,:),allocatable :: nlabelparts_og       ! nlabel_parts_og(j,i): jth part of nlabel_og
    Character(Len=14), dimension(  :),allocatable :: spacegroup_label_og  ! label_og(i): group symbol
+   Character(Len=27), dimension(  :),allocatable :: spacegroup_label_unified  ! label_unified(i): group symbol in UNI notation
    Integer,           dimension(  :),allocatable :: magtype              ! magtype(i): type of magnetic space group (1-4)
    ! BNS-OG transformation (if type-4)
    Integer,         dimension(:,:,:),allocatable :: bnsog_point_op     ! bnsog_point_op(j,k,i): 3x3 point operator part of transformation
@@ -132,6 +133,7 @@
     if(.not. allocated(nlabel_og))                  Allocate(nlabel_og(magcount))
     if(.not. allocated(nlabelparts_og))             Allocate(nlabelparts_og(3,magcount))
     if(.not. allocated(spacegroup_label_og))        Allocate(spacegroup_label_og(magcount))
+    if(.not. allocated(spacegroup_label_unified))   Allocate(spacegroup_label_unified(magcount))
     if(.not. allocated(magtype))                    Allocate(magtype(magcount))
     if(.not. allocated(bnsog_point_op))             Allocate(bnsog_point_op(3,3,magcount))
     if(.not. allocated(bnsog_origin))               Allocate(bnsog_origin(3,magcount))
@@ -180,6 +182,7 @@
     if(allocated(nlabel_og))                 deAllocate(nlabel_og)
     if(allocated(nlabelparts_og))            deAllocate(nlabelparts_og)
     if(allocated(spacegroup_label_og ))      deAllocate(spacegroup_label_og)
+    if(allocated(spacegroup_label_unified))  deAllocate(spacegroup_label_unified)
     if(allocated(magtype))                   deAllocate(magtype)
     if(allocated(bnsog_point_op))            deAllocate(bnsog_point_op)
     if(allocated(bnsog_origin))              deAllocate(bnsog_origin)
@@ -262,8 +265,13 @@
     ! read nonhexagonal point operators
     err_magg=.false.
     Do i=1,48
-      Read(i_mag,*)n,point_op_label(i),point_op_xyz(i),  &
+      Read(i_mag,*,iostat=ier)n,point_op_label(i),point_op_xyz(i),  &
           ((point_op_matrix(k,j,i),j=1,3),k=1,3)
+      If(ier /= 0) then
+        err_magg=.true.
+        write(err_magg_mess, "(a,i2)")  'Error reading nonhexagonal point operators for i = ',i
+        return
+      End If
       If(n /= i) then
         err_magg=.true.
         err_magg_mess= 'Error in numbering of nonhexagonal point operators'
@@ -271,24 +279,51 @@
       End If
     End Do
     ! read hexagonal point operators
+    !
+    !
+
+    !
     Do i=1,24
-      Read(i_mag,*) n,point_op_hex_label(i), point_op_hex_xyz(i),  &
+      Read(i_mag,*,iostat=ier) n,point_op_hex_label(i), point_op_hex_xyz(i),  &
           ((point_op_hex_matrix(k,j,i),j=1,3),k=1,3)
-      If(n /= i)then
+      If(ier /= 0) then
+        err_magg=.true.
+        write(err_magg_mess, "(a,i2)")  'Error reading hexagonal point operators for i = ',i
+        return
+      End If
+      If(n /= i) then
         err_magg=.true.
         err_magg_mess= 'Error in numbering of hexagonal point operators'
         return
       End If
+
     End Do
     ! read data for each magnetic space group
     Do i=1,1651
-      Read(i_mag,*) (nlabelparts_bns(j,i),j=1,2),nlabel_bns(i),  &
+      Read(i_mag,*,iostat=ier) (nlabelparts_bns(j,i),j=1,2),nlabel_bns(i),  &
+          spacegroup_label_unified(i), &
           spacegroup_label_bns(i),(nlabelparts_og(j,i),j=1,3),  &
           nlabel_og(i),spacegroup_label_og(i)
-      Read(i_mag,*) magtype(i)
+      If(ier /= 0) then
+        err_magg=.true.
+        write(err_magg_mess, "(a,i2)")  'Error reading labels for MSG = ',i
+        return
+      End If
+
+      Read(i_mag,*,iostat=ier) magtype(i)
+      If(ier /= 0) then
+        err_magg=.true.
+        write(err_magg_mess, "(a,i2)")  'Error reading magtype for MSG = ',i
+        return
+      End If
       If(magtype(i) == 4) Then
-        Read(i_mag,*) ((bnsog_point_op(j,k,i),j=1,3),k=1,3),  &
+        Read(i_mag,*,iostat=ier) ((bnsog_point_op(j,k,i),j=1,3),k=1,3),  &
             (bnsog_origin(j,i),j=1,3),bnsog_origin_denom(i)
+        If(ier /= 0) then
+          err_magg=.true.
+          write(err_magg_mess, "(a,i2)")  'Error reading bnsog_point_op, bnsog_origin and bnsog_origin_denom for MSG = ',i
+          return
+        End If
       End If
       Read(i_mag,*) ops_count(i)
       Read(i_mag,*) (ops_bns_point_op(j,i),(ops_bns_trans(k,j,i),k=1,3),  &
@@ -479,7 +514,7 @@
     real, dimension (3,3), parameter :: e = reshape ((/1.0,0.0,0.0,  &
                                                        0.0,1.0,0.0,  &
                                                        0.0,0.0,1.0/),(/3,3/))
-    Character(len=34)      :: OG_Symb, BNS_Symb
+    Character(len=34)      :: OG_Symb, BNS_Symb,Uni_Symb
     Character(len=30)      :: abc_op, Strsym, abc_symb
     Character(len=35)      :: ShOp_symb
     Character(len=3)       :: symb_OGBNS
@@ -514,12 +549,14 @@
     end if
     ipr=6
     if(present(lun)) ipr=lun
+    UNI_Symb="UNI:"//trim(spacegroup_label_unified(num))
     BNS_Symb="BNS:"//nlabel_bns(num)//" "//trim(spacegroup_label_bns(num))
     OG_Symb= " OG:"//nlabel_og(num)//" "//trim(spacegroup_label_og(num))
     Write(unit=ipr,fmt="(a,/)")  " "
     Write(unit=ipr,fmt="(a,i4)") " Group Ordering Number (BNS): ",num
     Write(unit=ipr,fmt="(a,i4)") "         Magnetic Group type: ",magtype(num)
     Write(unit=ipr,fmt="(a)")    "      Magnetic Group Symbols: "//BNS_Symb//OG_Symb
+    Write(unit=ipr,fmt="(a)")    "  UNI Magnetic Group Symbol : "//UNI_Symb
 
     if(.not. change_setting) then
 
@@ -716,19 +753,21 @@
     integer, intent(in)  :: num
     integer, intent(in)  :: ipr
 
-    Character(len=34)      :: OG_Symb, BNS_Symb
+    Character(len=34)      :: OG_Symb, BNS_Symb, UNI_Symb
     Character(len=30)      :: abc_op, Strsym
     Character(len=35)      :: ShOp_symb
     integer                :: idem,inv_time,j,k
     real,   dimension(3)   :: tr
     integer,dimension(3,3) :: op,rot
 
+    UNI_Symb="UNI:"//trim(spacegroup_label_unified(num))
     BNS_Symb="BNS:"//nlabel_bns(num)//" "//trim(spacegroup_label_bns(num))
     OG_Symb= " OG:"//nlabel_og(num)//" "//trim(spacegroup_label_og(num))
     Write(unit=ipr) num          ! Group Ordering Number (BNS)
     Write(unit=ipr) magtype(num) ! Magnetic Group type
     Write(unit=ipr) BNS_Symb     ! Magnetic Group BNS Symbol
     Write(unit=ipr) OG_Symb      ! Magnetic Group OG Symbol
+    Write(unit=ipr) UNI_Symb     ! Magnetic Group UNIFIED Symbol
 
     If(magtype(num) == 4) Then  !OG-BNS transformation:
       op=bnsog_point_op(:,:,num)
@@ -801,16 +840,17 @@
     integer, intent(in)  :: num
     integer, intent(in)  :: ipr
 
-    Character(len=34)      :: OG_Symb, BNS_Symb
+    Character(len=34)      :: OG_Symb, BNS_Symb, UNI_Symb
     Character(len=30)      :: abc_op,Strsym
     Character(len=35)      :: ShOp_symb
     integer                :: idem,inv_time,j,k
     real,   dimension(3)   :: tr
     integer,dimension(3,3) :: op,rot
 
+    UNI_Symb="UNI:"//trim(spacegroup_label_unified(num))
     BNS_Symb="BNS:"//trim(nlabel_bns(num))//" "//trim(spacegroup_label_bns(num))
     OG_Symb= " OG:"//trim(nlabel_og(num))//" "//trim(spacegroup_label_og(num))
-    Write(unit=ipr,fmt="(a,i5,a)") "Group Number:",num, " "//trim(BNS_Symb)//" "//trim(OG_Symb)          ! Group Ordering Number (BNS)
+    Write(unit=ipr,fmt="(a,i5,a)") "Group Number:",num, " "//trim(BNS_Symb)//" "//trim(OG_Symb)//trim(UNI_Symb)          ! Group Ordering Number (BNS)
     Write(unit=ipr,fmt="(a,i5)")   "Group Type:",magtype(num) ! Magnetic Group type
 
     If(magtype(num) == 4) Then  !OG-BNS transformation:
