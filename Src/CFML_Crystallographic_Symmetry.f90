@@ -9494,7 +9494,7 @@
               iorig=v
               write(unit=MSpGn%trn_from_standard,fmt="(a,f8.4)") adjustl(trim(isetting)//" -> det: "),1.0/det
               write(unit=MSpGn%trn_to_standard,fmt="(a,f8.4)") adjustl(trim(setting)//" -> det: "),det
-              det=1.0/det
+              det=1.0/det !This was lacking in older versions! only when det=1 was working
             else
               write(unit=MSpGn%trn_to_standard,fmt="(a,f8.4)") adjustl(trim(isetting)//" -> det: "),1.0/det
               write(unit=MSpGn%trn_from_standard,fmt="(a,f8.4)") adjustl(trim(setting)//" -> det: "),det
