@@ -81,10 +81,18 @@ rem .
       cd .\Src
       ren  CFML_GlobalDeps_Windows_Intel.xxx  CFML_GlobalDeps.f90
       cd ..
-      if [%_DEBUG%]==[Y] (
-         fpm @./rsp/ifx_win_debug_con.rsp
+      if [%_WINT%]==[win] (
+          if [%_DEBUG%]==[Y] (
+             fpm @./rsp/ifx_win_debug_win.rsp
+          ) else (
+             fpm @./rsp/ifx_win_release_win.rsp
+          )
       ) else (
-         fpm @./rsp/ifx_win_release_con.rsp
+          if [%_DEBUG%]==[Y] (
+             fpm @./rsp/ifx_win_debug_con.rsp
+          ) else (
+             fpm @./rsp/ifx_win_release_con.rsp
+          )
       )
       cd .\Src
       ren CFML_GlobalDeps.f90 CFML_GlobalDeps_Windows_Intel.xxx

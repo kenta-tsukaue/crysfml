@@ -1,0 +1,4 @@
+options install --prefix ifx_release_win
+options --profile release
+options --compiler ifx
+options --flag "-I %WINTER%/lib.i64"

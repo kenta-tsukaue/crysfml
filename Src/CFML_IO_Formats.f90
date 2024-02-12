@@ -149,7 +149,7 @@
               Get_job_info, File_To_FileList, Get_Phases_File, Read_Cif_Pressure,                &
               Read_Cif_Temp,Readn_Set_Magnetic_Space_Group, Set_Magnetic_Space_Group,            &
               Cleanup_Symmetry_Operators,Write_mCIF, Get_Refinement_Codes, Get_moment_ctr,       &
-              Readn_Set_Magnetic_Structure_MCIF
+              Readn_Set_Magnetic_Structure_MCIF, get_moment_ctr_Wigner
 
     !---- List of public overloaded procedures: subroutines ----!
     public :: Read_File_Cell, Readn_Set_Xtal_Structure, Write_Atoms_CFL, Write_CFL
@@ -978,12 +978,332 @@
 
     End Subroutine Get_Job_Info
 
-    Subroutine Get_moment_ctr(xnr,moment,Spg,codini,codes,ord,ss,att,Ipr)
+    !!
+    !!----  Subroutine get_moment_ctr_Wigner(xnr,moment,Spgr,codini,codes,side,ord,ss,att,Ipr,ctr_code)
+    !!----     real(kind=cp), dimension(3),            intent(in    ) :: xnr    !Atom position (fractional coordinates)
+    !!----     real(kind=cp), dimension(3),            intent(in out) :: moment !Moment at position xnr
+    !!----     class(SPG_type),                        intent(in    ) :: Spgr   !Magnetic Space Group
+    !!----     Integer,                                intent(in out) :: codini !Last attributed parameter
+    !!----     real(kind=cp), dimension(3),            intent(in out) :: codes  !codewords for positions
+    !!----     real(kind=cp), dimension(3),   optional,intent(in)     :: side
+    !!----     integer,                       optional,intent(in)     :: ord
+    !!----     integer, dimension(:),         optional,intent(in)     :: ss
+    !!----     real(kind=cp), dimension(:,:), optional,intent(in)     :: att
+    !!----     integer,                       optional,intent(in)     :: Ipr
+    !!----     character(len=*),              optional,intent(out)    :: ctr_code
+    !!----
+    !!----  Subroutine to get the appropriate constraints in the refinement codes of
+    !!----  magnetic moment parameters.
+    !!----  Algorithm based in the Wigner theorem.
+    !!----  The vector Mom = Sum { R Moment} displays the symmetry constraints to be
+    !!----  applied to the magnetic moments. The sum runs over all magnetic
+    !!----  matrices of the stabilizer of the particular atom position in the given
+    !!----  space group.
+    !!----
+    !!----   Updated: 16 April 2016
+    !!----
+    !!
+    Subroutine get_moment_ctr_Wigner(xnr,moment,Spgr,codini,codes,side,ord,ss,att,Ipr,ctr_code)
+       real(kind=cp), dimension(3),            intent(in)     :: xnr
+       real(kind=cp), dimension(3),            intent(in out) :: moment
+       type(Magnetic_Space_Group_type),        intent(in)     :: Spgr
+       Integer,                                intent(in out) :: codini
+       real(kind=cp), dimension(3),            intent(in out) :: codes
+       real(kind=cp), dimension(3),   optional,intent(in)     :: side
+       integer,                       optional,intent(in)     :: ord
+       integer, dimension(:),         optional,intent(in)     :: ss
+       real(kind=cp), dimension(:,:), optional,intent(in)     :: att
+       integer,                       optional,intent(in)     :: Ipr
+       character(len=*),              optional,intent(out)    :: ctr_code
+
+       ! Local variables
+       character (len=4), dimension(3)   :: cdw
+       character (len=4)                 :: cditem
+       real(kind=cp),     dimension(3)   :: multip
+       integer                           :: j,order, ig, npos
+       real(kind=cp)                     :: suma,dif
+       integer,           dimension(48)  :: ss_ptr
+       integer,           dimension(3)   :: codd,msym
+       real(kind=cp),     dimension(3,3) :: Rs
+       real(kind=cp),     dimension(3)   :: x,cod,multi,mom,mome,Rsym
+       real(kind=cp),     dimension(3,48):: atr
+       character(len=:),  allocatable    :: Symb,mag
+       integer,           dimension(3,3) :: s
+       real(kind=cp),     dimension(3)   :: t
+       real(kind=cp),     parameter      :: epss=0.01_cp
+
+       suma=0.0
+       do j=1,3
+          suma=suma+abs(codes(j))
+          cod(j)=int(abs(codes(j))/10.0_cp)             !Input Parameter number with sign
+          multi(j)=mod(codes(j),10.0_cp)                !Input Multipliers
+          if(cod(j) < 1.0 .and. abs(multi(j)) > epss)  then
+               codini=codini+1
+               cod(j) = real(codini)
+          end if
+       end do
+       if(suma < epss) return  !No refinement is required
+
+       x=modulo_lat(xnr)
+
+       if(present(ord) .and. present(ss) .and. present(att)) then
+         order=ord
+         ss_ptr(1:order) = ss(1:ord)
+         atr(:,1:order)  = att(:,1:ord)
+       else
+         call get_stabilizer(x,Spgr,order,ss_ptr,atr)
+       end if
+
+       mom=[17.0, 7.0,5.0]
+       if(present(side)) mom=mom/side
+       mome=mom
+       if(present(ipr)) Write(unit=ipr,fmt="(a,i3)") " => Magnetic stabilizer without identity, order:",order
+       if (order > 1 ) then
+          do j=2,order
+             Rs=real(Spgr%MSymOp(ss_ptr(j))%Rot)
+             Rsym=matmul(Rs,mom)
+             mome=mome+ Rsym
+             if(present(ipr)) then
+               write(unit=ipr,fmt='(a,i2,a,t20,a,t55,a,t75,3f8.1)') '     Operator ',j,": ",trim(Spgr%SymopSymb(ss_ptr(j))), &
+                trim(Spgr%MSymopSymb(ss_ptr(j))), Rsym
+             end if
+          end do
+          mome=mome/real(order)
+          if(present(side)) mome=mome*side
+       end if
+       msym=nint(1000.0*mome)
+       codd=msym
+       cdw=['a','b','c']
+       multip=1.0
+
+       !Search systematically all the possible constraints
+
+       if(codd(1) == codd(2) .and. codd(1) == codd(3)) then ! a a a
+         cdw=['a','a','a']     ! 1 A A A
+         multip=[1.0,1.0,1.0]
+         moment(2:3)=moment(1)
+         cod(2:3)=cod(1)
+         if(codd(1) == 0) then !No magnetic moment allowed for this site
+           cod=0
+           moment=0.0
+           multip=0.0
+           cdw=['0','0','0']
+         end if
+
+       else if(codd(1) == codd(2)) then ! a a c
+         cdw=['a','a','c']    ! 2  A A C
+         multip=[1.0,1.0,1.0]
+         moment(2)=moment(1)
+         cod(2)=cod(1)
+         if(codd(1) == 0) then ! 0 0 c
+           cod(1:2)=0
+           moment(1:2)=0.0
+           multip(1:2)=0.0
+           cdw=['0','0','c']
+         else if(codd(3) == 0) then  ! a a 0
+           cod(3)=0
+           moment(3)=0.0
+           multip(3)=0.0
+           cdw=['a','a','0']
+         else if(codd(3) == -codd(1)) then  ! a a -a
+           cod(3)=cod(1)
+           moment(3)=-moment(1)
+           multip(3)=-1.0
+           cdw=['a ','a ','-a']
+         end if
+
+       else if(codd(1) == codd(3)) then ! a b a
+         cdw=['a','b','a']     ! 3  A B A
+         multip=[1.0,1.0,1.0]
+         moment(3)=moment(1)
+         cod(3)=cod(1)
+         if(codd(1) == 0) then !0 b 0
+           cod(1)=0; cod(3)=0
+           moment(1)=0.0; moment(3)=0.0
+           multip(1)=0.0; multip(3)=0.0
+           cdw=['0','b','0']
+         else if(codd(2) == 0) then  ! a 0 a
+           cod(2)=0
+           moment(2)=0.0
+           multip(2)=0.0
+           cdw=['a','0','a']
+         else if(codd(2) == -codd(1)) then  ! a -a a
+           cod(2)=cod(1)
+           moment(2)=-moment(1)
+           multip(2)=-1.0
+           cdw=['a ','-a','a ']
+         end if
+
+       else if(codd(2) == codd(3)) then ! a b b
+         cdw=['a','b','b']     ! 4  A B B
+         multip=[1.0,1.0,1.0]
+         moment(3)=moment(2)
+         cod(3)=cod(2)
+         if(codd(2) == 0) then !a 0 0
+           cod(2:3)=0
+           moment(2:3)=0.0
+           multip(2:3)=0.0
+           cdw=['a','0','0']
+         else if(codd(1) == 0) then  ! 0 b b
+           cod(1)=0
+           moment(1)=0.0
+           multip(1)=0.0
+           cdw=['0','b','b']
+         else if(codd(1) == -codd(2)) then  ! -b b b
+           cod(1)=cod(2)
+           moment(1)=-moment(2)
+           multip(1)=-1.0
+           cdw=['-b','b ','b ']
+         end if
+
+       else !Now a /= b /= c
+
+         if(codd(1) == 0) then  !0 b c
+           cod(1)=0
+           moment(1)=0.0
+           multip(1)=0.0
+           cdw=['0','b','c']
+         end if
+         if(codd(2) == 0) then  !a 0 c
+           cod(2)=0
+           moment(2)=0.0
+           multip(2)=0.0
+           cdw=['a','0','c']
+         end if
+         if(codd(3) == 0) then  !a b 0
+           cod(3)=0
+           moment(3)=0.0
+           multip(3)=0.0
+           cdw=['a','b','0']
+         end if
+         !Comparison a,b
+         if(codd(1) /= 0 .and. codd(2)/=0) then
+           suma=real(codd(1))/real(codd(2))
+           if(abs(suma) < 1.0) then
+             suma=1.0/suma
+             order=codd(2)/codd(1)
+             dif=abs(suma-real(order))
+             if(dif < epss) then
+               cod(2)=cod(1)
+               multip(2)=suma
+               moment(2)=suma*moment(1)
+               write(unit=cditem,fmt="(i2,a)") order,"a"
+               !cdw=['a',cditem,'c']  !incompatible with Lahey compiler
+               cdw(1)='a'
+               cdw(2)=cditem
+               cdw(3)='c'
+             end if
+           else
+             order=codd(1)/codd(2)
+             dif=abs(suma-real(order))
+             if(dif < epss) then
+               cod(1)=cod(2)
+               multip(1)=suma
+               moment(1)=suma*moment(2)
+               write(unit=cditem,fmt="(i2,a)") order,"b"
+               !cdw=[cditem,'b','c']
+               cdw(1)=cditem
+               cdw(2)='b'
+               cdw(3)='c'
+             end if
+            end if
+         end if
+         !Comparison a,c
+         if(codd(1) /= 0 .and. codd(3)/=0) then
+           suma=real(codd(1))/real(codd(3))
+           if(abs(suma) < 1.0) then
+             suma=1.0/suma
+             order=codd(3)/codd(1)
+             dif=abs(suma-real(order))
+             if(dif < epss) then
+               cod(3)=cod(1)
+               multip(3)=suma
+               moment(3)=suma*moment(1)
+               write(unit=cditem,fmt="(i2,a)") order,"a"
+               !cdw=['a','b',cditem]
+               cdw(1)='a'
+               cdw(2)='b'
+               cdw(3)=cditem
+             end if
+           else
+             order=codd(1)/codd(3)
+             dif=abs(suma-real(order))
+             if(dif < epss) then
+               cod(1)=cod(3)
+               multip(1)=suma
+               moment(1)=suma*moment(3)
+               write(unit=cditem,fmt="(i2,a)") order,"c"
+               !cdw=[cditem,'b','c']
+               cdw(1)=cditem
+               cdw(2)='b'
+               cdw(3)='c'
+             end if
+            end if
+         end if
+         !Comparison b,c
+         if(codd(2) /= 0 .and. codd(3)/=0) then
+           suma=real(codd(2))/real(codd(3))
+           if(abs(suma) < 1.0) then
+             suma=1.0/suma
+             order=codd(3)/codd(2)
+             dif=abs(suma-real(order))
+             if(dif < epss) then
+               cod(3)=cod(2)
+               multip(3)=suma
+               moment(3)=suma*moment(2)
+               write(unit=cditem,fmt="(i2,a)") order,"b"
+               !cdw=['a','b',cditem]
+               cdw(1)='a'
+               cdw(2)='b'
+               cdw(3)=cditem
+             end if
+           else
+             order=codd(2)/codd(3)
+             dif=abs(suma-real(order))
+             if(dif < epss) then
+               cod(2)=cod(3)
+               multip(2)=suma
+               moment(2)=suma*moment(3)
+               write(unit=cditem,fmt="(i2,a)") order,"c"
+               !cdw=['a',cditem,'c']
+               cdw(1)='a'
+               cdw(2)=cditem
+               cdw(3)='c'
+             end if
+            end if
+         end if
+
+       end if
+       codini=maxval(cod)
+       do j=1,3
+         if(abs(multi(j)) < epss .or. cdw(j) == '0' ) then
+           codes(j) = 0.0_cp
+         else if(multi(j) < 0) then
+           codes(j) = sign(1.0_cp, multi(j))*(abs(cod(j))*10.0_cp + abs(multi(j)) )
+         else
+           codes(j) = sign(1.0_cp, multip(j))*(abs(cod(j))*10.0_cp + abs(multip(j)) )
+         end if
+       end do
+
+       if(present(Ipr)) then
+         write(Ipr,'(a,3f10.4)')        '     Codes on Moments     : ',codes
+         Write(Ipr,'(a,3(a,1x),6f7.3)') '     Codes and multipliers: ',cdw,multip
+         Write(Ipr,'(a,3f12.4)')        '     Moment_TOT vector    : ',mome
+       end if
+       if(present(ctr_code)) then
+          write(unit=ctr_code,fmt="(5a)") " ( ",(cdw(j)//", ",j=1,2),cdw(j)//" )"
+          ctr_code=pack_string(ctr_code)
+       end if
+
+    End Subroutine get_moment_ctr_Wigner
+
+    Subroutine Get_moment_ctr(xnr,moment,Spg,codini,codes,side,ord,ss,att,Ipr)
        real(kind=cp), dimension(3),            intent(in)     :: xnr
        real(kind=cp), dimension(:),            intent(in out) :: moment
        type(Magnetic_Space_Group_type),        intent(in)     :: Spg
        Integer,                                intent(in out) :: codini
        real(kind=cp), dimension(:),            intent(in out) :: codes
+       real(kind=cp), dimension(:),            intent(in)     :: side
        integer,                       optional,intent(in)     :: ord
        integer, dimension(:),         optional,intent(in)     :: ss
        real(kind=cp), dimension(:,:), optional,intent(in)     :: att
@@ -992,7 +1312,7 @@
        ! Local variables
        integer,           dimension(3,3) :: magm   !g, magm= delta * det(g) * g
        character(len=1),  dimension(3)   :: codd
-       integer                           :: i,j,order,n,ig,is
+       integer                           :: i,j,order,n,ig,iss
        real(kind=cp)                     :: suma
        integer,           dimension(48)  :: ss_ptr
        real(kind=cp),     dimension(3,48):: atr
@@ -1029,7 +1349,7 @@
          if(present(ipr)) Write(unit=ipr,fmt="(a,i3)") " => Stabilizer without identity, order:",order
        end if
 
-       momentL=moment
+       momentL=moment/side !Dividing the moments by the cell parameters
        sCtr=0.0_cp
        if(order > 1) then
          do ig=1,order
@@ -1054,11 +1374,11 @@
             return
          end if
          TotMom=matmul(sCtr,momentL)
-         call Get_Refinement_Codes(n,TotMom,sCtr,is,multi,codd,momentL)
+         call Get_Refinement_Codes(n,TotMom,sCtr,iss,multi,codd,momentL)
          cod=0.0
          do j=1,n
            if(codd(j) /= "0") then
-             do i=1,is
+             do i=1,iss
                if(codd(j) == cdd(i)) then
                  cod(j)=codini+i
                  exit
@@ -1066,19 +1386,20 @@
              end do
            end if
          end do
-         moment=momentL
+         moment=momentL*side
          codes=0.0
          do j=1,n
            if(abs(multi(j)) > epps)  codes(j) = sign(1.0_cp, multi(j))*(abs(cod(j))*10.0_cp + abs(multi(j)) )
          end do
-         codini=codini+is
+         codini=codini+iss
          if(present(Ipr)) then
-           Write(unit=Ipr,fmt="(a,i4)")       " Number of free parameters: ",is
+           Write(unit=Ipr,fmt="(a,i4)")       " Number of free parameters: ",iss
            write(unit=Ipr,fmt="(a,3f14.6)")   " Multipliers: ",(multi(j), j=1,n)
            write(unit=Ipr,fmt="(28a)")        " String with free parameters: ( ",(codd(j)//", ",j=1,n-1),codd(n)//" )"
            write(unit=Ipr,fmt="(a,3i6)")      " Resulting integer codes: ", nint(cod(1:n))
            write(unit=Ipr,fmt="(a,3f14.6)")   " Final codes: ",codes(1:n)
            write(unit=Ipr,fmt="(a,3f14.6)")   " Constrained Moment: ",moment
+           write(unit=Ipr,fmt="(a,3f14.6)")   " Moment(uB/Angstrm): ",momentL
          end if
 
        else !No restrictions
@@ -1129,8 +1450,8 @@
       do i=1,n
         if(abs(wr(i)-1.0_dp) < epps .and. abs(wi(i)) < epps) then
           iss=iss+1   !Number of eigenvalues = 1 => number of free parameters
-          pti(iss)=i !This points to the eigenvectors with eigenvalue equal to 1.
-          zmi=1.0e6 !normalize the eigenvectors so that the minimum (non-zero value) is 1.
+          pti(iss)=i  !This points to the eigenvectors with eigenvalue equal to 1.
+          zmi=1.0e6   !normalize the eigenvectors so that the minimum (non-zero value) is 1.
           j=1
           do k=1,n
             if(abs(zv(k,i)) < epps) cycle
@@ -3463,6 +3784,7 @@
                  else
                     MGp%trn_to_standard=adjustl(line(ind+22:))
                  end if
+                 if(trim(MGp%trn_to_standard) == "a,b,c;0,0,0") MGp%standard_setting=.true.
                end if
                ind=index(line,"Parent Space Group:")
                if(ind /= 0) then
@@ -3689,6 +4011,8 @@
                else
                  call Set_Magnetic_Space_Group(symbol,setting,MGp,trn_to=.true.)
                end if
+               if(trim(MGp%trn_to_standard) == "a,b,c;0,0,0") MGp%standard_setting=.true.
+
                return
 
           Case("database")
@@ -6336,11 +6660,11 @@
            MGp%PG_Symbol=pack_string(MGp%PG_Symbol//"1'")
       End Select
 
-      if(len_trim(setting) == 0 .or. setting =='a,b,c;0,0,0') then
-        MGp%standard_setting=.true.
-      else
-        MGp%standard_setting=.false.
-      end if
+      !if(len_trim(setting) == 0 .or. setting =='a,b,c;0,0,0') then
+      !  MGp%standard_setting=.true.
+      !else
+      !  MGp%standard_setting=.false.
+      !end if
       MGp%mcif=.false.     !true if mx,my,mz notation is used , false is u,v,w notation is used
       if(present(mcif)) MGp%mcif=mcif
       MGp%m_cell=.true.    !true if magnetic cell is used for symmetry operators
@@ -6400,20 +6724,28 @@
       Select Case (num)
         case(1:7)
           MGp%CrystalSys="Triclinic"
+          MGP%Laue="-1"
         case(8:98)
           MGp%CrystalSys="Monoclinic"
+          MGP%Laue="2/m"
         case(99:660)
           MGp%CrystalSys="Orthorhombic"
+          MGP%Laue="mmm"
         case(661:1230)
           MGp%CrystalSys="Tetragonal"
+          MGP%Laue="4/mmm"
         case(1231:1338)
           MGp%CrystalSys="Trigonal"
+          MGP%Laue="6/mmm"
         case(1339:1502)
           MGp%CrystalSys="Hexagonal"
+          MGP%Laue="6/mmm"
         case(1503:1651)
           MGp%CrystalSys="Cubic"
+          MGP%Laue="m3m"
         case default
           MGp%CrystalSys="Unknown"
+          MGP%Laue="-1"
       End Select
       if(MGp%MagType == 4) then
         MGp%SPG_lat=spacegroup_label_bns(num)(1:3)
@@ -6539,11 +6871,13 @@
       !write(*,"(a,i4)") " Number of minimal S.O. (Numops): ",MGp%NumOps
 
       if(change_setting) then
+
         if(present(trn_to)) then
           call Setting_Change(setting,MGp,MSpg,trn_to)
         else
           call Setting_Change(setting,MGp,MSpg)
         end if
+        MGp%standard_setting = .false.
         if(Err_Form) then
           if(.not. present(keepd)) call deAllocate_DataBase()
           return

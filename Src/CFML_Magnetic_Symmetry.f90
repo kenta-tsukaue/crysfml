@@ -2607,7 +2607,7 @@
     End Subroutine Readn_Set_Magnetic_Structure_MCIF
 
     !!
-    !!----  Subroutine get_moment_ctr(xnr,moment,Spgr,codini,codes,ord,ss,att,Ipr)
+    !!----  Subroutine get_moment_ctr_old(xnr,moment,Spgr,codini,codes,ord,ss,att,Ipr)
     !!----     real(kind=cp), dimension(3),            intent(in    ) :: xnr    !Atom position (fractional coordinates)
     !!----     real(kind=cp), dimension(3),            intent(in out) :: moment !Moment at position xnr
     !!----     type(Magnetic_Space_Group_type),        intent(in    ) :: Spgr   !Magnetic Space Group
