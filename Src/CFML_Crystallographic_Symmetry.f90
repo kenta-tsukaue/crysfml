@@ -500,6 +500,7 @@
        Character(len=80)                              :: trn_to_standard=" "
        Character(len=80)                              :: trn_from_standard=" "
        character(len=12)                              :: CrystalSys=" "       ! Crystal system
+       character(len=5)                               :: Laue=" "             ! Laue Class
        character(len= 3)                              :: SPG_lat=" "          ! Lattice type
        character(len= 4)                              :: SPG_latsy=" "        ! Lattice type Symbol
        integer                                        :: Num_Lat          ! Number of lattice points in a cell
@@ -7605,6 +7606,7 @@
        MGp%MagType=0
        MGp%Parent_num=0
        MGp%Parent_spg=" "
+       MGp%Laue=" "
        MGp%standard_setting=.false.
        MGp%mcif=.true.
        MGp%m_cell=.false.
@@ -11115,6 +11117,7 @@
        write(unit=lun,fmt="(a,i3)")          " =>           Parent group number: ", SG%Parent_num
        write(unit=lun,fmt="(a,a)")           " =>           Parent group Symbol: ", trim(SG%Parent_spg)
        write(unit=lun,fmt="(a,a)")           " =>   Magnetic point group Symbol: ", trim(SG%PG_symbol)
+       write(unit=lun,fmt="(a,a)")           " =>   Laue Class for Cell constr.: ", trim(SG%Laue)
        write(unit=lun,fmt="(a,a)")           " =>    Transformation   to parent: ", trim(SG%trn_to_parent)
        write(unit=lun,fmt="(a,a)")           " =>    Transformation from parent: ", trim(SG%trn_from_parent)
        write(unit=lun,fmt="(a,a)")           " =>    Transformation to standard: ", trim(SG%trn_to_standard)

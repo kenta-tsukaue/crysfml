@@ -18,7 +18,7 @@ auto-executables = false
 auto-tests = false
 auto-examples = false
 external-modules = "winteracter"
-link=["winter","user32", "gdi32", "comdlg32", "winspool", "winmm", "shell32", "advapi32", "htmlhelp"]
+link=["winter","user32", "gdi32", "comdlg32", "winspool", "winmm", "shell32", "advapi32"]
 
 [install]
 library = true
