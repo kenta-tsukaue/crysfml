@@ -67,12 +67,12 @@ if (WIN32 OR MSYS)
         else(${ARCH32})
             find_path(WINTERACTER_MOD_DIR
                       NAMES winteracter.mod
-                      PATHS ${WINTERACTER}/lib.gnu64
-                            ${WINTER}/lib.gnu64
-                            ${WINT}/lib.gnu64
-                            ${USERPROFILE}/wint/lib.gnu64
-                            ${HOMEDRIVE}/wint/lib.gnu64
-                            ${SYSTEMDRIVE}/wint/lib.gnu64)
+                      PATHS ${WINTERACTER}/lib.gnu64/8.1
+                            ${WINTER}/lib.gnu64/8.1
+                            ${WINT}/lib.gnu64/8.1
+                            ${USERPROFILE}/wint/lib.gnu64/8.1
+                            ${HOMEDRIVE}/wint/lib.gnu64/8.1
+                            ${SYSTEMDRIVE}/wint/lib.gnu64/8.1)
         endif(${ARCH32})
 
     endif()
