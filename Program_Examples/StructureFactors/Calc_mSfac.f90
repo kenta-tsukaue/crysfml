@@ -14,7 +14,7 @@ Program Calc_Magnetic_Structure_Factors
    use CFML_Crystal_Metrics,           only: Crystal_Cell_Type, Write_Crystal_Cell
    use CFML_Reflections_Utilities,     only: Reflect_List_Type
    use CFML_IO_Formats,                only: Readn_set_Xtal_Structure,err_form_mess,err_form,file_list_type, &
-                                             get_moment_ctr
+                                             get_moment_ctr_Wigner
    use CFML_Structure_Factors,         only: Magnetic_Structure_Factors, Write_Structure_Factors, &
                                              Strf_List_Type
    use CFML_String_Utilities,          only: u_case
@@ -104,7 +104,7 @@ Program Calc_Magnetic_Structure_Factors
       !Get information on moment constraints and modify the list of atoms accordingly
       do i=1,A%natoms
         if(A%Atom(i)%moment < 0.001) cycle !Skip non-magnetic atoms
-        call Get_moment_ctr(A%Atom(i)%X,A%Atom(i)%M_xyz,Spg,codini,codes,Ipr=lun)
+        call Get_moment_ctr_Wigner(A%Atom(i)%X,A%Atom(i)%M_xyz,Spg,codini,codes,Cell%cell,Ipr=lun)
       end do
       call Write_Atom_List(A,level=2,lun=lun)
       !Look for wavelength and Mode in CFL file

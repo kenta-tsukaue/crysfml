@@ -1294,7 +1294,6 @@
           write(unit=ctr_code,fmt="(5a)") " ( ",(cdw(j)//", ",j=1,2),cdw(j)//" )"
           ctr_code=pack_string(ctr_code)
        end if
-
     End Subroutine get_moment_ctr_Wigner
 
     Subroutine Get_moment_ctr(xnr,moment,Spg,codini,codes,side,ord,ss,att,Ipr)

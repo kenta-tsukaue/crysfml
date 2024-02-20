@@ -45,7 +45,7 @@
 !!--..    Operating system
 !!--..
 !!----    OPS
-!!----    OPS_NAME   
+!!----    OPS_NAME
 !!----    OPS_SEP
 !!--..
 !!--..    Precision Data
@@ -211,9 +211,10 @@ Module CFML_GlobalDeps
    !!----
    !!----  Update: January - 2009
    !!
-   real(kind=cp),  parameter, public  ::  eps=0.00001_cp
-
-   integer, parameter :: IL = selected_int_kind(16)              ! Long Integer
+   real(kind=cp),    parameter   :: eps=0.00001_cp
+   integer,          parameter   :: IL = selected_int_kind(16)   ! Long Integer
+   character(len=*), parameter   :: NEWLINE = char(13)//char(10) ! Newline character
+   character(len=1), parameter   :: TAB     = char(9)            ! TAB character
 
  Contains
 
@@ -290,4 +291,4 @@ Module CFML_GlobalDeps
             "  Time: "//tim(1:2)//":"//tim(3:4)//":"//tim(5:10)
      return
    End Subroutine Write_Date_Time
-End Module CFML_GlobalDeps 
+End Module CFML_GlobalDeps

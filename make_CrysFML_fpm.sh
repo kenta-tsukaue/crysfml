@@ -13,7 +13,8 @@ echo "            make_CrysFML_fpm.sh  gfortran"
 echo "            make_CrysFML_fpm.sh  gfortran debug"
 echo "            make_CrysFML_fpm.sh  ifx"
 echo "            make_CrysFML_fpm.sh  ifx debug"
-echo "    For using the Winteracter library add the word "win" as the last argument (without quotes)"
+echo "    For using the Winteracter library add the word "win" as the last argument without quotes"
+echo "    For using the Program_Examples, add the keyword "prog" without quotes "
 echo "----"
 
 if [ -z "$1" ]; then
@@ -30,6 +31,7 @@ COMP=""
 DEBUG="N"
 CONS="Y"
 WINT="N"
+PROG="N"
 #
 for arg in "$@"
 do
@@ -49,6 +51,9 @@ do
       "win")
          WINT=$arg
          ;;
+      "prog")
+         PROG=$arg
+         ;;
    esac
 done
 
@@ -60,7 +65,11 @@ done
           cp ./toml/fpm_linmac_win.toml  ./fpm.toml
    else
           echo "Copying ./toml/fpm_linmac_con.toml to ./fpm.toml" 
-          cp ./toml/fpm_linmac_con.toml  ./fpm.toml
+          if [ $PROG == "prog" ]; then
+            cp ./toml/fpm_linmac_con_prog.toml  ./fpm.toml
+          else
+            cp ./toml/fpm_linmac_con.toml  ./fpm.toml
+          fi
    fi
 #
 #  First change the extensions of files that are optionally used in fpm to "xxx" by

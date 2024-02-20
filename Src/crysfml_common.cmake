@@ -9,6 +9,9 @@ if(WIN32 OR MSYS)
     if(${COMPILER_NAME} STREQUAL ifort)
        set(GLOBAL_DEPS CFML_GlobalDeps_Windows_Intel.f90)
        set(STRING_UTILS CFML_String_Utilities.f90)
+    elseif(${COMPILER_NAME} STREQUAL ifx)
+       set(GLOBAL_DEPS CFML_GlobalDeps_Windows_Intel.f90)
+       set(STRING_UTILS CFML_String_Utilities.f90)
     else()
         set(GLOBAL_DEPS CFML_GlobalDeps_Windows.f90)
         set(STRING_UTILS CFML_String_Utilities_gf.f90)
@@ -27,6 +30,9 @@ elseif(APPLE)
 elseif(UNIX)
     # Intel Fortran compiler
     if(${COMPILER_NAME} STREQUAL ifort)
+        set(GLOBAL_DEPS CFML_GlobalDeps_Linux_Intel.f90)
+        set(STRING_UTILS CFML_String_Utilities.f90)
+    elseif(${COMPILER_NAME} STREQUAL ifx)
         set(GLOBAL_DEPS CFML_GlobalDeps_Linux_Intel.f90)
         set(STRING_UTILS CFML_String_Utilities.f90)
     else()
@@ -79,7 +85,12 @@ set(CRYSFML_COMMON_SOURCES
     CFML_Spherical_Harmonics.f90
     CFML_Rational_Arithmetic.f90
     CFML_Crystallographic_Symmetry.f90
-    CFML_Symmetry_Tables.f90)
+    CFML_Symmetry_Tables.f90
+    CFML_Rational_Groups.f90
+    CFML_Standard_Sett.f90
+    CFML_ssg_datafile.f90
+    CFML_SuperSpaceGroups.f90
+    )
 
 # Set the optimization flags.
 set_source_files_properties(${CRYSFML_COMMON_SOURCES} PROPERTIES COMPILE_FLAGS ${OPT_FLAGS})
