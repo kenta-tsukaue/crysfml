@@ -553,28 +553,28 @@
        else
 
           !---- General ----!
-          select case(SpaceGroup%Laue)
-             case("-1   ")
+          select case(trim(SpaceGroup%Laue))
+             case("-1")
                 k=asu_hkl_triclinic(h)
-             case("2/m  ")
+             case("2/m")
                 k=asu_hkl_monoclinic(h,"b")
-             case("mmm  ")
+             case("mmm")
                 k=asu_hkl_orthorhombic(h)
-             case("4/m  ")
-                k=asu_hkl_tetragonal(h,"4/m  ")
+             case("4/m")
+                k=asu_hkl_tetragonal(h,"4/m")
              case("4/mmm")
                 k=asu_hkl_tetragonal(h,"4/mmm")
-             case("-3   ")
-                k=asu_hkl_trigonal(h,"-3  ")
-             case("-3m  ")
+             case("-3")
+                k=asu_hkl_trigonal(h,"-3")
+             case("-3m")
                 k=asu_hkl_trigonal(h,"-3m")
-             case("6/m  ")
-                k=asu_hkl_hexagonal(h,"6/m  ")
+             case("6/m")
+                k=asu_hkl_hexagonal(h,"6/m")
              case("6/mmm")
                 k=asu_hkl_hexagonal(h,"6/mmm")
-             case("m-3  ")
-                k=asu_hkl_cubic(h,"m-3 ")
-             case("m-3m ")
+             case("m-3")
+                k=asu_hkl_cubic(h,"m-3")
+             case("m-3m")
                 k=asu_hkl_cubic(h,"m-3m")
              case default
                return
@@ -605,6 +605,7 @@
        !---- Local Variable ----!
        character(len=4)      :: mod_laue
        integer, dimension(3) :: hh
+       integer               :: it1,it3,j,i
 
        k=0
        mod_laue=l_case(adjustl(Mode))
@@ -612,8 +613,8 @@
           return
        end if
 
-       select case(mod_laue)
-          case("m-3  ")
+       select case(trim(mod_laue))
+          case("m-3")
              !---- Laue: m-3 ----!
              !---- hkl: h>l, k>l, l>=0 ; hkk: k>=0 h>=k ----!
              select case (h(1))
@@ -638,29 +639,39 @@
              if (hh(3) >=0 .and. hh(1) >= hh(3) .and. hh(2) == hh(3)) k=hh
              if (hh(3) >=0 .and. hh(1) >  hh(3) .and. hh(2) >  hh(3)) k=hh
 
-          case("m-3m ")
+          case("m-3m")
              !---- Laue: m-3m ----!
              !---- hkl: h >=0, k >=0, l >=0, h >=k, k >=l ----!
-             select case (h(1))
-                case (:-1)
-                   hh=-h
-                case (0)
-                   select case (h(2))
-                      case (:-1)
-                         hh=-h
-                      case (0)
-                         if (h(3) >= 0) then
-                            hh=h
-                         else
-                            hh=-h
-                         end if
-                      case (1:)
-                         hh=h
-                   end select
-                case (1:)
-                   hh=h
-             end select
-             if (hh(3) >= 0 .and. hh(2) >= hh(3) .and. hh(1) >= hh(2)) k=hh
+             hh=abs(h)
+             it1=maxval(hh); it3=minval(hh)
+             do i=1,3
+                if(hh(i) <= it1 .and. hh(i) >= it3) then
+                   j=hh(i)
+                   exit
+                end if
+             end do
+             hh=(/it1,j,it3/)
+             k=hh
+             !select case (h(1))
+             !   case (:-1)
+             !      hh=-h
+             !   case (0)
+             !      select case (h(2))
+             !         case (:-1)
+             !            hh=-h
+             !         case (0)
+             !            if (h(3) >= 0) then
+             !               hh=h
+             !            else
+             !               hh=-h
+             !            end if
+             !         case (1:)
+             !            hh=h
+             !      end select
+             !   case (1:)
+             !      hh=h
+             !end select
+             !if (hh(3) >= 0 .and. hh(2) >= hh(3) .and. hh(1) >= hh(2)) k=hh
 
           case default
              return
@@ -696,8 +707,8 @@
           return
        end if
 
-       select case(mod_laue)
-          case("6/m  ")
+       select case(trim(mod_laue))
+          case("6/m")
              !---- Laue: 6/m ----!
              !---- hkl: h>0,k>0,l>=0;  0kl k>=0,l>=0 ----!
              select case (h(1))
@@ -954,8 +965,8 @@
           return
        end if
 
-       select case(mod_laue)
-          case("4/m  ")
+       select case(trim(mod_laue))
+          case("4/m")
              !---- Laue: 4/m ----!
              !---- hkl: h >=0, l >=0, k >=0 if h = 0 ----!
              select case (h(1))
@@ -1080,8 +1091,8 @@
           return
        end if
 
-       select case(mod_laue)
-          case("-3  ")
+       select case(trim(mod_laue))
+          case("-3")
              !---- Laue: -3 ----!
              !---- hkl: h+k>0, l>0 ; hk0:h>0, k>=0
              select case (h(1))
@@ -1108,7 +1119,7 @@
              if (hh(1)+hh(2) > 0 .and. hh(3) > 0 ) k=hh
              if (hh(1) > 0  .and. hh(2) >= 0  .and. hh(3) == 0) k=hh
 
-          case("-3m ")
+          case("-3m")
              !---- Laue: -3m ----!
              !---- hkl: h>=0, h>=k ; hhl: h>=0,l>=0 ----!
              select case (h(1))
@@ -3635,7 +3646,7 @@
     !!
 
     !!--++
-    !!--++ Subroutine  Hkl_Uni_Reflect(Crystalcell, Spacegroup,Friedel,Value1,Value2,Code,Num_Ref,Reflex,no_order,check_ok,hlim)
+    !!--++ Subroutine  Hkl_Uni_Reflect(Crystalcell, Spacegroup,Friedel,Value1,Value2,Code,Num_Ref,Reflex,no_order,check_ok,hlim,strict)
     !!--++    Type (Crystal_Cell_Type),          intent(in) :: CrystalCell  !Cell Objet
     !!--++    Type (Space_Group_Type) ,          intent(in) :: SpaceGroup   !Space group Object
     !!--++    Logical,                           intent(in) :: Friedel
@@ -3646,6 +3657,7 @@
     !!--++    logical,                optional,  intent(in) :: no_order
     !!--++    logical,                optional,  intent(out):: check_ok
     !!--++    integer, dimension(3,2),optional,  intent(in) :: hlim
+    !!--++    logical,                optional,  intent(in) :: strict
     !!--++
     !!--++    (Overloaded)
     !!--++    Calculate unique reflections between two values (value1,value2)
@@ -3654,7 +3666,7 @@
     !!--++
     !!--++ Update: December - 2011
     !!
-    Subroutine Hkl_Uni_Reflect(Crystalcell,Spacegroup,Friedel,Value1,Value2,Code,Num_Ref,Reflex,no_order,check_ok,hlim)
+    Subroutine Hkl_Uni_Reflect(Crystalcell,Spacegroup,Friedel,Value1,Value2,Code,Num_Ref,Reflex,no_order,check_ok,hlim,strict)
        !---- Arguments ----!
        type (Crystal_Cell_Type),             intent(in)     :: crystalcell
        type (Space_Group_Type) ,             intent(in)     :: spacegroup
@@ -3666,10 +3678,11 @@
        logical,                   optional,  intent(in)     :: no_order
        logical,                   optional,  intent(out)    :: check_ok
        integer, dimension(3,2),   optional,  intent(in)     :: hlim
+       logical,                   optional,  intent(in)     :: strict
 
        !---- Local variables ----!
        real(kind=cp)                         :: vmin,vmax,sval
-       integer                               :: h,k,l,hmin,kmin,lmin,hmax,kmax,lmax, i, maxref
+       integer                               :: h,k,l,hmin,kmin,lmin,hmax,kmax,lmax, i, maxref, j
        integer, dimension(3)                 :: hh,kk,nulo
        integer,  dimension(  size(reflex))   :: ind
        integer,  dimension(  size(reflex))   :: mul
@@ -3765,16 +3778,25 @@
 
        num_ref=0
        if(present(hlim)) then
-          if(hmin < hlim(1,1)) hmin=hlim(1,1)
-          if(hmax > hlim(1,2)) hmax=hlim(1,2)
-          if(kmin < hlim(2,1)) kmin=hlim(2,1)
-          if(kmax > hlim(2,2)) kmax=hlim(2,2)
-          if(lmin < hlim(3,1)) lmin=hlim(3,1)
-          if(lmax > hlim(3,2)) lmax=hlim(3,2)
+          if(present(strict)) then
+             hmin=hlim(1,1)
+             hmax=hlim(1,2)
+             kmin=hlim(2,1)
+             kmax=hlim(2,2)
+             lmin=hlim(3,1)
+             lmax=hlim(3,2)
+          else
+             if(hmin < hlim(1,1)) hmin=hlim(1,1)
+             if(hmax > hlim(1,2)) hmax=hlim(1,2)
+             if(kmin < hlim(2,1)) kmin=hlim(2,1)
+             if(kmax > hlim(2,2)) kmax=hlim(2,2)
+             if(lmin < hlim(3,1)) lmin=hlim(3,1)
+             if(lmax > hlim(3,2)) lmax=hlim(3,2)
+          end if
        end if
        ext_do: do h=hmin,hmax
           do k=kmin,kmax
-             do l=lmin,lmax
+             do_int: do l=lmin,lmax
 
                 hh(1)=h
                 hh(2)=k
@@ -3789,6 +3811,10 @@
                 if (hkl_equal(kk,nulo)) cycle
                 if (hkl_equal(kk,-hh) .and. Friedel) cycle
 
+                do j=1,num_ref
+                  if(hkl_equal(kk,hkl(:,j))) cycle do_int
+                end do
+
                 num_ref=num_ref+1
                 if(num_ref > maxref) then
                    num_ref=maxref
@@ -3798,7 +3824,7 @@
                 hkl(:,num_ref)= kk
                 mul(num_ref)  = hkl_mult(kk,SpaceGroup,friedel)
                 sv(num_ref)   = sval
-             end do
+             end do do_int
           end do
        end do ext_do
 
@@ -3821,7 +3847,7 @@
     End Subroutine Hkl_Uni_reflect
 
     !!--++
-    !!--++ Subroutine  Hkl_Uni_Reflection(Crystalcell, Spacegroup,Friedel,Value1,Value2,Code,Num_Ref,Reflex, no_order,check_ok,hlim)
+    !!--++ Subroutine  Hkl_Uni_Reflection(Crystalcell, Spacegroup,Friedel,Value1,Value2,Code,Num_Ref,Reflex, no_order,check_ok,hlim,strict)
     !!--++    Type (Crystal_Cell_Type),          intent(in) :: CrystalCell  !Cell Objet
     !!--++    Type (Space_Group_Type) ,          intent(in) :: SpaceGroup   !Space group Object
     !!--++    Logical,                           intent(in) :: Friedel
@@ -3832,6 +3858,7 @@
     !!--++    logical,                optional,  intent(in) :: no_order
     !!--++    logical,                optional,  intent(out):: check_ok
     !!--++    integer, dimension(3,2),optional,  intent(in) :: hlim
+    !!--++    logical,                optional,  intent(in) :: strict
     !!--++
     !!--++    (Overloaded)
     !!--++    Calculate unique reflections between two values (value1,value2)
@@ -3840,7 +3867,7 @@
     !!--++
     !!--++ Update: December - 2011
     !!
-    Subroutine Hkl_Uni_Reflection(Crystalcell,Spacegroup,Friedel,Value1,Value2,Code,Num_Ref,Reflex,no_order,check_ok,hlim)
+    Subroutine Hkl_Uni_Reflection(Crystalcell,Spacegroup,Friedel,Value1,Value2,Code,Num_Ref,Reflex,no_order,check_ok,hlim,strict)
        !---- Arguments ----!
        type (Crystal_Cell_Type),             intent(in)     :: crystalcell
        type (Space_Group_Type) ,             intent(in)     :: spacegroup
@@ -3852,10 +3879,11 @@
        logical,                   optional,  intent(in)     :: no_order
        logical,                   optional,  intent(out)    :: check_ok
        integer, dimension(3,2),   optional,  intent(in)     :: hlim
+       logical,                   optional,  intent(in)     :: strict
 
        !---- Local variables ----!
        real(kind=cp)                         :: vmin,vmax,sval
-       integer                               :: h,k,l,hmin,kmin,lmin,hmax,kmax,lmax, i, maxref
+       integer                               :: h,k,l,hmin,kmin,lmin,hmax,kmax,lmax, i, maxref,j
        integer, dimension(3)                 :: hh,kk,nulo
        integer,  dimension(  size(reflex))   :: ind
        integer,  dimension(  size(reflex))   :: mul
@@ -3950,17 +3978,26 @@
        end select
 
        if(present(hlim)) then
-          if(hmin < hlim(1,1)) hmin=hlim(1,1)
-          if(hmax > hlim(1,2)) hmax=hlim(1,2)
-          if(kmin < hlim(2,1)) kmin=hlim(2,1)
-          if(kmax > hlim(2,2)) kmax=hlim(2,2)
-          if(lmin < hlim(3,1)) lmin=hlim(3,1)
-          if(lmax > hlim(3,2)) lmax=hlim(3,2)
+         if(present(strict)) then
+            hmin=hlim(1,1)
+            hmax=hlim(1,2)
+            kmin=hlim(2,1)
+            kmax=hlim(2,2)
+            lmin=hlim(3,1)
+            lmax=hlim(3,2)
+         else
+            if(hmin < hlim(1,1)) hmin=hlim(1,1)
+            if(hmax > hlim(1,2)) hmax=hlim(1,2)
+            if(kmin < hlim(2,1)) kmin=hlim(2,1)
+            if(kmax > hlim(2,2)) kmax=hlim(2,2)
+            if(lmin < hlim(3,1)) lmin=hlim(3,1)
+            if(lmax > hlim(3,2)) lmax=hlim(3,2)
+         end if
        end if
        num_ref=0
        ext_do: do h=hmin,hmax
           do k=kmin,kmax
-             do l=lmin,lmax
+             do_int: do l=lmin,lmax
 
                 hh(1)=h
                 hh(2)=k
@@ -3975,6 +4012,10 @@
                 if (hkl_equal(kk,nulo)) cycle
                 if (hkl_equal(kk,-hh) .and. Friedel) cycle
 
+                do j=1,num_ref
+                  if(hkl_equal(kk,hkl(:,j))) cycle do_int
+                end do
+
                 num_ref=num_ref+1
                 if(num_ref > maxref) then
                    num_ref=maxref
@@ -3984,7 +4025,7 @@
                 hkl(:,num_ref)=kk
                 mul(num_ref)  =hkl_mult(kk,SpaceGroup,friedel)
                 sv(num_ref)   = sval
-             end do
+             end do do_int
           end do
        end do ext_do
 
@@ -4008,7 +4049,7 @@
     End Subroutine Hkl_Uni_Reflection
 
     !!--++
-    !!--++ Subroutine  Hkl_Uni_ReflList(Crystalcell, Spacegroup,Friedel,Value1,Value2,Code,MaxRef,Reflex,no_order,check_ok,hlim)
+    !!--++ Subroutine  Hkl_Uni_ReflList(Crystalcell, Spacegroup,Friedel,Value1,Value2,Code,MaxRef,Reflex,no_order,check_ok,hlim,strict)
     !!--++    Type (Crystal_Cell_Type),          intent(in) :: CrystalCell  !Cell Objet
     !!--++    Type (Space_Group_Type) ,          intent(in) :: SpaceGroup   !Space group Object
     !!--++    Logical,                           intent(in) :: Friedel
@@ -4019,6 +4060,7 @@
     !!--++    logical,                optional,  intent(in) :: no_order
     !!--++    logical,                optional,  intent(out):: check_ok
     !!--++    integer, dimension(3,2),optional,  intent(in) :: hlim
+    !!--++    logical,                optional,  intent(in) :: strict
     !!--++
     !!--++    (OVERLOADED)
     !!--++    Calculate unique reflections between two values (value1,value2)
@@ -4027,7 +4069,7 @@
     !!--++
     !!--++ Update: December - 2011
     !!
-    Subroutine Hkl_Uni_ReflList(Crystalcell,Spacegroup,Friedel,Value1,Value2,Code,MaxRef,Reflex,no_order,check_ok,hlim)
+    Subroutine Hkl_Uni_ReflList(Crystalcell,Spacegroup,Friedel,Value1,Value2,Code,MaxRef,Reflex,no_order,check_ok,hlim,strict)
        !---- Arguments ----!
        type (Crystal_Cell_Type),         intent(in)     :: crystalcell
        type (Space_Group_Type) ,         intent(in)     :: spacegroup
@@ -4039,10 +4081,11 @@
        logical,                optional, intent(in)     :: no_order
        logical,                optional, intent(out)    :: check_ok
        integer, dimension(3,2),optional, intent(in)     :: hlim
+       logical,                optional, intent(in)     :: strict
 
        !---- Local variables ----!
        real(kind=cp)                   :: vmin,vmax,sval
-       integer                         :: h,k,l,hmin,kmin,lmin,hmax,kmax,lmax, i, num_ref
+       integer                         :: h,k,l,hmin,kmin,lmin,hmax,kmax,lmax, i, num_ref, j
        integer, dimension(3)           :: hh,kk,nulo
        integer,  dimension(  MaxRef)   :: ind
        integer,  dimension(  MaxRef)   :: mul
@@ -4135,22 +4178,30 @@
        end select
 
        if(present(hlim)) then
-          if(hmin < hlim(1,1)) hmin=hlim(1,1)
-          if(hmax > hlim(1,2)) hmax=hlim(1,2)
-          if(kmin < hlim(2,1)) kmin=hlim(2,1)
-          if(kmax > hlim(2,2)) kmax=hlim(2,2)
-          if(lmin < hlim(3,1)) lmin=hlim(3,1)
-          if(lmax > hlim(3,2)) lmax=hlim(3,2)
+         if(present(strict)) then
+            hmin=hlim(1,1)
+            hmax=hlim(1,2)
+            kmin=hlim(2,1)
+            kmax=hlim(2,2)
+            lmin=hlim(3,1)
+            lmax=hlim(3,2)
+         else
+            if(hmin < hlim(1,1)) hmin=hlim(1,1)
+            if(hmax > hlim(1,2)) hmax=hlim(1,2)
+            if(kmin < hlim(2,1)) kmin=hlim(2,1)
+            if(kmax > hlim(2,2)) kmax=hlim(2,2)
+            if(lmin < hlim(3,1)) lmin=hlim(3,1)
+            if(lmax > hlim(3,2)) lmax=hlim(3,2)
+         end if
        end if
        num_ref=0
        ext_do: do h=hmin,hmax
           do k=kmin,kmax
-             do l=lmin,lmax
+             do_int: do l=lmin,lmax
 
                 hh(1)=h
                 hh(2)=k
                 hh(3)=l
-
                 if (hkl_equal(hh,nulo)) cycle
                 sval=hkl_s(hh,crystalcell)
                 if (sval > vmax .or. sval < vmin) cycle
@@ -4159,6 +4210,10 @@
                 kk=asu_hkl(hh,Spacegroup)
                 if (hkl_equal(kk,nulo)) cycle
                 if (hkl_equal(kk,-hh) .and. Friedel) cycle
+
+                do j=1,num_ref
+                  if(hkl_equal(kk,hkl(:,j))) cycle do_int
+                end do
 
                 num_ref=num_ref+1
                 if(num_ref > maxref) then
@@ -4169,7 +4224,7 @@
                 hkl(:,num_ref)=kk
                 mul(num_ref)  =hkl_mult(kk,SpaceGroup,friedel)
                 sv(num_ref)   = sval
-             end do
+             end do do_int
           end do
        end do ext_do
 

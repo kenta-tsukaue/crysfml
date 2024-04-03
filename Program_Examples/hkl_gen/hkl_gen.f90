@@ -1,5 +1,4 @@
 Module Ref_Gen
-
     use CFML_IO_Formats,      only: file_list_type
     use CFML_Math_General,    only: sind,cosd,acosd,asind,Co_Prime_Vector
     use CFML_Math_3D,         only: cross_product
@@ -27,7 +26,7 @@ Module Ref_Gen
     integer,                    public :: n_phi, n_chi
     real, dimension(20),        public :: phi_val,chi_val
     real,                       public :: delta_ang,time_ref=3.0,sec_frame=4.0
-    logical,                    public :: optimize=.false., scann=.false.,scan_chi=.false.,scan_phi=.false.,unique=.false.
+    logical,                    public :: optimize=.false., scann=.false.,scan_chi=.false.,scan_phi=.false.,unique=.false., strict=.false.
     real, parameter, dimension(3,3), public :: Identity = reshape([1.0,0.0,0.0,  0.0,1.0,0.0,  0.0,0.0,1.0],[3,3])
 
  contains
@@ -98,6 +97,9 @@ Module Ref_Gen
 
                 case("unique")
                     unique=.true.
+
+                case("strict")
+                    strict=.true.
 
                 case("dmin")
                     if(present(sgiven) .and. present(smax)) then
@@ -563,6 +565,7 @@ Module Ref_Gen
 
     End subroutine calc_angles
 
+
 End Module Ref_Gen
 
 Program Sxtal_Ref_Gen
@@ -679,7 +682,7 @@ Program Sxtal_Ref_Gen
           "    * Generates single crystal reflections and nuc. structure factors *"  , &
           "    * (if atoms are given ) reading a *.CFL file (4C & NB geometries) *"  , &
           "    *******************************************************************"  , &
-          "                  (JRC- April-2007, updated January 2021)"
+          "                  (JRC- April-2007, updated March 2024)"
     write(unit=*,fmt=*) " "
 
     if(.not. arggiven) then
@@ -697,7 +700,7 @@ Program Sxtal_Ref_Gen
           "    * Generates single crystal reflections and nuc. structure factors *"  , &
           "    * (if atoms are given ) reading a *.CFL file (4C & NB geometries) *"  , &
           "    *******************************************************************"  , &
-          "                  (JRC- April-2007, updated January 2021)"
+          "                  (JRC- April-2007, updated March 2024)"
 
     cfl_file=trim(filcod)//".cfl"
     inquire(file=trim(cfl_file),exist=esta)
@@ -801,7 +804,15 @@ Program Sxtal_Ref_Gen
                 call Hkl_gen_sxtal(cell,SpG,stlmin,stlmax,MaxNumRef,hkl,ord)
             end if
         else
-            call Hkl_Uni(cell,SpG,.true.,stlmin,stlmax,"s",MaxNumRef,hkl, no_order=.true.)
+            if(lim) then
+              if(strict) then
+                call Hkl_Uni(cell,SpG,.true.,stlmin,stlmax,"s",MaxNumRef,hkl, no_order=.true.,hlim=hlim,strict=strict)
+              else
+                call Hkl_Uni(cell,SpG,.true.,stlmin,stlmax,"s",MaxNumRef,hkl, no_order=.true.,hlim=hlim)
+              end if
+            else
+              call Hkl_Uni(cell,SpG,.true.,stlmin,stlmax,"s",MaxNumRef,hkl, no_order=.true.)
+            end if
         end if
         nr_resol=hkl%nref
 
@@ -953,9 +964,18 @@ Program Sxtal_Ref_Gen
 
               do i=1,hkl%nref
                  h=hkl%Ref(i)%h
+                 !write(*,"(i5,tr4,3i4)") i,h
                  call Hkl_Equiv_List(h,SpG,.true.,Mul,Hlist)
                  do_mult:do j=1,mul
                     hr=Hlist(:,j)
+                    if(strict) then
+                       if(hr(1) < hlim(1,1))  cycle
+                       if(hr(1) > hlim(1,2))  cycle
+                       if(hr(2) < hlim(2,1))  cycle
+                       if(hr(2) > hlim(2,2))  cycle
+                       if(hr(3) < hlim(3,1))  cycle
+                       if(hr(3) > hlim(3,2))  cycle
+                    end if
                     !z1=matmul(Current_Orient%UB,hr)
                     do k=1,n_twins
                       R_UB= matmul(Chi_matx,matmul(Phi_matx,ub_matrix(:,:,k)))
