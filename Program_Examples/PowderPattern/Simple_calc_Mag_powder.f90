@@ -241,7 +241,7 @@
      use CFML_Diffraction_Patterns,      only: Diffraction_Pattern_Type, &
                                                Allocate_Diffraction_Pattern
      use CFML_IO_Formats,                only: Readn_set_Xtal_Structure,err_form_mess,err_form, &
-                                               file_list_type, Get_moment_ctr
+                                               file_list_type, Get_moment_ctr_Wigner
      use CFML_Structure_Factors,         only: Strf_List_Type
 
      use Gen_Mag_Powder_Pattern
@@ -338,7 +338,7 @@
        write(unit=lun,fmt="(/,a,/)") " => Symmetry constraints in magnetic moments:"
        do i=1,A%natoms
          if(A%Atom(i)%moment < 0.001) cycle !Skip non-magnetic atoms
-         call Get_moment_ctr(A%Atom(i)%X,A%Atom(i)%M_xyz,Spg,codini,codes)
+         call Get_moment_ctr_Wigner(A%Atom(i)%X,A%Atom(i)%M_xyz,Spg,codini,Cell%cell,codes)
          write(unit=lun,fmt="(a12,3(a,3f10.4))") "     "//A%Atom(i)%Lab," Pos:",A%Atom(i)%X," Mom:",A%Atom(i)%M_xyz," Codes:",codes
        end do
        call Write_Atom_List(A,level=2,lun=lun)

@@ -42,6 +42,17 @@ if (WIN32 OR MSYS)
                             ${SYSTEMDRIVE}/wint/lib.i64)
         endif(${ARCH32})
 
+    elseif(COMPILER_NAME STREQUAL ifx)
+
+            find_path(WINTERACTER_MOD_DIR
+                      NAMES winteracter.mod
+                      PATHS ${WINTERACTER}/lib.i64
+                            ${WINTER}/lib.i64
+                            ${WINT}/lib.i64
+                            ${USERPROFILE}/wint/lib.i64
+                            ${HOMEDRIVE}/wint/lib.i64
+                            ${SYSTEMDRIVE}/wint/lib.i64)
+
     elseif(COMPILER_NAME STREQUAL gfortran)
     
          if(${ARCH32})
@@ -56,12 +67,12 @@ if (WIN32 OR MSYS)
         else(${ARCH32})
             find_path(WINTERACTER_MOD_DIR
                       NAMES winteracter.mod
-                      PATHS ${WINTERACTER}/lib.gnu64
-                            ${WINTER}/lib.gnu64
-                            ${WINT}/lib.gnu64
-                            ${USERPROFILE}/wint/lib.gnu64
-                            ${HOMEDRIVE}/wint/lib.gnu64
-                            ${SYSTEMDRIVE}/wint/lib.gnu64)
+                      PATHS ${WINTERACTER}/lib.gnu64/8.1
+                            ${WINTER}/lib.gnu64/8.1
+                            ${WINT}/lib.gnu64/8.1
+                            ${USERPROFILE}/wint/lib.gnu64/8.1
+                            ${HOMEDRIVE}/wint/lib.gnu64/8.1
+                            ${SYSTEMDRIVE}/wint/lib.gnu64/8.1)
         endif(${ARCH32})
 
     endif()
@@ -172,6 +183,26 @@ else()
     if (COMPILER_NAME STREQUAL ifort)
       
       message("ifort")
+      
+      find_path(WINTERACTER_MOD_DIR
+        NAMES winteracter.mod
+        PATHS ${WINTERACTER}/lib.i64
+        ${WINTER}/lib.i64
+        ${WINT}/lib.i64
+        ${HOME}/wint/lib.i64
+        ${HOME}/lib.i64
+        /usr/local/lib/wint/lib.i64
+        /usr/lib/wint/lib.i64
+        /opt/lib/wint/lib.i64
+	/users/ci/projects/fullprof/wint13/lib.i64
+	NO_CACHE
+	)
+      
+      message("WINTERACTER_MOD_DIR " ${WINTERACTER_MOD_DIR})	       
+      
+    elseif (COMPILER_NAME STREQUAL ifx)
+      
+      message("ifx")
       
       find_path(WINTERACTER_MOD_DIR
         NAMES winteracter.mod

@@ -2023,14 +2023,24 @@
       CHARACTER (LEN=*), INTENT(IN OUT)        :: infile
       LOGICAL, INTENT(IN OUT)                  :: ok
 
+      interface
+        real(kind=dp)  function fn(h,k,a,b,ok)
+         use CFML_GlobalDeps,  only : dp
+         Integer,       Intent(In)  :: h
+         Integer,       Intent(In)  :: k
+         Real(kind=dp), Intent(In)  :: a
+         Real(kind=dp), Intent(In)  :: b
+         Logical,       Intent(Out) :: ok
+        end function fn
+      end interface
       INTEGER       :: h, k, i, j, n, info_step, info, cnt,  origin, li, n_step
       Real(kind=dp) :: x, s, s_value, angle, w4,  theta, q2, l
       Real(kind=dp) :: l_lower, dl, high1, high2
       Real(kind=dp), PARAMETER :: intervals = twenty
 
 ! external functions (FN is either GLQ16 or AGLQ16)
-      Real(kind=dp) :: fn
-      EXTERNAL fn
+!      Real(kind=dp) :: fn  !Replaced by an interface
+!      EXTERNAL fn
 
 ! external subroutines (Some compilers need them declared external)
 !      external XYPHSE, PRE_MAT
@@ -2302,6 +2312,18 @@
       ! Utiliza las subrutinas:  XYPHSE, PRE_MAT, GET_F, CHWDTH
 
       Character (Len=*), Intent(In Out)        :: infile
+      interface
+        real(kind=dp)  function fn(h,k,a,b,ok)
+         use CFML_GlobalDeps,  only : dp
+         Integer,       Intent(In)  :: h
+         Integer,       Intent(In)  :: k
+         Real(kind=dp), Intent(In)  :: a
+         Real(kind=dp), Intent(In)  :: b
+         Logical,       Intent(Out) :: ok
+        end function fn
+      end interface
+
+
       Logical          :: ok,  on_bndry, l_axis, shrp
       Integer          :: h, k, h_lower, h_upper, k_lower, k_upper, i_th, i_thm
       Integer          :: m, i, max_indx, lz, lzf
@@ -2313,8 +2335,10 @@
       Complex(kind=dp) :: f(max_l)
 
       ! external functions
-      Real(kind=dp) :: fn
-      External fn
+      !Real(kind=dp) :: fn
+      !External fn
+
+
       ! external subroutines (Some compilers need them declared external)
       !      external XYPHSE, PRE_MAT, GET_F, CHWDTH
 
@@ -3725,11 +3749,11 @@
 !                            f(MAX_L,16)
 !     Utiliza las funciones:   INTENS, INTEN2   externas  , Q2(h,k,l)
 !     Utiliza las subrutinas: APPR_F, GET_F  ,
-      INTEGER                 :: h
-      INTEGER                 :: k
-      Real(kind=dp)           :: a
-      Real(kind=dp)           :: b
-      LOGICAL, INTENT(IN OUT) :: ok
+      Integer,       Intent(In)  :: h
+      Integer,       Intent(In)  :: k
+      Real(kind=dp), Intent(In)  :: a
+      Real(kind=dp), Intent(In)  :: b
+      Logical,       Intent(Out) :: ok
 
       LOGICAL :: o, too_close
 
@@ -3822,7 +3846,7 @@
 
         IF(.NOT.too_close) THEN
           CALL appr_f(f, h, k, samp_l, ag_l, n, list, ok)
-          IF(.NOT.ok) GO TO 990
+          IF(.NOT. ok) GO TO 990
         ELSE
 ! sample f values once, and set all 16 values over l-range to be equal
           CALL get_f(f(:,1), q2(h,k,ag_l(1)), ag_l(1))
@@ -3905,7 +3929,7 @@
 !     Utiliza las subrutinas:INTEGR
 
       LOGICAL, INTENT(IN OUT)                  :: ok
-      INTEGER*4 i
+      INTEGER :: i
 ! external functions
 
 ! external subroutine (Some compilers need them declared external)
@@ -3922,7 +3946,7 @@
       ELSE
         CALL integr(glq16,ok)
       END IF
-      IF(.NOT.ok) GO TO 999
+      IF(.NOT. ok) GO TO 999
       i = 1
       2 WRITE(op,100) 'Enter 1 to integrate another interval.'
       READ(cntrl,*,ERR=2) i
@@ -4368,14 +4392,28 @@
       !                        LL(theta,h,k), W4(theta)
       !Utiliza las subrutinas: XYPHSE, PRE_MAT, GET_F
       Logical, Intent(In Out) :: ok
+
+      interface
+        real(kind=dp)  function fn(h,k,a,b,ok)
+         use CFML_GlobalDeps,  only : dp
+         Integer,       Intent(In)  :: h
+         Integer,       Intent(In)  :: k
+         Real(kind=dp), Intent(In)  :: a
+         Real(kind=dp), Intent(In)  :: b
+         Logical,       Intent(Out) :: ok
+        end function fn
+      end interface
+
+
+
       Logical :: divided
       Integer :: h, k, i_th, i_thm
       Real(kind=dp) :: l0, l1, max_th, x, w4, angle, theta, l, s, q2
       Real(kind=dp) :: t1, suma, tmp, ll, fact, d_th, l_tmp
 
       ! external function, passed by reference
-      Real(kind=dp) :: fn
-      External fn
+      !Real(kind=dp) :: fn
+      !External fn
       ! external subroutines (Some compilers need them declared external)
       !      external XYPHSE, PRE_MAT, GET_F
 
@@ -4526,15 +4564,15 @@
 !     Utiliza las subrutinas:
 
 
-      COMPLEX(kind=dp), INTENT(IN OUT)       :: f(max_l)
-      INTEGER, INTENT(IN OUT)                :: h
-      INTEGER, INTENT(IN)                    :: k
-      Real(kind=dp), INTENT(IN OUT)          :: l
-      LOGICAL, INTENT(IN OUT)                :: ok
+      Complex(Kind=Dp), Intent(In Out)       :: f(max_l)
+      Integer,          Intent(In)           :: h
+      Integer,          Intent(In)           :: k
+      Real(Kind=Dp),    Intent(In)           :: l
+      Logical,          Intent(Out)          :: ok
 
-      INTEGER          :: i, j, m
-      Real(kind=dp)    :: twopi_l, dot, tmp
-      COMPLEX(kind=dp) :: phi(max_l, max_l), z, z_to_n
+      Integer          :: i, j, m
+      Real(Kind=Dp)    :: twopi_l, dot, tmp
+      Complex(Kind=Dp) :: phi(max_l, max_l), z, z_to_n
 
       twopi_l = pi2 * l
 
@@ -7042,6 +7080,17 @@
       Character (Len=*), Intent(In Out) :: strkfile
       Logical, Intent(In Out)           :: ok
 
+      interface
+        real(kind=dp)  function fn(h,k,a,b,ok)
+         use CFML_GlobalDeps,  only : dp
+         Integer,       Intent(In)  :: h
+         Integer,       Intent(In)  :: k
+         Real(kind=dp), Intent(In)  :: a
+         Real(kind=dp), Intent(In)  :: b
+         Logical,       Intent(Out) :: ok
+        end function fn
+      end interface
+
       Logical       :: its_hot
       Integer       :: h, k, i, i_step, lz, lzf, str
       Real(kind=dp) :: l, theta, x, angle, s, q2, l0, l1
@@ -7049,8 +7098,8 @@
       Real(kind=dp), Parameter :: intervals = twenty
 
       ! external functions
-      Real(kind=dp) fn
-      External fn
+      !Real(kind=dp) fn
+      !External fn
 
       ! external subroutines
       !      external XYPHSE, PRE_MAT, GET_F
@@ -7185,9 +7234,9 @@
       LOGICAL, INTENT(IN OUT)                  :: ok
 
 
-      INTEGER*4 i, h, k, idum
-      Real(kind=dp)   s, angle
-      Real(kind=dp) l, tot_int
+      INTEGER       :: i, h, k, idum
+      Real(kind=dp) :: s, angle
+      Real(kind=dp) :: l, tot_int
 
 ! external functions
 
@@ -7850,14 +7899,14 @@
       !     Utiliza las subrutinas:  SMUDGE
 
 
-      CHARACTER (LEN=*), INTENT(IN OUT)        :: outfile
-      INTEGER*4, INTENT(IN OUT)                :: view
-      Real(kind=dp), INTENT(IN OUT)                   :: l_upper
-      INTEGER*4, INTENT(IN OUT)                :: hk_lim
-      LOGICAL, INTENT(IN OUT)                  :: ok
+      Character (Len=*), Intent(In Out)        :: outfile
+      Integer,           Intent(In Out)        :: view
+      Real(Kind=Dp),     Intent(In Out)        :: l_upper
+      Integer,           Intent(In Out)        :: hk_lim
+      Logical,           Intent(In Out)        :: ok
 
-      INTEGER*4 i, j, p1, p2, irow(sadsize)
-      Real(kind=dp) rowint(sadsize), incr, sigma, x
+      Integer :: i, j, p1, p2, irow(sadsize)
+      Real(kind=dp) :: rowint(sadsize), incr, sigma, x
       integer(kind=2), dimension(sadsize*sadsize) :: short_data    !The image is written in 16 bits and stored by column order
       integer(kind=2),          parameter :: zero_2bytes=0
 

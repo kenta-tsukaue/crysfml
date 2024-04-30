@@ -85,8 +85,8 @@
 !!-------------------------------------------------------------------------------------
 !!----
   Program Search_TwinLaws
-    USE IFPOSIX
-    USE IFPORT
+    !USE IFPOSIX
+    !USE IFPORT
     use CFML_GlobalDeps,       only:cp
     use CFML_Crystal_Metrics,  only: Crystal_Cell_Type, Err_Crys, Err_Crys_Mess, Init_err_crys,  &
                                      Change_Setting_Cell,Set_Crystal_Cell, Write_Crystal_Cell,   &
@@ -136,8 +136,8 @@
     write(unit=*,fmt='(a,2x,a/)') aDate(1:4)//":"//aDate(5:6)//":"//aDate(7:8), &
                                   aTime(1:2)//":"//aTime(3:4)//":"//aTime(5:6)
 
-    ier = GETCWD(line)
-    write(unit=*,fmt="(a,a)")            " => Working Directory: ",trim(line)
+    !ier = GETCWD(line)
+    !write(unit=*,fmt="(a,a)")            " => Working Directory: ",trim(line)
 
   !---- Get input file name from first argument
     narg=COMMAND_ARGUMENT_COUNT()
@@ -313,7 +313,7 @@
 
     iratio= (ia2-ia1+1)*(ia2-ia1+1)*(ia2-ia1+1)*(ib2-ib1+1)*(ib2-ib1+1)*(ib2-ib1+1)*(ic2-ic1+1)*(ic2-ic1+1)*(ic2-ic1+1)
     iratio=iratio*(in2-in1+1)*(in2-in1+1)*(in2-in1+1)
-    write(unit=*,fmt="(a,i)") " => The maximum number of test calculations is: ",iratio
+    write(unit=*,fmt="(a,i16)") " => The maximum number of test calculations is: ",iratio
     im=iratio/400
     n=0
     CALL cpu_time(start)

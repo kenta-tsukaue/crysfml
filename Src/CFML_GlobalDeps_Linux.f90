@@ -145,8 +145,6 @@ Module CFML_GlobalDeps
    !!
    integer, parameter :: cp = sp
 
-   integer, parameter :: IL = selected_int_kind(16)              ! Long Integer
-
    !----------------------------------!
    !---- Trigonometric Parameters ----!
    !----------------------------------!
@@ -213,7 +211,10 @@ Module CFML_GlobalDeps
    !!----
    !!----  Update: January - 2009
    !!
-   real(kind=cp),  parameter, public  ::  eps=0.00001_cp
+   real(kind=cp),    parameter   :: eps=0.00001_cp
+   integer,          parameter   :: IL = selected_int_kind(16)   ! Long Integer
+   character(len=*), parameter   :: NEWLINE = char(13)//char(10) ! Newline character
+   character(len=1), parameter   :: TAB     = char(9)            ! TAB character
 
  Contains
 

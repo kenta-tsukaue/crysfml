@@ -1,4 +1,5 @@
     Program read_ssg_datafile
+      use CFML_GlobalDeps, only: newline
       use CFML_ssg_datafile
       use CFML_SuperSpaceGroups
       use CFML_Rational_Arithmetic
@@ -7,9 +8,9 @@
 
       implicit none
 
-      integer :: iclass,nmod,i,j,k,m,multip,Dd, i1,i2,i3, ng,nk
+      integer :: iclass,nmod,i,j,k,n,m,multip,Dd, i1,i2,i3, ng,nk
       character(len=20)  :: forma
-      character(len=130) :: message,symb
+      character(len=130) :: message,symb, Env,data_base_path
       logical :: ok
       type(SuperSpaceGroup_Type) :: SSpaceGroup
       type(SuperSpaceGroup_Type),   dimension(200) :: spg
@@ -23,13 +24,28 @@
       real, dimension(3,8) :: kv
       real :: tini,tfin,tpar
 
-      call Read_SSG(" ",ok,message)
+      Env="FULLPROF"
+      call GET_ENVIRONMENT_VARIABLE(trim(Env),data_base_path)
+      n=len_trim(data_base_path)
+      if (n == 0) then
+         
+      write(unit=*,fmt="(a)") " => The "//trim(Env)//" environment variable is not defined! "//newline// &
+                              "    This is needed for localizing the data bases"//newline// &
+                              "    that should be within the %"//trim(Env)//"% directory"
+         
+      else
+        data_base_path=trim(data_base_path)//OPS_SEP//"Databases"
+      end if
+         
+      if (data_base_path(n:n) /= OPS_SEP) data_base_path=trim(data_base_path)//OPS_SEP
+    
+      call Read_SSG(data_base_path,ok,message)
       if(.not. ok) then
         write(*,"(a)") "   !!! "//message//" !!!"
         stop
       end if
       !
-      open(unit=1,file="class+group_pos.txt",status="replace",action="write")
+      open(unit=1,file=trim(data_base_path)//"class+group_pos.txt",status="replace",action="write")
       write(1,"(a,i6)") "Bravais Classes positions in database, Number of classes ",m_ncl
       write(1,"(10i7)") pos_class
       write(1,"(a,i6)") "Space Group positions in database, Number of groups ",m_ngs
@@ -117,7 +133,7 @@
           end do
         end do
 
-        call Set_SSG_Reading_Database(m,SSpaceGroup,ok,message) !construct
+        call Set_SSG_Reading_Database(data_base_path,m,SSpaceGroup,ok,message) !construct
 
         if(.not. ok) then
           write(*,"(a)") "   !!! "//message//" !!!"

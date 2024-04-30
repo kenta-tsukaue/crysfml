@@ -553,7 +553,7 @@ Module CFML_FFT
           gx(i) =  cmplx(value)
        end do
 
-       call Sfft(fx)     !Forward FFT
+       call Sfft(fx)           !Forward FFT
        call Sfft(gx)
 
        convo = fx * gx
