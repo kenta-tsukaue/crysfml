@@ -465,7 +465,6 @@
           vc=vc/vmod
        end if
 
-       return
     End Function Cart_U_Vector
 
     !!----
@@ -513,8 +512,6 @@
              vc = matmul(celda%BL_M,vc)!Converts to BL Cartesian frame
 
        end select
-
-       return
 
     End Function Cart_Vector
 
@@ -568,7 +565,6 @@
 
        sigma=Cell%Cellvol*sqrt(vc)
 
-       return
     End Function Cell_Volume_Sigma
 
     !!--..
@@ -604,7 +600,6 @@
        beta(5)=0.25*b(5)*cell%rcell(1)*cell%rcell(3) ! beta13
        beta(6)=0.25*b(6)*cell%rcell(2)*cell%rcell(3) ! beta23
 
-       return
     End Function Convert_B_Betas
 
     !!----
@@ -623,7 +618,6 @@
 
        u=b/(4.0*tpi2)
 
-       return
     End Function Convert_B_U
 
     !!----
@@ -649,7 +643,6 @@
        b(5)=4.0*beta(5)/(cell%rcell(1)*cell%rcell(3)) ! B13
        b(6)=4.0*beta(6)/(cell%rcell(2)*cell%rcell(3)) ! B23
 
-       return
     End Function Convert_Betas_B
 
     !!----
@@ -675,7 +668,6 @@
        u(5)=beta(5)/(tpi2*cell%rcell(1)*cell%rcell(3)) ! U13
        u(6)=beta(6)/(tpi2*cell%rcell(2)*cell%rcell(3)) ! U23
 
-       return
     End Function Convert_Betas_U
 
     !!----
@@ -694,7 +686,6 @@
 
        b=4.0*tpi2*u
 
-       return
     End Function Convert_U_B
 
     !!----
@@ -720,7 +711,6 @@
        beta(5)=tpi2*u(5)*cell%rcell(1)*cell%rcell(3) ! beta13
        beta(6)=tpi2*u(6)*cell%rcell(2)*cell%rcell(3) ! beta23
 
-       return
     End Function Convert_U_Betas
 
     !!----
@@ -761,7 +751,6 @@
        betas(5) = bet(1,3)
        betas(6) = bet(2,3)
 
-       return
     End Function Get_Betas_from_Biso
 
     !!--++
@@ -796,7 +785,6 @@
        G(3,1)=G(1,3)
        G(3,2)=G(2,3)
 
-       return
     End Function Metrics
 
     !!----
@@ -859,7 +847,6 @@
        rm(3,2)= umc*uu(3)*uu(2)+ s*uu(1)
        rm(3,3)= c+ umc*uu(3)**2
 
-       return
     End Function Rot_Matrix
 
     !!----
@@ -904,7 +891,6 @@
                            2.0*u13 * a * c * as * cs * cosb + &
                            2.0*u23 * b * c * bs * cs * cosa )
 
-       return
     End Function U_Equiv
 
     !!----
@@ -1216,7 +1202,6 @@
        !---- Construct the new cell
        call Set_Crystal_Cell(cellv,angl,Celln)
 
-       return
     End Subroutine Change_Setting_Cell
 
     !!----
@@ -1454,7 +1439,6 @@
        if (coun1 >= 2 .or. (coun1 == 1 .and. coun01 == 2)) ZoneB%rx=-ZoneB%rx
        if (coun2 >= 2 .or. (coun2 == 1 .and. coun02 == 2)) ZoneB%ry=-ZoneB%ry
 
-       return
     End Subroutine Get_Basis_From_Uvw
 
     !!----
@@ -2030,7 +2014,6 @@
       Call Set_Crystal_Cell(mv(1:3),ang(1:3),Cell)
       ok=.true.
 
-      return
     End Subroutine Get_Conventional_Cell
 
     !!----
@@ -2189,7 +2172,6 @@
 
        end select ! n
 
-       return
     End Subroutine Get_Cryst_Family
 
     !!--++
@@ -2355,7 +2337,6 @@
 
        End Select
 
-       return
     End Subroutine Get_Cryst_Orthog_Matrix
 
     !!----
@@ -2571,7 +2552,6 @@
 
        endif
 
-       return
     End Subroutine Get_Deriv_Orth_Cell
 
     !!----
@@ -2638,7 +2618,6 @@
        celang(3)=acosd(metric(1,2)/(celp(1)*celp(2)))
        call Set_Crystal_Cell(celp,celang,primitive_cell)
 
-       return
     End Subroutine Get_Primitive_Cell
 
     !!----
@@ -2697,7 +2676,6 @@
           end do           !i2
        end do  dox       !i1
 
-       return
     End Subroutine Get_Transfm_Matrix
 
     !!----
@@ -2798,7 +2776,6 @@
        twofold%ntwo=ntwo
        twofold%tol=tol
 
-       return
     End Subroutine Get_TwoFold_Axes
 
     !!----
@@ -2813,7 +2790,6 @@
        Err_Crys=.false.
        ERR_Crys_Mess=" "
 
-       return
     End Subroutine Init_Err_Crys
 
     !!----
@@ -2915,7 +2891,6 @@
        ad(5) = acosd(n_mat(2,2)/(ad(1)*ad(3)))
        ad(6) = acosd(n_mat(2,3)/(ad(1)*ad(2)))
 
-       return
     End Subroutine Niggli_Cell_abc
 
     !!--++
@@ -3102,7 +3077,6 @@
           end if
        end if
 
-       return
     End Subroutine Niggli_Cell_nigglimat
 
     !!--++
@@ -3164,7 +3138,6 @@
           al=celda%ang(1); be=celda%ang(2); ga=celda%ang(3)
        end if
 
-       return
     End Subroutine Niggli_Cell_Params
 
     !!--++
@@ -3216,7 +3189,6 @@
           cell=celda
        end if
 
-       return
     End Subroutine Niggli_Cell_Type
 
     !!--++
@@ -3268,7 +3240,6 @@
        if (Err_Crys) return
        if (present(celln)) celln=celda
 
-       return
     End Subroutine Niggli_Cell_Vect
 
 
@@ -3280,33 +3251,36 @@
     !!----
     !!----  re-orders eigenvectors and their eigenvalues so that #1 is close to +X of Cartesian, etc
     !!----  written 2/2019 RJA
+    !!----  changed sort algorithm  4/2024 RJA because previous version was not correct for all cases.
 
     Subroutine Orient_Eigenvectors(eval,evec)
-    !---- Arguments ----!
-    real(kind=cp),dimension(3),intent(inout)     :: eval
-    real(kind=cp),dimension(3,3),intent(inout)     :: evec
+      !---- Arguments ----!
+      real(kind=cp),dimension(3),intent(inout)     :: eval
+      real(kind=cp),dimension(3,3),intent(inout)     :: evec
 
-    !---- Local Variables ----!
-    integer                        :: j,s
-    integer,dimension(1)            :: i
+      !---- Local Variables ----!
+      integer                        :: j
+      integer,dimension(2)           :: ibig
 
-    real(kind=cp),dimension(3)     :: val,t
-    real(kind=cp),dimension(3,3)   :: vec
+      real(kind=cp),dimension(3)     :: val
+      real(kind=cp),dimension(3,3)   :: vec,vecs
 
-    !>working copy
-    val=eval
-    vec=evec
+      !>working copies
+      val=eval
+      vec=evec
+      vecs=evec
 
-    !> do sort by copy from vec back to evec
-    do j=1,3
-        t(1:3)=abs(vec(j,1:3))          ! find evector with largest component along Cart axis j, allow for evec parallel to -ve cart axis
-        i=maxloc(t)
-        s=sign(1.0_cp,vec(j,i(1)))
-        eval(j)=val(i(1))
-        evec(1:3,j)=s*vec(1:3,i(1))
-    enddo
+      !> do sort by copy from vec back to evec
+      do j=1,3
+          ibig=maxloc(abs(vec))       !Find largest abs(cosine) = smallest angle
+          !>copy evec and eval from store to correct location in evec
+          evec(1:3,ibig(2))=vecs(1:3,ibig(1))
+          eval(ibig(2))=val(ibig(1))
+          !>clear used values in vec to 0. which corresponds to 90deg
+          vec(ibig(1),1:3)=0.0_cp
+          vec(1:3,ibig(2))=0.0_cp
+      end do
 
-    return
     end subroutine Orient_Eigenvectors
 
     !!----
@@ -3344,7 +3318,6 @@
                        Celda%RCellVol,       &
                        Celda%CartType
        if( ier /= 0) ok=.false.
-       return
     End Subroutine Read_Bin_Crystal_Cell
 
 
@@ -3396,7 +3369,6 @@
           angr(i)=acosd(angr(i))
        end do
 
-       return
     End Subroutine Recip
 
     !!----
@@ -3483,7 +3455,6 @@
           end if
        end if
 
-       return
     End Subroutine Set_Crystal_Cell
 
     !!----
@@ -3550,7 +3521,6 @@
 
        sigv=sqrt(sigv)
 
-       return
     End Subroutine Volume_Sigma_from_Cell
 
     !!----
@@ -3582,7 +3552,6 @@
                        Celda%CellVol,        &
                        Celda%RCellVol,       &
                        Celda%CartType
-       return
     End Subroutine Write_Bin_Crystal_Cell
 
     !!----
@@ -3653,7 +3622,6 @@
           Write(unit=iunit,fmt="(3f12.6,a,3f12.4)") (Celda%BL_M(i,j),j=1,3),"      ", (Celda%BL_Minv(i,j),j=1,3)
        end do
 
-       return
     End Subroutine Write_Crystal_Cell
 
  End Module CFML_Crystal_Metrics
