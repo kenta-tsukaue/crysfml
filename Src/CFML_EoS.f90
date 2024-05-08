@@ -499,7 +499,6 @@ Contains
 
       alpha=(v(-2)+8.0_cp*(v(1)-v(-1))-v(2))/(12.0_cp*del)/v(0)     ! Derivative to second order approximation
 
-      return
    End Function Alpha_Cal
 
    !!--++
@@ -738,7 +737,6 @@ Contains
          end select                                 !other thermal equations have nothing to convert
       end if
 
-      return
    End Function Deriv_Partial_P_Analytic
 
    !!--++
@@ -842,7 +840,6 @@ Contains
 
       !> no need to fix derivatives for linear eos by this method
 
-      return
    End Function Deriv_Partial_P_Numeric
 
    !!--++
@@ -916,7 +913,6 @@ Contains
          warn_eos_mess='Error calculating some derivatives of scales in Least squares'
       end if
 
-      return
    End Function Deriv_Partial_P_Scales
 
    !!----
@@ -961,7 +957,6 @@ Contains
          end if
       end if
 
-      return
    End Function Deriv_Partial_P
 
    !!----
@@ -1034,7 +1029,6 @@ Contains
       !> No linear conversion is required because get_K returns values for "linear Kp" = Mp,
       !> so kppc is already dMp/dP = Mpp
 
-      return
    End Function dKdT_Cal
 
    !!----
@@ -1064,7 +1058,6 @@ Contains
       parvals(5)=dKdT_cal(p,t,eos)           ! dK/dT at this P,T
       parvals(6)=alpha_cal(p,t,eos)          ! 1/V.dV/dT at this T
 
-      return
    End Function EoS_Cal
 
    !!----
@@ -1099,7 +1092,6 @@ Contains
             esd(6)=esd(6)/3.0_cp            ! alpha is 1/3 of p1
       end select
 
-      return
    End Function EoS_Cal_Esd
 
    !!--++
@@ -1146,7 +1138,6 @@ Contains
 
       end if
 
-      return
    End Function EoS_to_Vec
 
    !!--++
@@ -1182,7 +1173,6 @@ Contains
       !> test for cm3/mol or equivalent
       if (index(vname,'CM') > 0 .and. index(vname,'3') > 0 .and. index(vname,'MOL') > 0)scale=scale*1.0E+6
 
-      return
    End Function EPthermal_factor
 
    !!--++
@@ -1217,7 +1207,6 @@ Contains
          err_eos_mess=trim(err_Mathgen_mess)
       end if
 
-      return
    End Function EthDebye
 
    !!--++
@@ -1243,7 +1232,6 @@ Contains
          Eth=3.0_cp*Natom*8.314_cp*Theta/(exp(Theta/T)-1.0_cp)
       end if
 
-      return
    End Function EthEinstein
    !!--++
    !!--++ FUNCTION ETHTABLE
@@ -1282,7 +1270,6 @@ Contains
             endif
       end if
 
-      return
    End Function EthTable
    !!--++
    !!--++ FUNCTION GET_ALPHA_AXIS
@@ -1319,7 +1306,6 @@ Contains
             alpha=alpha_cal(p,t,cell_eos%eos(cell_eos%unique))
       end select
 
-      return
    End Function Get_Alpha_Axis
 
    !!----
@@ -1354,7 +1340,6 @@ Contains
             alpha=get_alpha_general(p,T,cell_eos,axis)
       end select
 
-      return
    End Function Get_Alpha_Cell
 
    !!--++
@@ -1394,7 +1379,6 @@ Contains
       imid=int(NSTEP/2) + 1
       alpha=dy(imid)/y(imid)
 
-      return
    End Function Get_Alpha_General
 
    !!--++
@@ -1467,7 +1451,6 @@ Contains
             end select
       end select
 
-      return
    End Function Get_Alpha_Third
 
    !!----
@@ -1511,7 +1494,6 @@ Contains
          da=get_angle_eos_deriv(p,t,cell_eos,ia,realang,dx)
       end if
 
-      return
    End Function Get_Angle_Deriv
 
    !!--++
@@ -1567,7 +1549,6 @@ Contains
 
       d=dy(imid)*to_rad
 
-      return
    End Function Get_Angle_Eos_Deriv
 
    !!--++
@@ -1608,7 +1589,6 @@ Contains
          ang=90._cp
       end if
 
-      return
    End Function Get_Angle_Poly
 
    !!--++
@@ -1652,7 +1632,6 @@ Contains
       end select
       d=d*to_rad
 
-      return
    End Function Get_Angle_Poly_Deriv
 
    !!--++
@@ -1695,7 +1674,6 @@ Contains
             end if
       end select
 
-      return
    End Function Get_Angle_VolFactor
 
    !!--++
@@ -1767,7 +1745,6 @@ Contains
 
       end select
 
-      return
    End Function Get_Angle_VolFactor_Deriv
 
    !!--++
@@ -1819,7 +1796,6 @@ Contains
 
       d=(a(-2)+8.0_cp*(a(1)-a(-1))-a(2))/(12.0_cp*del)     ! Derivative to second order approximation
 
-      return
    End Function Get_Angle_VolFactor_Deriv2
 
    !!--++
@@ -1884,7 +1860,6 @@ Contains
       a(3,2)=c0*c0*a(1,2)
       a(3,3)=-2.0_cp*c2 + c3*(-4.0_cp*x+6.0_cp*x) !Only one with extra term for AP3
 
-      return
    End Function Get_APL
 
    !!----
@@ -1938,7 +1913,6 @@ Contains
             c=(1.0_cp + al*gamma*T)*get_cv(p,t,eos)
       end select
 
-      return
    End Function Get_Cp
 
    !!----
@@ -2052,7 +2026,6 @@ Contains
          cv=cvpart(jo)
       end if
 
-      return
    End Function Get_Cv
    
 
@@ -2120,7 +2093,6 @@ Contains
          end if
       end if
 
-      return
    End Function Get_DebyeT
 
    !!--++
@@ -2159,7 +2131,6 @@ Contains
             dmdt=dKdt_cal(p,t,cell_eos%eos(cell_eos%unique))
       end select
 
-      return
    End Function Get_DmDt_Axis
 
    !!--++
@@ -2193,7 +2164,6 @@ Contains
 
       end select
 
-      return
    End Function Get_DmDt_Cell
 
    !!--++
@@ -2234,7 +2204,6 @@ Contains
       imid=int(nstep/2) + 1
       dMdT=dy(imid)
 
-      return
    End Function Get_DmDt_General
 
    !!--++
@@ -2323,7 +2292,6 @@ Contains
             end select
       end select
 
-      return
    End Function Get_DmDt_Third
 
    !!----
@@ -2358,7 +2326,6 @@ Contains
 
       end select
 
-      return
    End Function Get_GPT
 
    !!----
@@ -2387,7 +2354,6 @@ Contains
       v=get_volume(P,T,eos)
       G=Get_Grun_V(v,Eos,i)
 
-      return
    End Function Get_Grun_PT
 
    !!----
@@ -2479,7 +2445,6 @@ Contains
         end if
       end if
 
-      return
    End Function Get_Grun_Th
 
   
@@ -2559,7 +2524,6 @@ Contains
          end if
       end if
 
-      return
    End Function Get_Grun_V
 
    !!----
@@ -2583,7 +2547,6 @@ Contains
       v=get_volume(p,t,eos)
       k=k_cal(v,t,eos,p=p)
 
-      return
    End Function Get_K
 
    !!--++
@@ -2622,7 +2585,6 @@ Contains
          end select
       end if
 
-      return
    End Function Get_K0_T
 
    !!----
@@ -2646,7 +2608,6 @@ Contains
       v=get_volume(p,t,eos)
       kp=kp_cal(v,t,eos,p=p)
 
-      return
    End Function Get_Kp
 
    !!--++
@@ -2682,7 +2643,6 @@ Contains
          end select
       end if
 
-      return
    End Function Get_Kp0_T
 
    !!--++
@@ -2718,7 +2678,6 @@ Contains
             kpp0=eost%params(4)
       end select
 
-      return
    End Function Get_Kpp0_T
 
 
@@ -2760,7 +2719,6 @@ Contains
             modu=get_k(p,t,cell_eos%eos(cell_eos%unique))
       end select
 
-      return
    End Function Get_Mod_Axis
 
    !!----
@@ -2795,7 +2753,6 @@ Contains
             modu=get_mod_general(p,T,cell_eos,axis)
       end select
 
-      return
    End Function Get_Mod_Cell
 
    !!--++
@@ -2850,7 +2807,6 @@ Contains
       imid=int(NSTEP/2) + 1
       Modu=-1.0*y(imid)/dy(imid)
 
-      return
    End Function  Get_Mod_General
 
    !!--++
@@ -2923,7 +2879,6 @@ Contains
             end select
       end select
 
-      return
    End Function Get_Mod_Third
 
    !!----
@@ -2961,7 +2916,6 @@ Contains
             modp=get_kp(p,t,cell_eos%eos(cell_eos%unique))
       end select
 
-      return
    End Function Get_Modp_Axis
 
    !!----
@@ -2995,7 +2949,6 @@ Contains
             modp=get_modp_general(p,T,cell_eos,axis)
       end select
 
-      return
    End Function Get_Modp_Cell
 
    !!--++
@@ -3043,7 +2996,6 @@ Contains
       imid=int(NSTEP/2) + 1
       Mp=dy(imid)
 
-      return
    End Function Get_Modp_General
 
    !!--++
@@ -3131,7 +3083,6 @@ Contains
             end select
       end select
 
-      return
    End Function Get_Modp_Third
 
 
@@ -3221,7 +3172,6 @@ Contains
       !> Set the metric tensor
       call Set_Crystal_Cell (abc, Ang, Cell,cartype=ctype)
 
-      return
    End Function Get_Params_Cell
 
    !!----
@@ -3258,7 +3208,6 @@ Contains
             p=get_pressure(p,t,cell_eos%eos(cell_eos%unique))
       end select
 
-      return
    End Function Get_Press_Axis
 
    !!----
@@ -3289,7 +3238,6 @@ Contains
 
       end select
 
-      return
    End Function Get_Press_Cell
 
    !!--++
@@ -3344,7 +3292,6 @@ Contains
          p=p+step
       end do
 
-      return
    End Function Get_Press_General
 
    !!--++
@@ -3403,7 +3350,6 @@ Contains
          p=p+step
       end do
 
-      return
    End Function Get_Press_Third
 
    !!----
@@ -3565,7 +3511,6 @@ Contains
          first=.false.
       end do
 
-      return
    End Function Get_Pressure
 
    !!----
@@ -3612,7 +3557,6 @@ Contains
       !> Final
       esd=sqrt(esd)
 
-      return
    End Function Get_Pressure_Esd
 
    !!--++
@@ -3714,7 +3658,6 @@ Contains
           end if
       end do
 
-      return
    End Function Get_Pressure_K
 
    !!----
@@ -3756,7 +3699,6 @@ Contains
             p=0.0_cp
       end select
 
-      return
    End Function Get_Pressure_X
 
    !!----
@@ -3800,7 +3742,6 @@ Contains
             val=0.0
       end select
 
-      return
    End Function Get_Property_X
 
    !!----
@@ -3829,7 +3770,6 @@ Contains
       parvals(5)=get_dMdT_general(P,T,cell_eos,axis)        ! dK/dT
       parvals(6)=get_alpha_general(P,T,cell_eos,axis)       ! alpha
 
-      return
    End Function Get_Props_General
 
    !!--++
@@ -4136,7 +4076,6 @@ Contains
           end select
       endif
       
-      return
    End Function Get_Props_PTVTable
 
    !!----
@@ -4166,7 +4105,6 @@ Contains
       parvals(5)=get_dMdT_third(P,T,cell_eos,ieos)         ! dK/dT
       parvals(6)=get_alpha_third(P,T,cell_eos,ieos)        ! alpha
 
-      return
    End Function Get_Props_Third
 
    !!--++
@@ -4217,7 +4155,6 @@ Contains
 
       Vec(3)= (1.0_cp+kp+k0*kpp)/(kp*kp+kp-k0*kpp)
 
-      return
    End Function Get_Tait
 
    !!----
@@ -4296,7 +4233,6 @@ Contains
 
       t=ta              ! success
 
-      return
    End Function Get_Temperature
 
    !!--++
@@ -4576,7 +4512,6 @@ Contains
 
       end select
 
-      return
    End Function Get_Temperature_P0
 
    !!----
@@ -4624,7 +4559,6 @@ Contains
 
       end select
 
-      return
    End Function Get_Transition_Pressure
 
    !!----
@@ -4685,7 +4619,6 @@ Contains
          end select
       end if
 
-      return
    End Function Get_Transition_Strain
 
    !!----
@@ -4718,7 +4651,6 @@ Contains
             Tr = eos%params(21)+p*eos%params(22)+p*p*eos%params(23)
       end select
 
-      return
    End Function Get_Transition_Temperature
 
    !!--++
@@ -4754,7 +4686,6 @@ Contains
             L=get_volume_third(cell_eos%eosc%pref,cell_eos%eosc%tref,cell_eos,ieos)
       end select
 
-      return
    End Function Get_V0_Axis
 
    !!--++
@@ -4788,7 +4719,6 @@ Contains
             L=get_volume_general(cell_eos%eosc%pref,cell_eos%eosc%tref,cell_eos,axis)
       end select
 
-      return
    End Function Get_V0_Cell
 
    !!--++
@@ -4889,7 +4819,6 @@ Contains
       !> Linear
       if (EoS%linear) v=v**(1.0_cp/3.0_cp)
 
-      return
    End Function Get_V0_T
 
    !!----
@@ -5097,7 +5026,6 @@ Contains
       v=vol
       if (EoS%itran > 0) v=vol*(1.0_cp + strain)  ! apply transition strain ('vol' is actually linear if linear eos)
 
-      return
    End Function Get_Volume
 
    !!----
@@ -5135,7 +5063,6 @@ Contains
             L=get_volume(p,t,cell_eos%eos(cell_eos%unique))
       end select
 
-      return
    End Function Get_Volume_Axis
 
    !!----
@@ -5170,7 +5097,6 @@ Contains
             L=get_volume_general(p,T,cell_eos,axis)
       end select
 
-      return
    End Function Get_Volume_Cell
 
    !!--++
@@ -5207,7 +5133,6 @@ Contains
             L=10.0_cp
       end select
 
-      return
    End Function Get_Volume_General
 
    !!--++
@@ -5292,7 +5217,6 @@ Contains
          V=vnew
       end do
 
-      return
    End Function Get_Volume_K
 
    !!--++
@@ -5334,7 +5258,6 @@ Contains
       !> Linear case
       if (e%linear) v=v**(1.0_cp/3.0_cp)
 
-      return
    End Function Get_Volume_K_old
 
    !!----
@@ -5388,7 +5311,6 @@ Contains
       !> Linear case
       if (EoS%linear) v=v**(1.0_cp/3.0_cp)
 
-      return
    End Function Get_Volume_S
 
    !!--++
@@ -5467,7 +5389,6 @@ Contains
             end select
       end select
 
-      return
    End Function Get_Volume_Third
 
    !!----
@@ -5493,7 +5414,6 @@ Contains
     if(index(sys,'CUB')  > 0)return
     isotropic=.false.
 
-    return
     end function Isotropic_Cell
 
    !!----
@@ -5730,7 +5650,6 @@ Contains
          kc=1.0_cp/(1.0_cp/kc - dVs/(1+Vs))
       end if
 
-      return
    End Function K_Cal
 
    !!----
@@ -5983,7 +5902,6 @@ Contains
          kpc= (betap_tran - betap_bare)*(k**2.0_cp)
       end if
 
-      return
    End Function Kp_Cal
 
    !!----
@@ -6051,7 +5969,6 @@ Contains
       !> No linear conversion is required because kp_cal returns values for "linear Kp" = Mp,
       !> so kppc is already dMp/dP = Mpp
 
-      return
    End Function Kpp_Cal
 
    !!--++
@@ -6081,7 +5998,6 @@ Contains
             allowed=.false.
       end select
 
-      return
    End Function Linear_EoS_Allowed_Eos
 
    !!--++
@@ -6110,7 +6026,6 @@ Contains
          if (itherm == 6 .or. itherm == 7 .or. itherm == 8 .or. itherm == 9) allowed=.false.  !MGD & Einstein
       end if
 
-      return
    End Function Linear_EoS_Allowed_I
 
    !!--++
@@ -6149,7 +6064,6 @@ Contains
       !> Value
       v=v0*(1.0_cp+kp/k0*(p-eos%table%ptv(is+1,j,1)))**(-1.0_cp/kp)
 
-      return
    End Function Murn_Interpolate_PTV_Table
 
    !!--++
@@ -6203,7 +6117,6 @@ Contains
       !> adjust K now if im /= i; Kp should be constant for a Murn
       if (i /= im) eosm%params(2)=eosm%params(2)+eosm%params(3)*(eos%table%ptv(i,j,1)-eos%table%ptv(im,j,1))
 
-      return
    End Function Murn_PTV_Table
 
    !!--++
@@ -6286,7 +6199,6 @@ Contains
             f=K0*(1.0_cp + b*s + c*s*s)
       end select
 
-      return
    End Function NormPressure_Eos
 
    !!--++
@@ -6336,7 +6248,6 @@ Contains
          end select
       end if
 
-      return
    End Function NormPressure_P
 
    !!----
@@ -6378,7 +6289,6 @@ Contains
             p=3.0_cp*f*s*exp(3.0_cp*s)
       end select
 
-      return
    End Function Pressure_F
 
    !!--++
@@ -6427,7 +6337,6 @@ Contains
             end select
       end select
 
-      return
    End Function Principal_EoS
 
    !!----
@@ -6452,7 +6361,6 @@ Contains
       if (index(vname,'KBAR') > 0 ) MGD=.true.
 
 
-      return
    End Function PscaleMGD
 
    !!----
@@ -6556,7 +6464,6 @@ Contains
          pth=pthp(jo)
       end if
 
-      return
    End Function Pthermal
 
    !!----
@@ -6590,7 +6497,6 @@ Contains
          end do
       end if
 
-      return
    End Function Set_XdataTypes
 
    !!----
@@ -6640,7 +6546,6 @@ Contains
             s= -1.0_cp*log(cvv0)/3.0_cp
       end select
 
-      return
    End Function Strain
 
    !!----
@@ -6672,7 +6577,6 @@ Contains
       vvo=v/get_volume(0.0_cp,t,eos)     ! vv0 is V(P,T)/V(0,T) or a(P,T)/a(0,T)
       s=strain(vvo,eos)                  ! cubes vv0 on input if linear
 
-      return
    End Function Strain_EOS
 
    !!----
@@ -6699,7 +6603,6 @@ Contains
             pth=.false.
       end select
 
-      return
    End Function Thermal_Pressure_Eos
 
    !!--++
@@ -6779,7 +6682,6 @@ Contains
           end if
       end do
 
-      return
    End Function Transform_Esd
 
    !!----
@@ -6824,7 +6726,6 @@ Contains
       !> Now invert result if the lowT phase is high symm phase:
       if (eos%params(20) < 0) ip = .not. ip
 
-      return
    End Function Transition_Phase
 
    !!----
@@ -6847,7 +6748,6 @@ Contains
 
       if (index(vname,'CM') > 0 .and. index(vname,'3') > 0 .and. index(vname,'MOL') > 0) MGD=.true.
 
-      return
    End Function VscaleMGD
 
 
@@ -6889,7 +6789,6 @@ Contains
          call init_eos_data_type(e%eosd(i))
       end do
 
-      return
    End Subroutine Allocate_EoS_Data_List
 
    !!----
@@ -6925,7 +6824,6 @@ Contains
          call init_eos_type(e%eos(i))
       end do
 
-      return
    End Subroutine Allocate_EoS_List
 
    !!----
@@ -7032,7 +6930,6 @@ Contains
          end if
       end do
 
-      return
    End Subroutine Calc_Conlev
 
    !!--++
@@ -7068,7 +6965,6 @@ Contains
 
       ok=.false.
 
-      return
    End Subroutine Check_Axis
 
    !!----
@@ -7164,7 +7060,6 @@ Contains
          end if
       end if
 
-      return
    End Subroutine Check_Scales
 
    !!----
@@ -7185,7 +7080,6 @@ Contains
       call Allocate_EoS_Data_List(dat1%N, dat2)
       dat2=dat1
 
-      return
    End Subroutine Copy_Eos_Data_List
 
    !!----
@@ -7204,7 +7098,6 @@ Contains
       if (allocated(E%eosd)) deallocate (E%eosd)
       E%n=0
 
-      return
    End Subroutine Deallocate_EoS_Data_List
 
    !!----
@@ -7223,7 +7116,6 @@ Contains
       if (allocated(E%eos)) deallocate (E%eos)
       E%n=0
 
-      return
    End Subroutine Deallocate_EoS_List
 
    !!----
@@ -7392,7 +7284,6 @@ Contains
          end do
       end if
 
-      return
    End Subroutine Def_Crystal_System
    !!----
    !!---- SUBROUTINE EOS_CELL_LOADED_CHECK
@@ -7493,7 +7384,6 @@ Contains
 
       Warn_EOS=.false.
 
-      return
    End Subroutine Eos_Cell_Loaded_Check
    !!----
    !!---- SUBROUTINE EOSCAL_TEXT
@@ -7644,8 +7534,6 @@ Contains
                 text=trim(text)//'  '//trim(rformat(parout(20),ip(20)))//'  '//trim(rformat(parout(21),ip(21)))
       endif
 
-
-      return
    End Subroutine Eoscal_Text
 
    !!--++
@@ -7718,7 +7606,6 @@ Contains
          text=trim(text)//'  '//trim(rformat(parout(i),ip(i)))
       end do
 
-      return
    End Subroutine Eoscal_Text_Direction
 
    !!----
@@ -7964,7 +7851,6 @@ Contains
         end if
       end if
 
-      return
    End Subroutine EoSParams_Check
 
    !!----
@@ -8004,7 +7890,6 @@ Contains
       if (present(f)) f=fc
       if (present(s)) s=sc
 
-      return
    End Subroutine FfCal_Dat
 
    !!----
@@ -8097,7 +7982,6 @@ Contains
             sigf=f*sqrt(e**2.0_cp + sigmap**2.0_cp)
       end select
 
-      return
    End Subroutine FfCal_Dat_Esd
 
    !!----
@@ -8127,7 +8011,6 @@ Contains
       s=strain_eos(v,t,eos)         ! finite strain at this P,T
       f=normpressure_eos(s,t,eos)   ! Norm pressure
 
-      return
    End Subroutine FfCal_EoS
 
 
@@ -8299,7 +8182,6 @@ Contains
          call fix_tensor(x%ep,x%system)   ! make strain conform to crystal system, and thus eliminate round-off error
       end if
 
-      return
    End Subroutine Get_Tensor_Eos
 
    !!----
@@ -8319,7 +8201,6 @@ Contains
       Eos%AngPoly  = 0.0_cp
       Eos%angpoly(1:3,0,1)=90._cp
 
-      return
    End Subroutine Init_EoS_Angles
 
    !!----
@@ -8350,7 +8231,6 @@ Contains
       call Init_EoS_Type(cell_eos%eosang)
       call set_cell_types(cell_eos)      ! sets the cout array PV VT etc
 
-      return
     end subroutine Init_Eos_Cell_Type
 
    !!----
@@ -8378,7 +8258,6 @@ Contains
       call Set_Cross_Names(EoS)    ! Set the variable names
       call Set_Eos_Use(EoS)        ! update the use flags
 
-      return
    End Subroutine Init_EoS_Cross
 
    !!----
@@ -8406,7 +8285,6 @@ Contains
       E%sigc = 0.0
       E%siga = 0.0
 
-      return
    End Subroutine Init_EoS_Data_Type
 
    !!----
@@ -8441,7 +8319,6 @@ Contains
       ! and therefore cannot be set in cfml_eos_mod but must be reset by main programs
       EoS%iuse(50:59)=0
 
-      return
    End Subroutine Init_EoS_GroupScales
 
    !!----
@@ -8492,7 +8369,6 @@ Contains
       call Set_Osc_Names(Eos)    ! Set the variable names
       call Set_Eos_Use(Eos)        ! update the use flags
 
-      return
    End Subroutine Init_EoS_Osc
 
    !!----
@@ -8533,7 +8409,6 @@ Contains
       call Set_Shear_Names(EoS)    ! Set the variable names
       call Set_Eos_Use(EoS)        ! update the use flags
 
-      return
    End Subroutine Init_EoS_Shear
 
    !!----
@@ -8662,7 +8537,6 @@ Contains
       call Set_Thermal_Names(EoS)                  ! Set the variable names
       call Set_Eos_Use(EoS)                        ! update the use flags and other pointers
 
-      return
    End Subroutine Init_EoS_Thermal
 
    !!----
@@ -8742,7 +8616,6 @@ Contains
       call Set_Transition_Names(EoS)    ! Set the variable names
       call Set_Eos_Use(EoS)             ! update the use flags
 
-      return
    End Subroutine Init_EoS_Transition
 
    !!----
@@ -8849,7 +8722,6 @@ Contains
 
       call Init_EoS_Angles(Eos)
 
-      return
    End Subroutine Init_EoS_Type
 
    !!----
@@ -8866,7 +8738,6 @@ Contains
       Warn_EoS=.false.
       Warn_Eos_Mess=" "
 
-      return
    End Subroutine Init_Err_EoS
 
 
@@ -9056,7 +8927,6 @@ Contains
          end if
       end if
 
-      return
    End Subroutine Physical_Check
 
    !!----
@@ -9159,7 +9029,6 @@ Contains
 
       if (err_eos)err_eos_mess='K < K0/2'
 
-      return
    End Subroutine PVEoS_Check
 
    !!----
@@ -9168,7 +9037,9 @@ Contains
    !!---- General routine to read data for Eos
    !!----
    !!---- Update: 06/12/2018  RJA: reading of Vscale and Pscale from file
-   !!
+   !!---- Update: 07/05/2024  RJA: clean up code after various fixes, including elimination of tabs from file
+   !!----
+   
    Subroutine Read_EoS_DataFile(FName, Dat)
       !---- Arguments ----!
       character(len=*),          intent(in)  :: fname   ! File name
@@ -9215,6 +9086,14 @@ Contains
       allocate(flines(nlines))
       flines=' '
       call reading_lines(trim(filedat),nlines,flines)
+      
+      !> Replace tabs in all lines by blank character: moved here April 2024. Previously only applied to data lines
+      do i=1,nlines
+          call Get_Separator_pos(flines(i),char(9),ivet,iv)
+          do j=1,iv
+             flines(i)(ivet(j):ivet(j))=' '
+          end do      
+      enddo      
 
       !> Title
       i=1
@@ -9298,11 +9177,7 @@ Contains
          line(ivet(m):ivet(m))=' '
       end do
 
-      !> Replace tabs in the format line by blank character
-      call Get_Separator_pos(line,char(9),ivet,iv)
-      do j=1,iv
-         line(ivet(j):ivet(j))=' '
-      end do
+
 
       call getword(line,dire,iv)
       if (iv <= 1) then
@@ -9450,11 +9325,6 @@ Contains
             line(ivet(j):ivet(j))=' '
          end do
 
-         !> Replace tab by blank character
-         call Get_Separator_pos(line,char(9),ivet,iv)
-         do j=1,iv
-            line(ivet(j):ivet(j))=' '
-         end do
 
          !> Check for brackets indicating esd's consistent with format
          if (esd_as_num) then
@@ -9592,9 +9462,7 @@ Contains
       !> Volume calculation if have cell parameters
       call Set_Volume_from_Cell(dat)
 
-      return
    End Subroutine Read_EoS_DataFile
-
    !!----
    !!---- SUBROUTINE READ_EOS_FILE
    !!----
@@ -9620,7 +9488,6 @@ Contains
           EoS=Eoslist%eos(1)
       end if
 
-      return
    End Subroutine Read_Eos_File
 
    !!--++
@@ -9913,7 +9780,6 @@ Contains
          if (abs(eos%vcv(i,i)) > tiny(0.0)) eos%iref(i)=1
       end do
 
-      return
    End Subroutine Read_Eos_In
 
    !!----
@@ -9984,7 +9850,6 @@ Contains
          eoslist%eos(i)=eos
       end do
 
-      return
    End Subroutine Read_Multiple_Eos_File
 
    !!----
@@ -10159,7 +10024,6 @@ Contains
          end if
       end do
 
-      return
    End Subroutine Set_Cell_Types
 
    !!--++
@@ -10206,7 +10070,6 @@ Contains
             EoS%comment(9) = 'delta_prime for Kprime power law, without units'
       end select
 
-      return
    End Subroutine Set_Cross_Names
 
    !!--++
@@ -10265,7 +10128,6 @@ Contains
             EoS%factor(26)          = 1.0E3_cp         ! 1000 for aH
       end select
 
-      return
    End Subroutine Set_Eos_Factors
 
    !!----
@@ -10368,7 +10230,6 @@ Contains
          if (EoS%iorder == 2 .or. EoS%iorder == 3) EoS%params(4)=ev(4)*3.0_cp
       end if
 
-      return
    End Subroutine Set_Eos_Implied_Values
 
    !!----
@@ -10454,7 +10315,6 @@ Contains
       EoS%pscale_name=trim(adjustl(EoS%pscale_name))
       EoS%vscale_name=trim(adjustl(EoS%vscale_name))
 
-      return
    End Subroutine Set_Eos_Names
 
    !!----
@@ -10669,7 +10529,6 @@ Contains
          if (EoS%iuse(i) /=1) EoS%iref(i)=0
       end do
 
-      return
    End Subroutine Set_Eos_Use
 
 
@@ -10733,7 +10592,6 @@ Contains
           end select
       end do
 
-      return
    End Subroutine Set_Osc_Names
 
    !!--++
@@ -10780,7 +10638,6 @@ Contains
             EoS%comment(34)='Temperature derivative of shear modulus'
       end select
 
-      return
    End Subroutine Set_Shear_Names
 
    !!--++
@@ -10900,7 +10757,6 @@ Contains
       EoS%parname(19) = 'q    '
       EoS%comment(19) = 'Gruneisen power law in V/V0'
 
-      return
    End Subroutine Set_Thermal_Names
 
    !!--++
@@ -10966,7 +10822,6 @@ Contains
             EoS%comment(27) = 'Power law term, high phase'
       end select
 
-      return
    End Subroutine Set_Transition_Names
 
    !!--++
@@ -10994,7 +10849,6 @@ Contains
                                      dat%eosd(i)%siga,dat%eosd(i)%v,dat%eosd(i)%sigv)
       end do
 
-      return
    End Subroutine Set_Volume_from_Cell
 
    !!--++
@@ -11036,7 +10890,6 @@ Contains
 
       end if
 
-      return
    End Subroutine Vec_to_EoS
 
    !!----
@@ -11067,7 +10920,6 @@ Contains
                                        trim(rformat(xyy(3,i),10))
       end do
 
-      return
    End Subroutine Write_Data_Conlev
 
    !!----
@@ -11173,7 +11025,6 @@ Contains
          write(unit=lun,fmt='(1x)',iostat=ierr)          ! forces new line
       end do
 
-      return
    End Subroutine Write_Eos_Datafile
 
    !!----
@@ -11344,7 +11195,6 @@ Contains
          enddo
       endif
       
-      return
    End Subroutine Write_Eos_File
 
    !!----
@@ -11498,7 +11348,6 @@ Contains
          end if
       end do outer
 
-      return
    End Subroutine Write_Eoscal
 
    !!--++
@@ -11540,7 +11389,6 @@ Contains
       !> Write header
       write(lun,'(/a)')trim(head)
 
-      return
    End Subroutine Write_Eoscal_Cell_Header
 
    !!----
@@ -11633,8 +11481,6 @@ Contains
             write(lun,'(/a)')trim(head)
         endif
         
-
-      return
    End Subroutine Write_Eoscal_Header
 
    !!--++
@@ -11707,7 +11553,6 @@ Contains
          write(unit=lun,fmt='(a)')trim(ltext)
       end do
 
-      return
    End Subroutine Write_Info_Angle_Poly
 
    !!----
@@ -11741,8 +11586,6 @@ Contains
       write(lun,'(//,a,//)') &
                 "Data points for plotting: first column is X with two columns with the two Y values at that X"
 
-
-      return
    End Subroutine Write_Info_Conlev
 
    !!----
@@ -11868,7 +11711,6 @@ Contains
       !> End
       write(unit=lun,fmt='(a)') ' '
 
-      return
    End Subroutine Write_Info_Eos
 
    !!----
@@ -11973,7 +11815,6 @@ Contains
 
       write(unit=lun,fmt='(a)') ' '
 
-      return
    End Subroutine Write_Info_Eos_Cell_Type
 
    !!--++
@@ -12023,7 +11864,6 @@ Contains
       end do
       write(unit=lun,fmt='(a)') ' '
 
-      return
    End Subroutine Write_Info_Eos_Cross
 
    !!--++
@@ -12063,7 +11903,6 @@ Contains
          end if
       end do
 
-      return
    End Subroutine Write_Info_Eos_GroupScales
 
    !!--++
@@ -12116,7 +11955,6 @@ Contains
          end do
       end do
 
-      return
    End Subroutine Write_Info_Eos_Oscillator
 
    !!--++
@@ -12166,7 +12004,6 @@ Contains
       end do
       write(unit=lun,fmt='(a)') ' '
 
-      return
    End Subroutine Write_Info_Eos_Shear
 
    !!--++
@@ -12234,7 +12071,6 @@ Contains
          write(unit=lun,fmt='(a,f6.3,a)') '   This oscillator models ',1.0_cp-EoS%params(40)-EoS%params(45),' of the total modes'
       end if
 
-      return
    End Subroutine Write_Info_Eos_Thermal
 
    !!--++
@@ -12283,7 +12119,6 @@ Contains
          end if
       end do
 
-      return
    End Subroutine Write_Info_Eos_Transition
 
 End Module CFML_EoS
