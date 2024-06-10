@@ -642,36 +642,36 @@
           case("m-3m")
              !---- Laue: m-3m ----!
              !---- hkl: h >=0, k >=0, l >=0, h >=k, k >=l ----!
-             hh=abs(h)
-             it1=maxval(hh); it3=minval(hh)
-             do i=1,3
-                if(hh(i) <= it1 .and. hh(i) >= it3) then
-                   j=hh(i)
-                   exit
-                end if
-             end do
-             hh=(/it1,j,it3/)
-             k=hh
-             !select case (h(1))
-             !   case (:-1)
-             !      hh=-h
-             !   case (0)
-             !      select case (h(2))
-             !         case (:-1)
-             !            hh=-h
-             !         case (0)
-             !            if (h(3) >= 0) then
-             !               hh=h
-             !            else
-             !               hh=-h
-             !            end if
-             !         case (1:)
-             !            hh=h
-             !      end select
-             !   case (1:)
-             !      hh=h
-             !end select
-             !if (hh(3) >= 0 .and. hh(2) >= hh(3) .and. hh(1) >= hh(2)) k=hh
+             !hh=abs(h)
+             !it1=maxval(hh); it3=minval(hh)
+             !do i=1,3
+             !   if(hh(i) <= it1 .and. hh(i) >= it3) then
+             !      j=hh(i)
+             !      exit
+             !   end if
+             !end do
+             !hh=(/it1,j,it3/)
+             !k=hh
+             select case (h(1))
+                case (:-1)
+                   hh=-h
+                case (0)
+                   select case (h(2))
+                      case (:-1)
+                         hh=-h
+                      case (0)
+                         if (h(3) >= 0) then
+                            hh=h
+                         else
+                            hh=-h
+                         end if
+                      case (1:)
+                         hh=h
+                   end select
+                case (1:)
+                   hh=h
+             end select
+             if (hh(3) >= 0 .and. hh(2) >= hh(3) .and. hh(1) >= hh(2)) k=hh
 
           case default
              return
