@@ -4333,7 +4333,7 @@
           if (Molecule%in_xtal ) then
              do i=1,Molecule%natoms
                   if(Molecule%AtSymb(i) /= "ZE") geom_cent=geom_cent + Molecule%I_Coor(:,i)
-                  write(unit=uni,fmt="(t29,a,tr2,a,3f12.5,3i4,2f12.5)")  &
+                  write(unit=uni,fmt="(t29,a6,tr2,a,3f12.5,3i4,2f12.5)")  &
                        Molecule%AtName(i), Molecule%AtSymb(i),Molecule%I_Coor(:,i),  &
                        Molecule%Conn(:,i), Molecule%Biso(i),  Molecule%Occ(i)
                   var="    "
