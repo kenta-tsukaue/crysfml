@@ -100,6 +100,9 @@
 !!----       SET_ROTATION_MATRIX
 !!----       SET_TDIST_COORDINATION
 !!----       SET_TDIST_PARTIAL_COORDINATION
+!!----       SIGMA_TRANSF
+!!--++       SIGMA_TRANSF_SIG    [Overloaded]
+!!--++       SIGMA_TRANSF_VAR    [Overloaded]
 !!----       TORSION_AND_SIGMA
 !!----
 !!
@@ -131,13 +134,13 @@
               Deallocate_Coordination_Type, Deallocate_Point_List, Distance_and_Sigma, Get_Euler_From_Fract, &
               Get_PhiTheChi, init_err_geom, P1_Dist, Print_Distances, Set_Orbits_InList, Set_TDist_Coordination, &
               Get_Transf_List, Set_TDist_Partial_Coordination, Get_Anglen_Axis_From_RotMat, Get_Matrix_moving_v_to_u, &
-              Get_OmegaChiPhi, Set_Rotation_Matrix, Set_New_AsymUnit,Angle_and_Sigma, Torsion_and_Sigma
+              Get_OmegaChiPhi, Set_Rotation_Matrix, Set_New_AsymUnit,Angle_and_Sigma, Torsion_and_Sigma, sigma_transf
 
     !---- List of public overloaded procedures: subroutines ----!
 
     !---- List of private functions ----!
     private :: Angle_Dihedral_Uvw,  Angle_Dihedral_Ijkn, Angle_Uvi, Angle_Uvr, Angle_Modn, Angle_Modv, &
-               Coord_Modn, Coord_Modv, Distance_fr, Distance_fr_dp, Distance_sc
+               Coord_Modn, Coord_Modv, Distance_fr, Distance_fr_dp, Distance_sc, sigma_transf_sig, sigma_transf_var
 
     !---- Definitions ----!
 
@@ -257,6 +260,11 @@
        Module Procedure Distance_FR_DP
        Module Procedure Distance_FR
        Module Procedure Distance_SC
+    End Interface
+
+    Interface  Sigma_Transf
+       Module Procedure Sigma_Transf_var
+       Module Procedure Sigma_Transf_sig
     End Interface
 
  Contains
@@ -3146,9 +3154,77 @@
          end do !k
          Coord_Info%Coord_Num(i)=ico
        end do !i
-
-       return
     End Subroutine Set_TDist_Partial_Coordination
+
+    !!----
+    !!----  Subroutine Sigma_Transf_var(R,t,x,varx,xt,st)
+    !!----    integer,       dimension(3,3), intent(in)  :: R         !Rotational  part of the symmetry operator
+    !!----    real(kind=cp), dimension(3),   intent(in)  :: t         !Translation part of the symmetry operator
+    !!----    real(kind=cp), dimension(3),   intent(in)  :: x         !Fractional coordinates of the position
+    !!----    real(kind=cp), dimension(3,3), intent(in)  :: varx      !Variance-covariance matrix of the x-vector
+    !!----    real(kind=cp), dimension(3),   intent(out) :: xt        !Transformed position by operator (R|t)
+    !!----    real(kind=cp), dimension(3),   intent(out) :: st        !Standard deviation of the transformed position
+    !!----
+    !!----
+    !!----   Calculation of the standard deviation of the transformed position (in fractional coordinates)
+    !!----   by the symmetry operator (R|t), providing the variance-covariance matrix of x.
+    !!----   The propagation error formula, assuming a Gaussian distribution of errors, is used.
+    !!----   If the covariance terms are not available the user should supply the diagonal terms of the matrix,
+    !!----   which are formed by the squares of the standard deviations, or use the alternative calculation
+    !!----   using only the sigma values in the overloaded subroutine.
+    !!----   The calculation of the output variables are performed applying the following formulae
+    !!----
+    !!----        xt = R x + t     st(xt(j)) = sqrt [Sum(k,l) {R(j,k) Varx(k,l) R(j,l)}]
+    !!----
+    !!----   If only sigma values of x are available the second formula reduces to:
+    !!----              st(xt(j)) = sqrt [Sum(k) { R(j,k)^2 sx(k)^2 }]
+    !!----   The symmetry operators have no error and the calculation of the derivatives of Rx+t w.r.t. x(i)
+    !!----   does not depend on t.
+    !!----   Dxt(j)/Dx(k) = R(j,k), so the propagation error provides the formula above for sigmas of xt.
+    !!----
+    !!----  Update: July - 2024
+    !!
+    Subroutine Sigma_Transf_sig(R,t,x,sx,xt,st)
+      integer,       dimension(3,3), intent(in)  :: R         !Rotational  part of the symmetry operator
+      real(kind=cp), dimension(3),   intent(in)  :: t         !Translation part of the symmetry operator
+      real(kind=cp), dimension(3),   intent(in)  :: x         !Fractional coordinates of the position
+      real(kind=cp), dimension(3),   intent(in)  :: sx        !Standard deviations of the x-vector
+      real(kind=cp), dimension(3),   intent(out) :: xt        !Transformed position by operator (R|t)
+      real(kind=cp), dimension(3),   intent(out) :: st        !Standard deviation of the transformed position
+      !--- Local variables ---!
+      integer :: j,k
+
+      xt=matmul(R,x) + t
+      st=0.0_cp
+      do j=1,3
+         do k=1,3
+           st(j)=st(j)+ R(j,k)*R(j,k)*sx(k)*sx(k)
+         end do
+      end do
+      st=sqrt(st)
+    End Subroutine Sigma_Transf_sig
+
+    Subroutine Sigma_Transf_var(R,t,x,varx,xt,st)
+      integer,       dimension(3,3), intent(in)  :: R         !Rotational  part of the symmetry operator
+      real(kind=cp), dimension(3),   intent(in)  :: t         !Translation part of the symmetry operator
+      real(kind=cp), dimension(3),   intent(in)  :: x         !Fractional coordinates of the position
+      real(kind=cp), dimension(3,3), intent(in)  :: varx      !Variance-covariance matrix of the x-vector
+      real(kind=cp), dimension(3),   intent(out) :: xt        !Transformed position by operator (R|t)
+      real(kind=cp), dimension(3),   intent(out) :: st        !Standard deviation of the transformed position
+      !--- Local variables ---!
+      integer :: j,k,l
+
+      xt=matmul(R,x) + t
+      st=0.0_cp
+      do j=1,3
+         do k=1,3
+            do l=1,3
+               st(j)=st(j)+ R(j,k)*Varx(k,l)*R(j,l)
+            end do
+         end do
+      end do
+      st=sqrt(st)
+    End Subroutine Sigma_Transf_var
 
     !!----
     !!---- Subroutine Torsion_and_Sigma(Cellp,x1,x2,x3,x4,sx1,sx2,sx3,sx4,tor,s)
