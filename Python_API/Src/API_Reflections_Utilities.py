@@ -70,6 +70,20 @@ class ReflectionList(CFML_api.FortranBindedClass):
         CFML_api.crysfml_api.structure_factors_structure_factors(
             atom_list.get_fortran_address(), space_group.get_fortran_address(),
             self.get_fortran_address(), job.get_fortran_address())
+        
+    def compute_af0(self, space_group, atom_list, job):
+        """
+        Compute all structure factors 
+        ...
+        Parameters
+        ----------
+        space_group : CMFL_api.crysfml_api.SpaceGroup
+        atom_list :  CMFL_api.crysfml_api.AtomList
+        job : CMFL_api.crysfml_api.JobInfo
+        """
+        CFML_api.crysfml_api.create_table_af0_xray_fun(
+            atom_list.get_fortran_address(), space_group.get_fortran_address(),
+            self.get_fortran_address(), job.get_fortran_address())
 
         
     def print_description(self):

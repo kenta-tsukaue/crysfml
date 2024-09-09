@@ -234,7 +234,7 @@ contains
 
     !> @todo here value2 is assumed to be stlmax 
     MaxNumRef = get_maxnumref(value2,Cell_p%p%CellVol,mult=2*SpG_p%p%NumOps)
-    
+
     allocate(hkl_p%p)
     call Hkl_Uni(cell_p%p,spg_p%p,friedel,value1,value2,"s",MaxNumRef,hkl_p%p)
 

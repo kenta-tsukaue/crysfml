@@ -101,7 +101,8 @@ module API_init
 
   use API_Structure_Factors, only: &
        structure_factors_structure_factors, &
-       structure_factors_write_structure_factors
+       structure_factors_write_structure_factors, &
+       create_table_af0_xray_fun
 
   use API_Crystal_Metrics, only: &
        crystal_metrics_set_crystal_cell, &
@@ -1228,7 +1229,7 @@ CONTAINS
 
 
     !--------------------------
-    ! Structure Factors (2)
+    ! Structure Factors (3)
     !--------------------------
     call method_table%add_method("structure_factors_structure_factors", &                  ! method name
          "Computes structure factors", &  !doc-string
@@ -1239,6 +1240,11 @@ CONTAINS
          "Print structure factors", &  !doc-string
          METH_VARARGS, &                  ! this method takes arguments but no keyword arguments
          c_funloc(structure_factors_write_structure_factors))  ! address of Fortran function to add
+
+    call method_table%add_method("create_table_af0_xray_fun", &  ! メソッド名
+         "Creates Set_Fixed_Tables ", &  ! ドキュメント文字列
+         METH_VARARGS, &                  ! 引数を取るがキーワード引数はなし
+         c_funloc(create_table_af0_xray_fun))  ! Fortran関数のアドレスを登録
 
     
     !--------------------------

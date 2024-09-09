@@ -46,3 +46,13 @@ CFML.egg-info/
 dist/
 
 *.whl
+
+build/
+BuildServer/
+BinariesDistributions/
+cmake/
+gfortran
+Help
+Html
+Program_Examples
+Scripts

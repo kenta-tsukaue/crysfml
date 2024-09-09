@@ -21,7 +21,8 @@ module API_Structure_Factors
   use CFML_GlobalDeps,                 only: Cp
   use CFML_Structure_Factors,          only: &
        Structure_Factors, &
-       Write_Structure_Factors
+       Write_Structure_Factors, &
+       Set_Fixed_Tables
 
   use API_Crystallographic_Symmetry, only: &
        Space_Group_Type_p, &
@@ -177,8 +178,71 @@ contains
 
     ierror = dict_create(retval)
     r = retval%get_c_ptr()
+   end function structure_factors_structure_factors
 
-  end function structure_factors_structure_factors
+  function create_table_af0_xray_fun(self_ptr, args_ptr) result(r) bind(c)
+
+    type(c_ptr), value :: self_ptr
+    type(c_ptr), value :: args_ptr
+    type(c_ptr)        :: r
+    type(tuple)        :: args
+    type(dict)         :: retval
+
+    integer            :: num_args
+    integer            :: ierror
+    integer            :: ii
+
+    type(list)   :: index_obj
+    type(object) :: arg_obj
+
+    type(Atom_list_type_p)          :: atom_list_p
+    type(Space_Group_type_p)        :: spg_p
+    type(Reflection_List_type_p)    :: reflection_list_p
+    type(job_info_type_p)           :: job_p
+
+    character(len=16)      :: mode
+    real(kind=cp)          :: lambda
+    integer                :: lun
+
+    r = C_NULL_PTR   ! エラー時の返り値をNULLポインタに初期化
+
+    ! unsafe_cast_from_c_ptrを使ってc_ptrからFortranのデータ型にキャスト
+    call unsafe_cast_from_c_ptr(args, args_ptr)
+
+    ! 引数の数をチェック
+    ierror = args%len(num_args)
+
+    if (num_args /= 4 .and. num_args /= 5) then
+       call raise_exception(TypeError, "create_table_af0_xray expects 4 or 5 arguments")
+       ! 引数のリストを破棄して終了
+       call args%destroy
+       return
+    endif
+
+
+    ! 引数を取得
+    call get_atom_list_type_from_arg(args, atom_list_p, 0)
+    call get_space_group_type_from_arg(args, spg_p, 1)
+    call get_reflection_list_from_arg(args, reflection_list_p, 2)
+    call get_job_info_type_from_arg(args, job_p, 3)
+
+    print *, "今までの処理"
+
+    ! Create_Table_AF0_Xrayサブルーチンを呼び出し
+    ! call Create_Table_AF0_Xray(reflection_list_p%p, atom_list_p%p)
+    mode = "XRA"
+    !write(*,*) "X-Ray calculation"
+    lambda = job_p%p%lambda(1)%mina
+    call Set_Fixed_Tables(reflection_list_p%p, atom_list_p%p, spg_p%p, mode, lambda)
+    
+
+    ! 結果を辞書型にして返す
+    ierror = dict_create(retval)
+    r = retval%get_c_ptr()
+
+    
+
+   end function create_table_af0_xray_fun
 
   function structure_factors_write_structure_factors(self_ptr, args_ptr) result(r) bind(c)
 
