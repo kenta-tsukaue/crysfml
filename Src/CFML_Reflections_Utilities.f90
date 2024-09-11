@@ -3906,6 +3906,8 @@
        lmax=nint(CrystalCell%cell(3)*2.0*vmax+1.0)
        lmin= 0  !l positive or zero except for -3 1 m (see below)
 
+       print *, "Hkl_Uni_Reflectionが呼ばれている"
+
        !---- Select approximate region to generate reflections depending
        !---- on the space group. This allows a faster generation.
        Select Case(SpaceGroup%NumSpg)
@@ -4106,6 +4108,8 @@
        lmax=nint(CrystalCell%cell(3)*2.0*vmax+1.0)
        lmin= 0  !l positive or zero except for -3 1 m (see below)
 
+       print *, "Hkl_Uni_ReflListが呼ばれている"
+
        !---- Select approximate region to generate reflections depending
        !---- on the space group. This allows a faster generation.
        Select Case(SpaceGroup%NumSpg)
@@ -4179,12 +4183,15 @@
 
        if(present(hlim)) then
          if(present(strict)) then
+            print*, "Setting limits using strict mode"
+            print*, "hlim(3,1) = ", hlim(3,1)  ! デバッグ: hlim の値を確認
             hmin=hlim(1,1)
             hmax=hlim(1,2)
             kmin=hlim(2,1)
             kmax=hlim(2,2)
             lmin=hlim(3,1)
             lmax=hlim(3,2)
+            print*, "lmin = ", lmin, " lmax = ", lmax  ! デバッグ: 設定後の lmin, lmax
          else
             if(hmin < hlim(1,1)) hmin=hlim(1,1)
             if(hmax > hlim(1,2)) hmax=hlim(1,2)
@@ -4202,17 +4209,21 @@
                 hh(1)=h
                 hh(2)=k
                 hh(3)=l
-                if (hkl_equal(hh,nulo)) cycle
+                !if (hkl_equal(hh,nulo)) cycle
                 sval=hkl_s(hh,crystalcell)
-                if (sval > vmax .or. sval < vmin) cycle
-                if (hkl_absent(hh,Spacegroup)) cycle
+                !if (sval > vmax .or. sval < vmin) cycle
+                !if (hkl_absent(hh,Spacegroup)) cycle
 
-                kk=asu_hkl(hh,Spacegroup)
-                if (hkl_equal(kk,nulo)) cycle
-                if (hkl_equal(kk,-hh) .and. Friedel) cycle
+                !kk=asu_hkl(hh,Spacegroup)
+                !if (hkl_equal(kk,nulo)) cycle
+                !if (hkl_equal(kk,-hh) .and. Friedel) cycle
+
+                !do j=1,num_ref
+                !  if(hkl_equal(kk,hkl(:,j))) cycle do_int
+                !end do
 
                 do j=1,num_ref
-                  if(hkl_equal(kk,hkl(:,j))) cycle do_int
+                  if(hkl_equal(hh,hkl(:,j))) cycle do_int
                 end do
 
                 num_ref=num_ref+1
@@ -4221,8 +4232,11 @@
                    if(present(check_ok)) check_ok=.false.
                    exit ext_do
                 end if
-                hkl(:,num_ref)=kk
-                mul(num_ref)  =hkl_mult(kk,SpaceGroup,friedel)
+                !hkl(:,num_ref)=kk
+                !mul(num_ref)  =hkl_mult(kk,SpaceGroup,friedel)
+                !sv(num_ref)   = sval
+                hkl(:,num_ref)=hh
+                mul(num_ref)  =hkl_mult(hh,SpaceGroup,friedel)
                 sv(num_ref)   = sval
              end do do_int
           end do

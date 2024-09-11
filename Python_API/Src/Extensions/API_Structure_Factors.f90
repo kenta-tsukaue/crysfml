@@ -194,6 +194,8 @@ contains
 
     type(list)   :: index_obj
     type(object) :: arg_obj
+    type(list) :: atom_list
+    type(list) :: h_list, k_list, l_list  ! h, k, l 用のリストを作成
 
     type(Atom_list_type_p)          :: atom_list_p
     type(Space_Group_type_p)        :: spg_p
@@ -203,6 +205,19 @@ contains
     character(len=16)      :: mode
     real(kind=cp)          :: lambda
     integer                :: lun
+
+    character(len=32) :: af0_str
+    integer :: i, j
+
+    ! 一時変数の宣言
+    real(kind=cp), dimension(:), allocatable :: af0_slice
+    character(len=32) :: h_str
+
+     ! af0 配列を宣言
+    real(kind=cp), dimension(:,:), allocatable :: af0
+    integer :: total_size, idx
+    real(kind=cp), allocatable :: af0_1d(:)
+    type(list) :: af0_list  ! af0用のリストを作成
 
     r = C_NULL_PTR   ! エラー時の返り値をNULLポインタに初期化
 
@@ -233,14 +248,64 @@ contains
     mode = "XRA"
     !write(*,*) "X-Ray calculation"
     lambda = job_p%p%lambda(1)%mina
-    call Set_Fixed_Tables(reflection_list_p%p, atom_list_p%p, spg_p%p, mode, lambda)
+    call Set_Fixed_Tables(reflection_list_p%p, atom_list_p%p, spg_p%p, mode, lambda, af0=af0)
     
 
-    ! 結果を辞書型にして返す
+    ! ---- 辞書型で結果を返す ----!
+    ! 辞書作成
     ierror = dict_create(retval)
-    r = retval%get_c_ptr()
-
     
+    !call dict_add_value(retval, "test", "test")
+    ! atom_listの情報をリストに格納
+   ierror = list_create(atom_list)  ! atom用のリストを作成
+   do ii = 1, atom_list_p%p%natoms
+      ierror = atom_list%append(atom_list_p%p%atom(ii)%chemsymb)  ! リストに追加
+   end do
+   ierror = retval%setitem("atom", atom_list)  ! 最終的に辞書にセット
+
+   ! 各リストを作成
+   ierror = list_create(h_list)
+   ierror = list_create(k_list)
+   ierror = list_create(l_list)
+   ! h, k, l の値をリストに追加
+   do ii = 1, reflection_list_p%p%nref
+      ! h(1), h(2), h(3) をそれぞれリストに追加
+      ierror = h_list%append(reflection_list_p%p%ref(ii)%h(1))  ! hリストに追加
+      ierror = k_list%append(reflection_list_p%p%ref(ii)%h(2))  ! kリストに追加
+      ierror = l_list%append(reflection_list_p%p%ref(ii)%h(3))  ! lリストに追加
+   end do
+
+   ! 最終的に辞書にセット
+   ierror = retval%setitem("h", h_list)
+   ierror = retval%setitem("k", k_list)
+   ierror = retval%setitem("l", l_list)
+
+   ! af0の1次元配列化
+   total_size = size(af0, 1) * size(af0, 2)  ! 2次元配列の全要素数
+   allocate(af0_1d(total_size))  ! 1次元配列を作成
+
+   ! 2次元配列を1次元配列に変換
+   idx = 1
+   do i = 1, size(af0, 1)
+      do j = 1, size(af0, 2)
+         af0_1d(idx) = af0(i, j)
+         idx = idx + 1
+      end do
+   end do
+
+   ! af0用のリストを作成
+   ierror = list_create(af0_list)
+
+   ! af0_1dの各要素をリストに追加
+   do idx = 1, total_size
+      ierror = af0_list%append(af0_1d(idx))  ! 1次元配列の要素をリストに追加
+   end do
+   ! af0_listを辞書にセット
+   ierror = retval%setitem("af0", af0_list)
+    
+
+    ! 結果をPythonに返す
+    r = retval%get_c_ptr()
 
    end function create_table_af0_xray_fun
 

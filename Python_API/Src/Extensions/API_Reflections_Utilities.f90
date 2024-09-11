@@ -204,6 +204,8 @@ contains
     logical       :: friedel
     real(kind=cp) :: value1, value2
     integer       :: maxnumref
+    integer, dimension(3,2) :: hlim
+    logical :: strict_flag
     
 
     r = C_NULL_PTR   ! in case of an exception return C_NULL_PTR
@@ -235,8 +237,15 @@ contains
     !> @todo here value2 is assumed to be stlmax 
     MaxNumRef = get_maxnumref(value2,Cell_p%p%CellVol,mult=2*SpG_p%p%NumOps)
 
+    hlim(1,:) = [-2, 2]   ! H の範囲
+    hlim(2,:) = [-2, 2]   ! K の範囲
+    hlim(3,:) = [-2, 2]   ! L の範囲
+
+    ! strict フラグを True に設定
+    strict_flag = .true.
+
     allocate(hkl_p%p)
-    call Hkl_Uni(cell_p%p,spg_p%p,friedel,value1,value2,"s",MaxNumRef,hkl_p%p)
+    call Hkl_Uni(cell_p%p,spg_p%p,friedel,value1,value2,"s",MaxNumRef,hkl_p%p, hlim=hlim, strict=strict_flag)
 
     hkl_p12 = transfer(hkl_p,hkl_p12)
     ierror = list_create(index_obj)

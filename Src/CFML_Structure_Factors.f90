@@ -1821,12 +1821,13 @@
     !!--++
     !!--++ Update: February - 2005
     !!
-    Subroutine Create_Table_AF0_Xray(Reflex,Atm,lambda,lun)
+    Subroutine Create_Table_AF0_Xray(Reflex,Atm,lambda,lun, af0)
        !---- Arguments ----!
        type(reflection_list_type), intent(in) :: Reflex
        type(atom_list_type),       intent(in) :: Atm
        real(kind=cp), optional,    intent(in) :: lambda
        integer, optional,          intent(in) :: lun
+       real(kind=cp), dimension(:,:), allocatable, intent(out) :: af0  ! af0 をアウトプットに
 
        !---- Local Variables ----!
        character(len=4)               :: symbcar
@@ -1834,18 +1835,18 @@
        integer, dimension(atm%natoms) :: ix,jx,ia
        real(kind=cp)                  :: dmin,d
 
-       print *, "Create_Table_AF0_Xray: 開始"
+       ! print *, "Create_Table_AF0_Xray: 開始"
 
        !---- Init ----!
        err_sfac=.false.
 
        !---- Load form factor values for XRay ----!
-       print *, "Set_Xray_Formを呼び出し"
+       !print *, "Set_Xray_Formを呼び出し"
        call Set_Xray_Form()
        
 
        !---- Found Species on Xray_Form ----!
-       print *, "X-ray scattering factorを検索中"
+       !print *, "X-ray scattering factorを検索中"
        ix=0
        jx=0
        n=0
@@ -1861,37 +1862,37 @@
              exit
           end do
        end do
-       print *, "X-ray scattering factorの探索終了"
+       !print *, "X-ray scattering factorの探索終了"
 
        if (present(lun)) then
           write(unit=lun,fmt="(/,a)") "  INFORMATION FROM TABULATED X-RAY SCATTERING FACTORS"
           write(unit=lun,fmt="(a,/)") "  ==================================================="
        End if
-       print *, "lunでの設定完了"
+       !print *, "lunでの設定完了"
 
        if (present(lambda)) then
-          print *, "分岐1"
+          !print *, "分岐1"
           !---- Load anomalous scattering form factor values for XRays ----!
           call Set_Delta_Fp_Fpp()
-          print *, "この処理終了"
+          !print *, "この処理終了"
 
           !---- Select wavelength (by default is CuKalpha1: k=5 in the list) ----!
-          print *, "Xray_Wavelengthsのサイズ: ", size(Xray_Wavelengths)
+          !print *, "Xray_Wavelengthsのサイズ: ", size(Xray_Wavelengths)
           do i = 1, 5
-             print *, "現在のi=", i
-             print *, "Xray_Wavelengths(i)%Kalfa(1)=", Xray_Wavelengths(i)%Kalfa(1)
+             !print *, "現在のi=", i
+             !print *, "Xray_Wavelengths(i)%Kalfa(1)=", Xray_Wavelengths(i)%Kalfa(1)
              d = abs(lambda - Xray_Wavelengths(i)%Kalfa(1))
              if (d < dmin) then
                 dmin = d
                 k = i
              endif
           end do
-          print *, "波長選択完了: k=", k, "dmin=", dmin
+          !print *, "波長選択完了: k=", k, "dmin=", dmin
 
           !---- Found Species on Anomalous_ScFac ----!
-          print *, "Anomalous_ScFacのサイズ: ", size(Anomalous_ScFac)
-          print *, "atm%natoms=", atm%natoms
-          print *, "Num_Delta_Fp=", Num_Delta_Fp
+          !print *, "Anomalous_ScFacのサイズ: ", size(Anomalous_ScFac)
+          !print *, "atm%natoms=", atm%natoms
+          !print *, "Num_Delta_Fp=", Num_Delta_Fp
 
           ! afpとafppのメモリ割り当て
           if (.not. allocated(afp)) allocate(afp(atm%natoms))
@@ -1900,38 +1901,38 @@
           ! Anomalous_ScFacのループ処理
           do i = 1, atm%natoms
              symbcar = l_case(atm%atom(i)%chemsymb)
-             print *, "現在の原子シンボル symbcar=", symbcar
+             !print *, "現在の原子シンボル symbcar=", symbcar
              do j = 1, Num_Delta_Fp
-                print *, "Anomalous_ScFac(j)%Symb=", Anomalous_ScFac(j)%Symb
+                !print *, "Anomalous_ScFac(j)%Symb=", Anomalous_ScFac(j)%Symb
                 if (symbcar /= Anomalous_ScFac(j)%Symb) cycle
                 if (i > atm%natoms) then
-                      print *, "範囲外アクセス: i=", i, "atm%natoms=", atm%natoms
+                      !print *, "範囲外アクセス: i=", i, "atm%natoms=", atm%natoms
                       return
                 endif
                 afp(i) = Anomalous_ScFac(j)%fp(k)
                 afpp(i) = Anomalous_ScFac(j)%fpp(k)
-                print *, "afpに代入: afp(i)=", afp(i), "i=", i
-                print *, "afppに代入: afpp(i)=", afpp(i), "i=", i
+                !print *, "afpに代入: afp(i)=", afp(i), "i=", i
+                !print *, "afppに代入: afpp(i)=", afpp(i), "i=", i
                 exit
              end do
           end do
           call Remove_Delta_Fp_Fpp()
        else
-           print *, "分岐2"
+           !print *, "分岐2"
            if (present(lun)) then
              write(unit=lun,fmt="(a)")    "  Missed lambda, anomalous dipersion corrections not applied   "
              write(unit=lun,fmt="(a)")    "  The default wavelength is that of Cu-Kalpha1 spectral line  "
            end if
        end if
-       print *, "lamdaでの設定完了"
+       !print *, "lamdaでの設定完了"
 
        if (any(ix==0)) then
-          print *, "分岐1"
+          !print *, "分岐1"
           err_sfac=.true.
           ERR_SFac_Mess="The Species "//symbcar//" was not found"
        else
           !---- Fill AF Table ----!
-          print *, "分岐2"
+          !print *, "分岐2"
 
           ! af0のメモリ割り当て
           if (.not. allocated(af0)) allocate(af0(atm%natoms, reflex%nref))
@@ -1942,18 +1943,18 @@
                    ! af0への代入
                    af0(i, j) = fj(reflex%ref(j)%s, xray_form(ix(i))%a, xray_form(ix(i))%b, xray_form(ix(i))%c) + afp(i)
                    ! 代入後に値を表示
-                   print *, "Atom Symbol: ", atm%atom(i)%chemsymb
-                   print *, "Reflection_Type: ", reflex%ref(j)%h
-                   print *, "reflex%ref(j)%s = ", reflex%ref(j)%s
-                   print *, "xray_form(ix(i))%a = ", xray_form(ix(i))%a
-                   print *, "xray_form(ix(i))%b = ", xray_form(ix(i))%b
-                   print *, "xray_form(ix(i))%c = ", xray_form(ix(i))%c
-                   print *, "af0(i, j) = ", af0(i, j)
+                   !print *, "Atom Symbol: ", atm%atom(i)%chemsymb
+                   !print *, "Reflection_Type: ", reflex%ref(j)%h
+                   !print *, "reflex%ref(j)%s = ", reflex%ref(j)%s
+                   !print *, "xray_form(ix(i))%a = ", xray_form(ix(i))%a
+                   !print *, "xray_form(ix(i))%b = ", xray_form(ix(i))%b
+                   !print *, "xray_form(ix(i))%c = ", xray_form(ix(i))%c
+                   !print *, "af0(i, j) = ", af0(i, j)
              end do
           end do
        end if
 
-       print *, "ここまできた1"
+       !print *, "ここまできた1"
 
        !---- Printing Information ----!
        if (present(lun)) then
@@ -1972,12 +1973,12 @@
           write(unit=lun,fmt="(/,/)")
        end if
 
-       print *, "ここまできた2"
+       !print *, "ここまできた2"
 
        call Remove_Xray_Form()
 
        ! 終了時
-       print *, "Create_Table_AF0_Xray: 終了"
+       !print *, "Create_Table_AF0_Xray: 終了"
 
        return
     End Subroutine Create_Table_AF0_Xray
@@ -2068,45 +2069,50 @@
 
       !---- Local Variables ----!
       integer :: i,j,Multr
-      print *, "Create_Table_HR_HT呼び出し"
-      print *, "Grp%Numops=", Grp%Numops
-      print *, "Grp%centred=", Grp%centred
-      print *, "reflex%nref=", reflex%nref
+      ! *, "Create_Table_HR_HT呼び出し"
+      !print *, "Grp%Numops=", Grp%Numops
+      !print *, "Grp%centred=", Grp%centred
+      !print *, "reflex%nref=", reflex%nref
 
       ! Grp%NumopsやGrp%centredに基づいてMultrを計算
       Multr= Grp%Numops
       if (Grp%centred == 0) then
          Multr = Multr * 2
       endif
-      print *, "Multr=", Multr
+      !print *, "Multr=", Multr
 
       ! hrとhtをMultrとreflex%nrefに基づいて割り当て
-      allocate(hr(Multr, reflex%nref))
-      allocate(ht(Multr, reflex%nref))
+      if (.not. allocated(hr)) then
+         allocate(hr(Multr, reflex%nref))
+      end if
+
+      if (.not. allocated(ht)) then
+         allocate(ht(Multr, reflex%nref))
+      end if
 
       ! reflex%nrefのループ
       do j = 1, reflex%nref
-         print *, "現在の反射インデックス j=", j
+         !print *, "現在の反射インデックス j=", j
 
          ! Multrのループ
          do i = 1, Multr
-               print *, "現在の操作インデックス i=", i
-               print *, "reflex%ref(j)%h=", reflex%ref(j)%h
-               print *, "Grp%symop(i)=", Grp%symop(i)
+               !print *, "現在の操作インデックス i=", i
+               !print *, "reflex%ref(j)%h=", reflex%ref(j)%h
+               !print *, "Grp%symop(i)=", Grp%symop(i)
 
-               print *, "Hkl_Rの計算結果=", Hkl_R(reflex%ref(j)%h, Grp%symop(i))
-               print *, "dot_productの計算結果=", dot_product(real(reflex%ref(j)%h), Grp%SymOp(i)%Tr)
+               !print *, "Hkl_Rの計算結果=", Hkl_R(reflex%ref(j)%h, Grp%symop(i))
+               !print *, "dot_productの計算結果=", dot_product(real(reflex%ref(j)%h), Grp%SymOp(i)%Tr)
 
                ! hrとhtのサイズ確認
-               print *, "hrのサイズ: ", size(hr,1), size(hr,2)
-               print *, "htのサイズ: ", size(ht,1), size(ht,2)
-               print *, "i=", i, "j=", j
+               !print *, "hrのサイズ: ", size(hr,1), size(hr,2)
+               !print *, "htのサイズ: ", size(ht,1), size(ht,2)
+               !print *, "i=", i, "j=", j
                if (i > size(hr,1) .or. j > size(hr,2)) then
-                   print *, "hrの範囲外アクセス検出: i=", i, "j=", j
+                   !print *, "hrの範囲外アクセス検出: i=", i, "j=", j
                    return
                endif
                if (i > size(ht,1) .or. j > size(ht,2)) then
-                   print *, "htの範囲外アクセス検出: i=", i, "j=", j
+                   !print *, "htの範囲外アクセス検出: i=", i, "j=", j
                    return
                endif
 
@@ -2114,8 +2120,8 @@
                hr(i,j)%h = Hkl_R(reflex%ref(j)%h, Grp%symop(i))
                ht(i,j) = dot_product(real(reflex%ref(j)%h), Grp%SymOp(i)%Tr)
 
-               print *, "hr(i,j)%h=", hr(i,j)%h
-               print *, "ht(i,j)=", ht(i,j)
+               !print *, "hr(i,j)%h=", hr(i,j)%h
+               !print *, "ht(i,j)=", ht(i,j)
          end do
       end do
 
@@ -2361,29 +2367,29 @@
        if (present(mode)) then
           if (present(lambda)) then
              if (present(lun)) then
-                call Set_Fixed_Tables(Reflex,Atm,Grp,Mode,lambda,lun)
+                call Set_Fixed_Tables(Reflex,Atm,Grp,Mode,lambda,lun,af0)
              else
-                call Set_Fixed_Tables(Reflex,Atm,Grp,Mode,lambda)
+                call Set_Fixed_Tables(Reflex,Atm,Grp,Mode,lambda,af0=af0)
              end if
           else
              if (present(lun)) then
-                call Set_Fixed_Tables(Reflex,Atm,Grp,Mode,lun=lun)
+                call Set_Fixed_Tables(Reflex,Atm,Grp,Mode,lun=lun,af0=af0)
              else
-                call Set_Fixed_Tables(Reflex,Atm,Grp,Mode)
+                call Set_Fixed_Tables(Reflex,Atm,Grp,Mode,af0=af0)
              end if
           end if
        else
           if (present(lambda)) then
              if (present(lun)) then
-                call Set_Fixed_Tables(Reflex,Atm,Grp,lambda=lambda,lun=lun)
+                call Set_Fixed_Tables(Reflex,Atm,Grp,lambda=lambda,lun=lun,af0=af0)
              else
-                call Set_Fixed_Tables(Reflex,Atm,Grp,lambda=lambda)
+                call Set_Fixed_Tables(Reflex,Atm,Grp,lambda=lambda,af0=af0)
              end if
           else
              if (present(lun)) then
-                call Set_Fixed_Tables(Reflex,Atm,Grp,lun=lun)
+                call Set_Fixed_Tables(Reflex,Atm,Grp,lun=lun,af0=af0)
              else
-                call Set_Fixed_Tables(Reflex,Atm,Grp)
+                call Set_Fixed_Tables(Reflex,Atm,Grp,af0=af0)
              end if
           end if
        end if
@@ -2560,7 +2566,7 @@
     !!--++
     !!--++ Update: February - 2005
     !!
-    Subroutine Set_Fixed_Tables(Reflex,Atm,Grp,Mode,lambda,lun)
+    Subroutine Set_Fixed_Tables(Reflex,Atm,Grp,Mode,lambda,lun, af0)
        !---- Arguments ----!
        type(reflection_list_type),         intent(in) :: Reflex
        type(atom_list_type),               intent(in) :: Atm
@@ -2568,6 +2574,7 @@
        character(len=*), optional,         intent(in) :: Mode
        real(kind=cp), optional,            intent(in) :: lambda
        integer, optional,                  intent(in) :: lun
+       real(kind=cp), dimension(:,:), allocatable, optional, intent(out) :: af0  ! af0 をオプショナル引数に
 
        !---- Local variables ----!
        character(len=3) :: tipo
@@ -2577,26 +2584,26 @@
        tipo=U_Case(tipo)
 
        !---- Table HR - HT ----!
-       print *, "ここまで来た1"
+       !print *, "ここまで来た1"
        call Create_Table_HR_HT(Reflex,Grp)
-       print *, "Create_Table_HR_HT終了"
+       !print *, "Create_Table_HR_HT終了"
 
        !---- Table AF0 ----!
        select case (tipo)
 
           case ("XRA")
-             print *, "分岐XRA"
+             !print *, "分岐XRA"
              if (present(lambda)) then
                 if (present(lun)) then
-                   call Create_Table_AF0_Xray(Reflex,Atm,lambda,lun)
+                   call Create_Table_AF0_Xray(Reflex,Atm,lambda,lun,af0)
                 else
-                   call Create_Table_AF0_Xray(Reflex,Atm,lambda)
+                   call Create_Table_AF0_Xray(Reflex,Atm,lambda,af0=af0)
                 end if
              else
                 if (present(lun)) then
-                   call Create_Table_AF0_Xray(Reflex,Atm,lun=lun)
+                   call Create_Table_AF0_Xray(Reflex,Atm,lun=lun,af0=af0)
                 else
-                   call Create_Table_AF0_Xray(Reflex,Atm)
+                   call Create_Table_AF0_Xray(Reflex,Atm,af0=af0)
                 end if
              end if
 
@@ -2614,7 +2621,7 @@
              end if
 
           case ("ELE")
-             print *, "分岐ELE"
+             !print *, "分岐ELE"
 
              if (present(lun)) then
                 call Create_Table_AF0_Electrons(Reflex,Atm,lun=lun)
@@ -2636,7 +2643,7 @@
              end if
 
           case ("NUC","NEU")
-             print *, "分岐NUC, NEU"
+             !print *, "分岐NUC, NEU"
              if (present(lun)) then
                 call Create_Table_AFP_NeutNuc(Atm,lun=lun)
              else

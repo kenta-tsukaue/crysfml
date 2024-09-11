@@ -81,9 +81,10 @@ class ReflectionList(CFML_api.FortranBindedClass):
         atom_list :  CMFL_api.crysfml_api.AtomList
         job : CMFL_api.crysfml_api.JobInfo
         """
-        CFML_api.crysfml_api.create_table_af0_xray_fun(
+        a = CFML_api.crysfml_api.create_table_af0_xray_fun(
             atom_list.get_fortran_address(), space_group.get_fortran_address(),
             self.get_fortran_address(), job.get_fortran_address())
+        print(a)
 
         
     def print_description(self):
